@@ -1,2 +1,6 @@
 # Runtime-generated user settings
 CalendarClickThrough.ini
+
+# .NET build output
+bin/
+obj/
