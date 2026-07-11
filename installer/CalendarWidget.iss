@@ -22,6 +22,7 @@ ArchitecturesInstallIn64BitMode=x64compatible
 ; admin rights: the runtime installers are machine-wide anyway
 PrivilegesRequired=admin
 UninstallDisplayIcon={app}\{#MyAppExeName}
+SetupIconFile=..\CalendarWidget\app.ico
 WizardStyle=modern
 
 [Tasks]

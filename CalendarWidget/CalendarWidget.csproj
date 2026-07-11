@@ -9,6 +9,7 @@
     <RootNamespace>CalendarWidget</RootNamespace>
     <AssemblyName>CalendarWidget</AssemblyName>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <ApplicationIcon>app.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

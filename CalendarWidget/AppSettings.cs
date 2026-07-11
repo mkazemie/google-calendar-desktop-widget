@@ -5,7 +5,6 @@ namespace CalendarWidget;
 public class AppSettings
 {
     public int Transparency { get; set; } = 220;  // 80..255
-    public int Dim { get; set; } = 0;             // 0..90 (%)
 
     // which screen corner hosts the hover panel: BottomRight, BottomLeft, TopRight, TopLeft
     public string PanelCorner { get; set; } = "BottomRight";

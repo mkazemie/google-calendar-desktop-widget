@@ -9,8 +9,9 @@ namespace CalendarWidget;
 /// </summary>
 public class HoverPanel : Form
 {
-    public const int PanelW = 100;
-    public const int PanelH = 40;
+    // compact enough to sit on the window's title bar in interactive mode
+    public const int PanelW = 96;
+    public const int PanelH = 30;
 
     private static readonly Color PanelBack = Color.FromArgb(32, 33, 36);
     private static readonly Color HoverBack = Color.FromArgb(60, 64, 67);
@@ -41,14 +42,14 @@ public class HoverPanel : Form
         BackColor = PanelBack;
         ClientSize = new Size(PanelW, PanelH);
 
-        var iconFont = CreateIconFont(12f);
-        btnToggle = MakeIconButton("\uE7E8", 0, iconFont);              // power glyph
+        var iconFont = CreateIconFont(11f);
+        btnToggle = MakeIconButton("\uE962", 0, iconFont);              // mouse glyph: do clicks pass through?
         var btnMenu = MakeIconButton("\uE700", PanelW / 2, iconFont);   // hamburger glyph
         btnToggle.Click += (_, _) => onToggle();
         btnMenu.Click += (_, _) => onSettings();
 
         var tips = new ToolTip();
-        tips.SetToolTip(btnToggle, "Toggle click-through");
+        tips.SetToolTip(btnToggle, "Toggle click-through (pass clicks to the desktop or not)");
         tips.SetToolTip(btnMenu, "Settings");
 
         Controls.Add(btnToggle);
@@ -61,7 +62,7 @@ public class HoverPanel : Form
         NativeMethods.ApplyRoundedCorners(Handle);
     }
 
-    /// <summary>Tint the power icon while click-through is active so the widget state is visible at a glance.</summary>
+    /// <summary>Tint the mouse icon while click-through is active so the widget state is visible at a glance.</summary>
     public void UpdateState(bool clickThrough) => btnToggle.ForeColor = clickThrough ? IconActive : IconIdle;
 
     private Button MakeIconButton(string glyph, int x, Font font)

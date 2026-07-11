@@ -33,7 +33,8 @@ public class SettingsForm : Form
         BackColor = Back;
         ForeColor = Fore;
         Font = new Font("Segoe UI", 10f);
-        ClientSize = new Size(340, 400);
+        ClientSize = new Size(340, 304);
+        try { Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { /* keep default */ }
 
         // ---- transparency ----
         var valAlpha = ValueLabel(settings.Transparency.ToString(), 16);
@@ -47,23 +48,11 @@ public class SettingsForm : Form
         };
         Controls.Add(sldAlpha);
 
-        // ---- dim ----
-        var valDim = ValueLabel(settings.Dim + "%", 100);
-        Controls.Add(SectionLabel("DIM", 100));
-        Controls.Add(valDim);
-        var sldDim = Slider(124, 0, 90, settings.Dim);
-        sldDim.ValueChanged += (_, _) =>
-        {
-            valDim.Text = sldDim.Value + "%";
-            main.SetDim(sldDim.Value);
-        };
-        Controls.Add(sldDim);
-
         // ---- hover panel corner ----
-        Controls.Add(SectionLabel("PANEL CORNER", 184));
+        Controls.Add(SectionLabel("PANEL CORNER", 100));
         var cmbCorner = new ComboBox
         {
-            Location = new Point(20, 208),
+            Location = new Point(20, 124),
             Width = 300,
             DropDownStyle = ComboBoxStyle.DropDownList,
             FlatStyle = FlatStyle.Flat,
@@ -80,7 +69,7 @@ public class SettingsForm : Form
         {
             Text = "Start with Windows",
             AutoSize = true,
-            Location = new Point(20, 252),
+            Location = new Point(20, 168),
             ForeColor = Fore,
         };
         cbStartup.Checked = IsStartupEnabled();
@@ -90,17 +79,17 @@ public class SettingsForm : Form
         // ---- tip + exit ----
         Controls.Add(new Label
         {
-            Text = "Tip: for a real dark theme, enable dark mode inside Google Calendar's own settings (gear icon).",
+            Text = "Tip: for a dark widget, enable dark mode inside Google Calendar's own settings (gear icon).",
             ForeColor = Muted,
             Font = new Font("Segoe UI", 9f),
-            Location = new Point(20, 288),
+            Location = new Point(20, 200),
             Size = new Size(300, 40),
         });
 
         var btnExit = new Button
         {
             Text = "Exit widget",
-            Location = new Point(20, 340),
+            Location = new Point(20, 252),
             Size = new Size(140, 36),
             FlatStyle = FlatStyle.Flat,
             BackColor = CardBack,
@@ -114,7 +103,7 @@ public class SettingsForm : Form
         btnAccount = new Button
         {
             Text = "Sign in",  // refreshed from the real cookie state whenever the form is shown
-            Location = new Point(180, 340),
+            Location = new Point(180, 252),
             Size = new Size(140, 36),
             FlatStyle = FlatStyle.Flat,
             BackColor = CardBack,
@@ -147,21 +136,35 @@ public class SettingsForm : Form
 
     private async void OnAccountClick(object? sender, EventArgs e)
     {
-        if (await main.IsSignedInAsync())
-        {
-            if (MessageBox.Show(
-                    "Sign out of Google? This clears the widget's saved session; you'll need to sign in again to see your calendar.",
-                    "Calendar widget", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-            {
-                await main.SignOutAsync();
-                RefreshAccountButton();
-            }
-        }
-        else
+        if (!await main.IsSignedInAsync())
         {
             main.BeginSignIn();
             Hide();  // get out of the way of the sign-in page
+            return;
         }
+
+        var keepBtn = new TaskDialogButton("Sign out, keep account");
+        var wipeBtn = new TaskDialogButton("Sign out & delete all data");
+        var page = new TaskDialogPage
+        {
+            Caption = "Calendar widget",
+            Heading = "Sign out of Google?",
+            Text = "Keep account: Google remembers this account, so signing back in is quicker.\n\n"
+                 + "Delete all data: wipes the widget's entire browser profile (accounts, cookies, cache) — "
+                 + "like a fresh install.",
+            Icon = TaskDialogIcon.ShieldBlueBar,
+            Buttons = { keepBtn, wipeBtn, TaskDialogButton.Cancel },
+            AllowCancel = true,
+        };
+
+        var result = TaskDialog.ShowDialog(this, page);
+        if (result == keepBtn)
+            await main.SignOutKeepAccountAsync();
+        else if (result == wipeBtn)
+            await main.SignOutAsync();
+        else
+            return;
+        RefreshAccountButton();
     }
 
     protected override void OnHandleCreated(EventArgs e)

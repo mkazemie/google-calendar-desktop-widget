@@ -28,6 +28,7 @@ public class MainForm : Form
         ShowInTaskbar = false;
         StartPosition = FormStartPosition.Manual;
         Bounds = InitialBounds();
+        try { Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { /* keep default */ }
 
         Controls.Add(webView);
         hoverPanel = new HoverPanel(ToggleClickThrough, ShowSettings);
@@ -35,6 +36,10 @@ public class MainForm : Form
         SetupTray();
         hoverPoll.Tick += (_, _) => CheckMouseHover();
         hoverPoll.Start();
+
+        // in interactive mode the panel docks onto the title bar and follows the window
+        LocationChanged += (_, _) => RepositionTitleBarPanel();
+        SizeChanged += (_, _) => RepositionTitleBarPanel();
     }
 
     private Rectangle InitialBounds()
@@ -67,7 +72,6 @@ public class MainForm : Form
         {
             var env = await CoreWebView2Environment.CreateAsync(null, AppSettings.WebViewDataFolder);
             await webView.EnsureCoreWebView2Async(env);
-            webView.CoreWebView2.NavigationCompleted += (_, _) => ApplyDim();
             webView.CoreWebView2.Navigate(CalendarUrl);
 
             // WebView2's child windows didn't exist during the startup toggle; cover them now
@@ -108,8 +112,20 @@ public class MainForm : Form
             Activate();
         }
         hoverPanel.UpdateState(enable);
-        ApplyDim();
+        hoverPanel.Hide();  // re-shown by RepositionTitleBarPanel (interactive) or corner hover (click-through)
+        RepositionTitleBarPanel();
         settings.Save();
+    }
+
+    /// <summary>While interactive, pin the control panel onto the title bar, left of min/max/close.</summary>
+    private void RepositionTitleBarPanel()
+    {
+        if (isClickThrough || WindowState == FormWindowState.Minimized)
+            return;
+        int captionButtons = 3 * SystemInformation.CaptionButtonSize.Width + 28;
+        hoverPanel.Location = new Point(Bounds.Right - captionButtons - HoverPanel.PanelW, Bounds.Top + 5);
+        if (!hoverPanel.Visible)
+            hoverPanel.Show();
     }
 
     // pin the window to the bottom of the Z-order: any attempt to raise it
@@ -137,38 +153,11 @@ public class MainForm : Form
         }
     }
 
-    // ---------------- dim (poor man's dark mode) ----------------
-
-    // Instead of the AHK overlay window, darken the page itself: we own the browser,
-    // so a CSS brightness filter does the job with no extra window to keep aligned.
-    public async void ApplyDim()
-    {
-        if (webView.CoreWebView2 is null)
-            return;
-        int dim = isClickThrough ? settings.Dim : 0;
-        string filter = dim > 0 ? $"brightness({100 - dim}%)" : "";
-        try
-        {
-            await webView.ExecuteScriptAsync($"document.documentElement.style.filter = '{filter}';");
-        }
-        catch
-        {
-            // navigation raced the script; NavigationCompleted will re-apply
-        }
-    }
-
     public void SetTransparency(int alpha)
     {
         settings.Transparency = Math.Clamp(alpha, 80, 255);
         if (isClickThrough)
             Opacity = settings.Transparency / 255.0;
-        settings.Save();
-    }
-
-    public void SetDim(int dim)
-    {
-        settings.Dim = Math.Clamp(dim, 0, 90);
-        ApplyDim();
         settings.Save();
     }
 
@@ -196,14 +185,20 @@ public class MainForm : Form
 
     private void CheckMouseHover()
     {
+        // interactive mode: panel lives on the title bar, no corner-hover logic
+        if (!isClickThrough)
+        {
+            RepositionTitleBarPanel();
+            return;
+        }
+
         // every ~2s, re-assert click-through on the whole child tree: Chrome can recreate
         // its input windows (renderer restart, navigation) and WinForms style updates can
         // wipe manually-set ex-styles. AddExStyle no-ops when the bit is already set.
         if (++guardTick >= 20)
         {
             guardTick = 0;
-            if (isClickThrough)
-                NativeMethods.EnableClickThrough(Handle, clickThroughApplied);
+            NativeMethods.EnableClickThrough(Handle, clickThroughApplied);
         }
 
         var rect = GetPanelRect();
@@ -249,6 +244,20 @@ public class MainForm : Form
         webView.CoreWebView2.Navigate(CalendarUrl);
     }
 
+    /// <summary>
+    /// Sign out via Google's logout endpoint, keeping the account on Google's chooser
+    /// so signing back in doesn't require retyping the address (often just the password).
+    /// </summary>
+    public async Task SignOutKeepAccountAsync()
+    {
+        if (webView.CoreWebView2 is null)
+            return;
+        EnsureInteractive();
+        webView.CoreWebView2.Navigate("https://accounts.google.com/Logout");
+        await Task.Delay(2500);  // let the logout round-trip settle before heading back
+        webView.CoreWebView2.Navigate(CalendarUrl);
+    }
+
     /// <summary>Bring the widget to interactive mode on the calendar page, which redirects to Google sign-in.</summary>
     public void BeginSignIn()
     {
@@ -273,7 +282,7 @@ public class MainForm : Form
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add("Exit", null, (_, _) => Application.Exit());
 
-        tray.Icon = System.Drawing.SystemIcons.Application;
+        tray.Icon = Icon ?? SystemIcons.Application;
         tray.Text = "Google Calendar widget";
         tray.ContextMenuStrip = menu;
         tray.Visible = true;
