@@ -134,3 +134,13 @@ begin
     DownloadPage.Hide;
   end;
 end;
+
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+begin
+  // user data (settings + Google session in the WebView2 profile) lives in
+  // %LOCALAPPDATA%\CalendarWidget, outside {app}; offer to wipe it on uninstall
+  if CurUninstallStep = usPostUninstall then
+    if MsgBox('Also remove saved settings and the Google sign-in data?',
+        mbConfirmation, MB_YESNO) = IDYES then
+      DelTree(ExpandConstant('{localappdata}\CalendarWidget'), True, True, True);
+end;

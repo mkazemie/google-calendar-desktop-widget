@@ -7,6 +7,9 @@ public class SettingsForm : Form
     private const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
     private const string RunValueName = "CalendarWidget";
 
+    private readonly MainForm main;
+    private readonly Button btnAccount;
+
     private static readonly Color Back = Color.FromArgb(32, 33, 36);
     private static readonly Color CardBack = Color.FromArgb(48, 49, 52);
     private static readonly Color Border = Color.FromArgb(94, 99, 104);
@@ -19,6 +22,7 @@ public class SettingsForm : Form
 
     public SettingsForm(MainForm main, AppSettings settings)
     {
+        this.main = main;
         Text = "Calendar widget";
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MinimizeBox = false;
@@ -106,6 +110,58 @@ public class SettingsForm : Form
         btnExit.FlatAppearance.MouseOverBackColor = Color.FromArgb(60, 64, 67);
         btnExit.Click += (_, _) => Application.Exit();
         Controls.Add(btnExit);
+
+        btnAccount = new Button
+        {
+            Text = "Sign in",  // refreshed from the real cookie state whenever the form is shown
+            Location = new Point(180, 340),
+            Size = new Size(140, 36),
+            FlatStyle = FlatStyle.Flat,
+            BackColor = CardBack,
+            ForeColor = Fore,
+        };
+        btnAccount.FlatAppearance.BorderColor = Border;
+        btnAccount.FlatAppearance.MouseOverBackColor = Color.FromArgb(60, 64, 67);
+        btnAccount.Click += OnAccountClick;
+        Controls.Add(btnAccount);
+    }
+
+    protected override void OnVisibleChanged(EventArgs e)
+    {
+        base.OnVisibleChanged(e);
+        if (Visible)
+            RefreshAccountButton();
+    }
+
+    private async void RefreshAccountButton()
+    {
+        try
+        {
+            btnAccount.Text = await main.IsSignedInAsync() ? "Sign out" : "Sign in";
+        }
+        catch
+        {
+            btnAccount.Text = "Sign in";  // webview not ready yet; signing in is the sane default
+        }
+    }
+
+    private async void OnAccountClick(object? sender, EventArgs e)
+    {
+        if (await main.IsSignedInAsync())
+        {
+            if (MessageBox.Show(
+                    "Sign out of Google? This clears the widget's saved session; you'll need to sign in again to see your calendar.",
+                    "Calendar widget", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                await main.SignOutAsync();
+                RefreshAccountButton();
+            }
+        }
+        else
+        {
+            main.BeginSignIn();
+            Hide();  // get out of the way of the sign-in page
+        }
     }
 
     protected override void OnHandleCreated(EventArgs e)

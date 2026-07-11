@@ -228,6 +228,41 @@ public class MainForm : Form
         }
     }
 
+    // ---------------- Google account ----------------
+
+    /// <summary>Signed-in check: Google's session cookies exist in the widget's profile.</summary>
+    public async Task<bool> IsSignedInAsync()
+    {
+        if (webView.CoreWebView2 is null)
+            return false;
+        var cookies = await webView.CoreWebView2.CookieManager.GetCookiesAsync("https://calendar.google.com");
+        return cookies.Any(c => c.Name is "SID" or "__Secure-1PSID" or "__Secure-3PSID");
+    }
+
+    /// <summary>Clear the embedded browser profile (cookies, storage) and return to the sign-in page.</summary>
+    public async Task SignOutAsync()
+    {
+        if (webView.CoreWebView2 is null)
+            return;
+        await webView.CoreWebView2.Profile.ClearBrowsingDataAsync();
+        EnsureInteractive();  // show the signed-out page so the user can sign back in
+        webView.CoreWebView2.Navigate(CalendarUrl);
+    }
+
+    /// <summary>Bring the widget to interactive mode on the calendar page, which redirects to Google sign-in.</summary>
+    public void BeginSignIn()
+    {
+        EnsureInteractive();
+        webView.CoreWebView2?.Navigate(CalendarUrl);
+    }
+
+    private void EnsureInteractive()
+    {
+        if (isClickThrough)
+            SetClickThrough(false);
+        Activate();
+    }
+
     // ---------------- tray + settings ----------------
 
     private void SetupTray()
