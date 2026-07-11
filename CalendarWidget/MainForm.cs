@@ -14,6 +14,7 @@ public class MainForm : Form
     private readonly NotifyIcon tray = new();
     private readonly System.Windows.Forms.Timer hoverPoll = new() { Interval = 100 };
     private readonly HoverPanel hoverPanel;
+    private readonly TitleBar titleBar;
     private SettingsForm? settingsForm;
 
     private bool isClickThrough;
@@ -24,22 +25,23 @@ public class MainForm : Form
     public MainForm()
     {
         Text = "Google Calendar Widget";
-        FormBorderStyle = FormBorderStyle.None;
+        FormBorderStyle = FormBorderStyle.None;  // always borderless; TitleBar is the caption in interactive mode
+        BackColor = Color.FromArgb(32, 33, 36);  // shows as the frame around the webview in interactive mode
         ShowInTaskbar = false;
         StartPosition = FormStartPosition.Manual;
         Bounds = InitialBounds();
         try { Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { /* keep default */ }
 
+        titleBar = new TitleBar(ToggleClickThrough, ShowSettings) { Visible = false };
         Controls.Add(webView);
+        Controls.Add(titleBar);
+        webView.BringToFront();  // Fill-docked control must lay out after the Top-docked bar
+
         hoverPanel = new HoverPanel(ToggleClickThrough, ShowSettings);
 
         SetupTray();
         hoverPoll.Tick += (_, _) => CheckMouseHover();
         hoverPoll.Start();
-
-        // in interactive mode the panel docks onto the title bar and follows the window
-        LocationChanged += (_, _) => RepositionTitleBarPanel();
-        SizeChanged += (_, _) => RepositionTitleBarPanel();
     }
 
     private Rectangle InitialBounds()
@@ -95,9 +97,9 @@ public class MainForm : Form
         isClickThrough = enable;
         if (enable)
         {
-            // capture bounds while still bordered so the sizable frame is what the user resized
-            FormBorderStyle = FormBorderStyle.None;
             SaveBounds();
+            titleBar.Visible = false;
+            Padding = Padding.Empty;  // widget mode: calendar bleeds to the window edge
             NativeMethods.AddExStyle(Handle, NativeMethods.WS_EX_NOACTIVATE);
             NativeMethods.EnableClickThrough(Handle, clickThroughApplied);  // form + WebView2 child windows
             Opacity = settings.Transparency / 255.0;
@@ -108,24 +110,13 @@ public class MainForm : Form
             NativeMethods.DisableClickThrough(clickThroughApplied);
             NativeMethods.RemoveExStyle(Handle, NativeMethods.WS_EX_NOACTIVATE);
             Opacity = 1.0;
-            FormBorderStyle = FormBorderStyle.Sizable;  // titlebar lets the user move/resize
+            titleBar.Visible = true;
+            Padding = new Padding(6, 0, 6, 6);  // thin frame = resize grips (see WM_NCHITTEST)
+            hoverPanel.Hide();  // controls live in the title bar while interactive
             Activate();
         }
         hoverPanel.UpdateState(enable);
-        hoverPanel.Hide();  // re-shown by RepositionTitleBarPanel (interactive) or corner hover (click-through)
-        RepositionTitleBarPanel();
         settings.Save();
-    }
-
-    /// <summary>While interactive, pin the control panel onto the title bar, left of min/max/close.</summary>
-    private void RepositionTitleBarPanel()
-    {
-        if (isClickThrough || WindowState == FormWindowState.Minimized)
-            return;
-        int captionButtons = 3 * SystemInformation.CaptionButtonSize.Width + 28;
-        hoverPanel.Location = new Point(Bounds.Right - captionButtons - HoverPanel.PanelW, Bounds.Top + 5);
-        if (!hoverPanel.Visible)
-            hoverPanel.Show();
     }
 
     // pin the window to the bottom of the Z-order: any attempt to raise it
@@ -139,6 +130,34 @@ public class MainForm : Form
             wp.flags &= ~NativeMethods.SWP_NOZORDER;
             Marshal.StructureToPtr(wp, m.LParam, false);
         }
+
+        // borderless resize: the padding frame around the webview doubles as resize grips
+        if (m.Msg == NativeMethods.WM_NCHITTEST && !isClickThrough)
+        {
+            base.WndProc(ref m);
+            if ((int)m.Result == NativeMethods.HTCLIENT)
+            {
+                int x = unchecked((short)(long)m.LParam);
+                int y = unchecked((short)((long)m.LParam >> 16));
+                var pt = PointToClient(new Point(x, y));
+                const int grip = 8;
+                bool left = pt.X < grip, right = pt.X >= ClientSize.Width - grip;
+                bool top = pt.Y < grip, bottom = pt.Y >= ClientSize.Height - grip;
+                int hit =
+                    top && left ? NativeMethods.HTTOPLEFT :
+                    top && right ? NativeMethods.HTTOPRIGHT :
+                    bottom && left ? NativeMethods.HTBOTTOMLEFT :
+                    bottom && right ? NativeMethods.HTBOTTOMRIGHT :
+                    left ? NativeMethods.HTLEFT :
+                    right ? NativeMethods.HTRIGHT :
+                    top ? NativeMethods.HTTOP :
+                    bottom ? NativeMethods.HTBOTTOM :
+                    NativeMethods.HTCLIENT;
+                m.Result = new IntPtr(hit);
+            }
+            return;
+        }
+
         base.WndProc(ref m);
     }
 
@@ -146,6 +165,7 @@ public class MainForm : Form
     protected override void OnHandleCreated(EventArgs e)
     {
         base.OnHandleCreated(e);
+        NativeMethods.ApplyRoundedCorners(Handle);  // borderless windows get square corners by default
         if (isClickThrough)
         {
             NativeMethods.AddExStyle(Handle, NativeMethods.WS_EX_TRANSPARENT | NativeMethods.WS_EX_NOACTIVATE);
@@ -185,12 +205,9 @@ public class MainForm : Form
 
     private void CheckMouseHover()
     {
-        // interactive mode: panel lives on the title bar, no corner-hover logic
+        // interactive mode: controls are integrated in the title bar, no corner-hover logic
         if (!isClickThrough)
-        {
-            RepositionTitleBarPanel();
             return;
-        }
 
         // every ~2s, re-assert click-through on the whole child tree: Chrome can recreate
         // its input windows (renderer restart, navigation) and WinForms style updates can

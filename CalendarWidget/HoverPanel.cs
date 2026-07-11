@@ -83,7 +83,7 @@ public class HoverPanel : Form
         return b;
     }
 
-    private static Font CreateIconFont(float size)
+    internal static Font CreateIconFont(float size)
     {
         // Segoe Fluent Icons ships with Windows 11; MDL2 Assets is the Windows 10 fallback
         using var installed = new InstalledFontCollection();
