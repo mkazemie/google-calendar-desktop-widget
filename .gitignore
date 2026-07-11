@@ -4,3 +4,6 @@ CalendarClickThrough.ini
 # .NET build output
 bin/
 obj/
+
+# Compiled installer
+installer/Output/
