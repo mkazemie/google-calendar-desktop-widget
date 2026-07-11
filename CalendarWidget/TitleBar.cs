@@ -1,11 +1,13 @@
-﻿namespace CalendarWidget;
+namespace CalendarWidget;
 
 /// <summary>
-/// Custom caption strip shown in interactive mode. The form is always borderless,
-/// so this bar IS the title bar: app icon + title (drag area) on the left, and the
-/// widget controls (click-through toggle, settings) integrated next to close.
+/// The widget's title bar, visible in BOTH modes. It is a separate top-level window
+/// owned by MainForm (owned windows always float directly above their owner), so it is
+/// never subject to the click-through styling applied to the main window's tree — the
+/// controls keep working while the calendar underneath passes clicks to the desktop.
+/// Dragging it forwards a native caption drag to the owner, so Aero Snap works.
 /// </summary>
-public class TitleBar : Panel
+public class TitleBar : Form
 {
     public const int BarHeight = 34;
     private const int BtnW = 46;
@@ -14,15 +16,38 @@ public class TitleBar : Panel
     private static readonly Color HoverBack = Color.FromArgb(60, 64, 67);
     private static readonly Color CloseHover = Color.FromArgb(196, 43, 28);  // Win11 close-button red
     private static readonly Color Fore = Color.FromArgb(232, 234, 237);
+    private static readonly Color IconActive = Color.FromArgb(138, 180, 248);
 
     private const int WM_NCLBUTTONDOWN = 0xA1;
     private const int HTCAPTION = 2;
 
-    public TitleBar(Action onToggle, Action onSettings)
+    private readonly Form owner;
+    private readonly Action onToggleMaximize;
+    private readonly Button btnToggle;
+
+    // the bar must never steal focus from the owner or anything else
+    protected override bool ShowWithoutActivation => true;
+
+    protected override CreateParams CreateParams
     {
-        Dock = DockStyle.Top;
-        Height = BarHeight;
+        get
+        {
+            var cp = base.CreateParams;
+            cp.ExStyle |= unchecked((int)NativeMethods.WS_EX_NOACTIVATE);
+            return cp;
+        }
+    }
+
+    public TitleBar(Form owner, Action onToggle, Action onSettings, Action onToggleMaximize)
+    {
+        this.owner = owner;
+        this.onToggleMaximize = onToggleMaximize;
+
+        FormBorderStyle = FormBorderStyle.None;
+        StartPosition = FormStartPosition.Manual;
+        ShowInTaskbar = false;
         BackColor = BarBack;
+        Height = BarHeight;
 
         var iconBox = new PictureBox
         {
@@ -42,15 +67,15 @@ public class TitleBar : Panel
         };
 
         var iconFont = HoverPanel.CreateIconFont(10f);
-        var btnToggle = MakeButton("\uE962", iconFont, HoverBack);  // mouse: enable click-through
-        var btnMenu = MakeButton("\uE700", iconFont, HoverBack);    // hamburger: settings
-        var btnClose = MakeButton("\uE8BB", iconFont, CloseHover);  // ChromeClose glyph
+        btnToggle = MakeButton("", iconFont, HoverBack);      // mouse: toggle click-through
+        var btnMenu = MakeButton("", iconFont, HoverBack);    // hamburger: settings
+        var btnClose = MakeButton("", iconFont, CloseHover);  // ChromeClose glyph
         btnToggle.Click += (_, _) => onToggle();
         btnMenu.Click += (_, _) => onSettings();
         btnClose.Click += (_, _) => Application.Exit();
 
         var tips = new ToolTip();
-        tips.SetToolTip(btnToggle, "Back to widget mode (clicks pass through)");
+        tips.SetToolTip(btnToggle, "Toggle click-through (pass clicks to the desktop or not)");
         tips.SetToolTip(btnMenu, "Settings");
         tips.SetToolTip(btnClose, "Exit widget");
 
@@ -64,11 +89,24 @@ public class TitleBar : Panel
             btnToggle.Location = new Point(Width - 3 * BtnW, 0);
         };
 
-        // dragging the bar (or the title/icon on it) moves the window
+        // dragging the bar (or the title/icon on it) moves the owner window
         MouseDown += StartDrag;
         title.MouseDown += StartDrag;
         iconBox.MouseDown += StartDrag;
     }
+
+    protected override void OnHandleCreated(EventArgs e)
+    {
+        base.OnHandleCreated(e);
+        NativeMethods.ApplyRoundedCorners(Handle);
+    }
+
+    /// <summary>Snap the bar onto the top edge of the owner window.</summary>
+    public void Reposition() =>
+        Bounds = new Rectangle(owner.Left, owner.Top, owner.Width, BarHeight);
+
+    /// <summary>Tint the mouse icon while click-through is active.</summary>
+    public void UpdateState(bool clickThrough) => btnToggle.ForeColor = clickThrough ? IconActive : Fore;
 
     private Button MakeButton(string glyph, Font font, Color hover)
     {
@@ -91,9 +129,15 @@ public class TitleBar : Panel
 
     private void StartDrag(object? sender, MouseEventArgs e)
     {
-        if (e.Button != MouseButtons.Left || FindForm() is not { } form)
+        if (e.Button != MouseButtons.Left)
             return;
+        if (e.Clicks == 2)
+        {
+            onToggleMaximize();  // native caption double-click behavior
+            return;
+        }
+        // native caption drag on the OWNER: gives live move + Aero Snap (drag-to-top/edges)
         NativeMethods.ReleaseCapture();
-        NativeMethods.SendMessage(form.Handle, WM_NCLBUTTONDOWN, new IntPtr(HTCAPTION), IntPtr.Zero);
+        NativeMethods.SendMessage(owner.Handle, WM_NCLBUTTONDOWN, new IntPtr(HTCAPTION), IntPtr.Zero);
     }
 }

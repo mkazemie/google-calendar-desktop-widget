@@ -99,7 +99,14 @@ internal static class NativeMethods
     public static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 
     public const int WM_NCHITTEST = 0x84;
+    public const int WM_NCCALCSIZE = 0x83;
     public const int HTCLIENT = 1;
+
+    // window styles that enable native behaviors (Aero Snap, drag-to-top maximize)
+    // on an otherwise borderless window; the visual frame is removed via WM_NCCALCSIZE
+    public const int WS_CAPTION = 0x00C00000;
+    public const int WS_THICKFRAME = 0x00040000;
+    public const int WS_MAXIMIZEBOX = 0x00010000;
     public const int HTLEFT = 10, HTRIGHT = 11, HTTOP = 12, HTTOPLEFT = 13, HTTOPRIGHT = 14;
     public const int HTBOTTOM = 15, HTBOTTOMLEFT = 16, HTBOTTOMRIGHT = 17;
 

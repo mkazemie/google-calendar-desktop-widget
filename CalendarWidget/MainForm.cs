@@ -32,16 +32,55 @@ public class MainForm : Form
         Bounds = InitialBounds();
         try { Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { /* keep default */ }
 
-        titleBar = new TitleBar(ToggleClickThrough, ShowSettings) { Visible = false };
+        // the bar is a separate owned window floating over the form's top edge; the padding
+        // reserves that strip so the calendar never renders underneath it
+        titleBar = new TitleBar(this, ToggleClickThrough, ShowSettings, ToggleMaximize);
+        Padding = new Padding(0, TitleBar.BarHeight, 0, 0);
         Controls.Add(webView);
-        Controls.Add(titleBar);
-        webView.BringToFront();  // Fill-docked control must lay out after the Top-docked bar
 
         hoverPanel = new HoverPanel(ToggleClickThrough, ShowSettings);
 
         SetupTray();
         hoverPoll.Tick += (_, _) => CheckMouseHover();
         hoverPoll.Start();
+    }
+
+    // native window behaviors (Aero Snap, drag-to-top / double-click maximize) require these
+    // styles; the frame and caption they'd normally draw are removed in WM_NCCALCSIZE below
+    protected override CreateParams CreateParams
+    {
+        get
+        {
+            var cp = base.CreateParams;
+            cp.Style |= NativeMethods.WS_CAPTION | NativeMethods.WS_THICKFRAME | NativeMethods.WS_MAXIMIZEBOX;
+            return cp;
+        }
+    }
+
+    public void ToggleMaximize()
+    {
+        if (isClickThrough)
+            return;  // the widget never sits full-screen
+        WindowState = WindowState == FormWindowState.Maximized ? FormWindowState.Normal : FormWindowState.Maximized;
+    }
+
+    // keep maximize confined to the current monitor's work area (no taskbar overlap):
+    // a borderless-maximized window would otherwise overhang by the invisible frame size
+    protected override void OnLocationChanged(EventArgs e)
+    {
+        base.OnLocationChanged(e);
+        if (WindowState == FormWindowState.Normal)
+            MaximizedBounds = Screen.FromControl(this).WorkingArea;
+        titleBar?.Reposition();
+    }
+
+    protected override void OnSizeChanged(EventArgs e)
+    {
+        base.OnSizeChanged(e);
+        // Aero Snap can maximize even in widget mode (drag-to-top); undo it there
+        if (isClickThrough && WindowState == FormWindowState.Maximized)
+            WindowState = FormWindowState.Normal;
+        titleBar?.Reposition();
     }
 
     private Rectangle InitialBounds()
@@ -58,6 +97,9 @@ public class MainForm : Form
     protected override async void OnLoad(EventArgs e)
     {
         base.OnLoad(e);
+
+        titleBar.Show(this);  // owned: always floats directly above the main window
+        titleBar.Reposition();
 
         // first run: stay interactive so the user can sign in to Google;
         // afterwards the widget always starts in click-through mode
@@ -97,11 +139,13 @@ public class MainForm : Form
         isClickThrough = enable;
         if (enable)
         {
+            if (WindowState == FormWindowState.Maximized)
+                WindowState = FormWindowState.Normal;  // the widget never sits full-screen
             SaveBounds();
-            titleBar.Visible = false;
-            Padding = Padding.Empty;  // widget mode: calendar bleeds to the window edge
+            Padding = new Padding(0, TitleBar.BarHeight, 0, 0);  // widget mode: no resize frame
             NativeMethods.AddExStyle(Handle, NativeMethods.WS_EX_NOACTIVATE);
-            NativeMethods.EnableClickThrough(Handle, clickThroughApplied);  // form + WebView2 child windows
+            // only this window's tree goes transparent; the owned TitleBar stays clickable
+            NativeMethods.EnableClickThrough(Handle, clickThroughApplied);
             Opacity = settings.Transparency / 255.0;
             NativeMethods.SendToBottom(Handle);
         }
@@ -110,12 +154,13 @@ public class MainForm : Form
             NativeMethods.DisableClickThrough(clickThroughApplied);
             NativeMethods.RemoveExStyle(Handle, NativeMethods.WS_EX_NOACTIVATE);
             Opacity = 1.0;
-            titleBar.Visible = true;
-            Padding = new Padding(6, 0, 6, 6);  // thin frame = resize grips (see WM_NCHITTEST)
-            hoverPanel.Hide();  // controls live in the title bar while interactive
+            Padding = new Padding(6, TitleBar.BarHeight, 6, 6);  // side/bottom frame = resize grips
+            hoverPanel.Hide();
             Activate();
         }
         hoverPanel.UpdateState(enable);
+        titleBar.UpdateState(enable);
+        titleBar.Reposition();
         settings.Save();
     }
 
@@ -129,6 +174,14 @@ public class MainForm : Form
             wp.hwndInsertAfter = NativeMethods.HWND_BOTTOM;
             wp.flags &= ~NativeMethods.SWP_NOZORDER;
             Marshal.StructureToPtr(wp, m.LParam, false);
+        }
+
+        // claim the caption/frame area as client: removes the native title bar visuals
+        // while keeping the WS_CAPTION/WS_THICKFRAME behaviors (snap, maximize)
+        if (m.Msg == NativeMethods.WM_NCCALCSIZE && m.WParam != IntPtr.Zero)
+        {
+            m.Result = IntPtr.Zero;
+            return;
         }
 
         // borderless resize: the padding frame around the webview doubles as resize grips
