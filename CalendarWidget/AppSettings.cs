@@ -15,6 +15,9 @@ public class AppSettings
         set => Transparency = (int)Math.Round(255 * (100 - Math.Clamp(value, 0, 95)) / 100.0);
     }
 
+    // widget mode sits behind the desktop icons (live-wallpaper style, WorkerW reparenting)
+    public bool BehindDesktopIcons { get; set; }
+
     // hover panel in a screen corner (click-through mode); redundant with the title bar, so toggleable
     public bool CornerPanelEnabled { get; set; } = true;
 

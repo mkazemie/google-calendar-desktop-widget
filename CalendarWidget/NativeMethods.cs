@@ -91,6 +91,66 @@ internal static class NativeMethods
     public static void SendToBottom(IntPtr hwnd) =>
         SetWindowPos(hwnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE_NOMOVE_NOACTIVATE);
 
+    // ---- live-wallpaper mode: reparent the widget behind the desktop icons ----
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
+
+    [DllImport("user32.dll")]
+    public static extern bool ScreenToClient(IntPtr hWnd, ref Point point);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern IntPtr FindWindowW(string className, string? windowName);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern IntPtr FindWindowExW(IntPtr parent, IntPtr childAfter, string className, string? windowName);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern IntPtr SendMessageTimeoutW(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam,
+        uint flags, uint timeout, out IntPtr result);
+
+    [DllImport("user32.dll")]
+    private static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
+
+    /// <summary>
+    /// The Wallpaper-Engine trick: message 0x052C makes Progman split off a WorkerW
+    /// window that sits behind the desktop icons (SHELLDLL_DefView) but above the
+    /// wallpaper. A window reparented into it renders under the icons. Classic layout:
+    /// the WorkerW is the sibling AFTER the window hosting SHELLDLL_DefView; on
+    /// Win11 24H2 it is a CHILD of Progman instead. Returns IntPtr.Zero when the
+    /// shell doesn't cooperate — callers must degrade to normal bottom-pinning.
+    /// </summary>
+    public static IntPtr FindDesktopWorkerW()
+    {
+        IntPtr progman = FindWindowW("Progman", null);
+        if (progman == IntPtr.Zero)
+            return IntPtr.Zero;
+        SendMessageTimeoutW(progman, 0x052C, new IntPtr(0xD), new IntPtr(1), 0, 1000, out _);
+
+        // explorer creates the WorkerW asynchronously after the message; poll briefly
+        for (int attempt = 0; attempt < 20; attempt++)
+        {
+            IntPtr workerW = IntPtr.Zero;
+            EnumWindows((top, _) =>
+            {
+                if (FindWindowExW(top, IntPtr.Zero, "SHELLDLL_DefView", null) != IntPtr.Zero)
+                {
+                    IntPtr sibling = FindWindowExW(IntPtr.Zero, top, "WorkerW", null);
+                    if (sibling != IntPtr.Zero)
+                        workerW = sibling;
+                }
+                return true;
+            }, IntPtr.Zero);
+
+            if (workerW == IntPtr.Zero)
+                workerW = FindWindowExW(progman, IntPtr.Zero, "WorkerW", null);  // Win11 24H2 layout
+            if (workerW != IntPtr.Zero)
+                return workerW;
+            Thread.Sleep(50);
+        }
+        return IntPtr.Zero;
+    }
+
     // custom title bar: window dragging + resize hit-test codes
     [DllImport("user32.dll")]
     public static extern bool ReleaseCapture();

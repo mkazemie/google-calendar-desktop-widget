@@ -21,6 +21,8 @@ public class MainForm : Form
     private DateTime? hoverHideDeadline;  // set while the panel is visible but the mouse has left it
     private int guardTick;                // periodic re-assert of click-through styles
     private int styleBurst;               // fast re-assert right after enabling (Chrome recreates windows)
+    private bool attachedToDesktop;       // reparented into WorkerW (behind the desktop icons)
+    private Rectangle boundsBeforeAttach; // screen bounds to restore on detach (child coords are parent-relative)
     private readonly HashSet<IntPtr> clickThroughApplied = [];  // windows WE made transparent
 
     public MainForm()
@@ -141,9 +143,12 @@ public class MainForm : Form
             NativeMethods.EnableClickThrough(Handle, clickThroughApplied);
             styleBurst = 20;
             NativeMethods.SendToBottom(Handle);
+            if (settings.BehindDesktopIcons)
+                AttachToDesktop();
         }
         else
         {
+            DetachFromDesktop();  // interactive mode is always a normal top-level window
             styleBurst = 0;
             NativeMethods.DisableClickThrough(clickThroughApplied);
             NativeMethods.RemoveExStyle(Handle, NativeMethods.WS_EX_NOACTIVATE);
@@ -237,6 +242,54 @@ public class MainForm : Form
         settings.TransparencyPercent = percent;
         if (isClickThrough)
             Opacity = settings.Transparency / 255.0;
+        settings.Save();
+    }
+
+    // ---------------- live-wallpaper mode (behind desktop icons) ----------------
+
+    /// <summary>Reparent into the shell's WorkerW layer so the widget renders UNDER the desktop icons.</summary>
+    private void AttachToDesktop()
+    {
+        if (attachedToDesktop)
+            return;
+        IntPtr workerW = NativeMethods.FindDesktopWorkerW();
+        if (workerW == IntPtr.Zero)
+            return;  // shell didn't cooperate; stay a normal bottom-pinned window
+        boundsBeforeAttach = Bounds;
+        var pt = boundsBeforeAttach.Location;
+        NativeMethods.SetParent(Handle, workerW);
+        NativeMethods.ScreenToClient(workerW, ref pt);  // child coordinates are WorkerW-relative
+        NativeMethods.SetWindowPos(Handle, IntPtr.Zero, pt.X, pt.Y,
+            boundsBeforeAttach.Width, boundsBeforeAttach.Height, NativeMethods.SWP_NOZORDER_NOACTIVATE);
+        attachedToDesktop = true;
+        titleBar.Reposition();
+    }
+
+    private void DetachFromDesktop()
+    {
+        if (!attachedToDesktop)
+            return;
+        NativeMethods.SetParent(Handle, IntPtr.Zero);
+        Bounds = boundsBeforeAttach;
+        attachedToDesktop = false;
+        titleBar.Reposition();
+    }
+
+    public void SetBehindDesktopIcons(bool behind)
+    {
+        settings.BehindDesktopIcons = behind;
+        if (isClickThrough)
+        {
+            if (behind)
+            {
+                AttachToDesktop();
+            }
+            else
+            {
+                DetachFromDesktop();
+                NativeMethods.SendToBottom(Handle);
+            }
+        }
         settings.Save();
     }
 
@@ -403,7 +456,9 @@ public class MainForm : Form
     protected override void OnFormClosed(FormClosedEventArgs e)
     {
         hoverPoll.Stop();
-        if (isClickThrough)
+        // while attached, Bounds are WorkerW-relative and the window can't have moved
+        // since attach anyway — the entering-widget-mode SaveBounds already captured them
+        if (isClickThrough && !attachedToDesktop)
             SaveBounds();
         settings.Save();
         tray.Visible = false;

@@ -33,7 +33,7 @@ public class SettingsForm : Form
         BackColor = Back;
         ForeColor = Fore;
         Font = new Font("Segoe UI", 10f);
-        ClientSize = new Size(340, 380);
+        ClientSize = new Size(340, 416);
         try { Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { /* keep default */ }
 
         // ---- transparency ----
@@ -48,20 +48,32 @@ public class SettingsForm : Form
         };
         Controls.Add(sldAlpha);
 
+        // ---- live-wallpaper mode ----
+        var cbBehind = new CheckBox
+        {
+            Text = "Sit behind desktop icons (live wallpaper)",
+            AutoSize = true,
+            Location = new Point(20, 96),
+            ForeColor = Fore,
+            Checked = settings.BehindDesktopIcons,
+        };
+        cbBehind.CheckedChanged += (_, _) => main.SetBehindDesktopIcons(cbBehind.Checked);
+        Controls.Add(cbBehind);
+
         // ---- corner hover panel ----
-        Controls.Add(SectionLabel("HOVER PANEL", 100));
+        Controls.Add(SectionLabel("HOVER PANEL", 140));
         var cbCorner = new CheckBox
         {
             Text = "Show hover panel in a screen corner",
             AutoSize = true,
-            Location = new Point(20, 124),
+            Location = new Point(20, 164),
             ForeColor = Fore,
             Checked = settings.CornerPanelEnabled,
         };
         Controls.Add(cbCorner);
         var cmbCorner = new ComboBox
         {
-            Location = new Point(20, 156),
+            Location = new Point(20, 196),
             Enabled = settings.CornerPanelEnabled,
             Width = 300,
             DropDownStyle = ComboBoxStyle.DropDownList,
@@ -84,7 +96,7 @@ public class SettingsForm : Form
         {
             Text = "Start with Windows",
             AutoSize = true,
-            Location = new Point(20, 200),
+            Location = new Point(20, 240),
             ForeColor = Fore,
         };
         cbStartup.Checked = IsStartupEnabled();
@@ -97,7 +109,7 @@ public class SettingsForm : Form
             Text = "Tip: for a dark widget, enable dark mode inside Google Calendar's own settings (gear icon).",
             ForeColor = Muted,
             Font = new Font("Segoe UI", 9f),
-            Location = new Point(20, 232),
+            Location = new Point(20, 272),
             Size = new Size(300, 40),
         });
 
@@ -105,7 +117,7 @@ public class SettingsForm : Form
         var btnDonate = new Button
         {
             Text = "♥  Support development (PayPal)",
-            Location = new Point(20, 280),
+            Location = new Point(20, 316),
             Size = new Size(300, 36),
             FlatStyle = FlatStyle.Flat,
             BackColor = CardBack,
@@ -120,7 +132,7 @@ public class SettingsForm : Form
         var btnExit = new Button
         {
             Text = "Exit widget",
-            Location = new Point(20, 328),
+            Location = new Point(20, 364),
             Size = new Size(140, 36),
             FlatStyle = FlatStyle.Flat,
             BackColor = CardBack,
@@ -134,7 +146,7 @@ public class SettingsForm : Form
         btnAccount = new Button
         {
             Text = "Sign in",  // refreshed from the real cookie state whenever the form is shown
-            Location = new Point(180, 328),
+            Location = new Point(180, 364),
             Size = new Size(140, 36),
             FlatStyle = FlatStyle.Flat,
             BackColor = CardBack,
