@@ -7,6 +7,8 @@
 **Your Google Calendar, living on your desktop.**
 Transparent. Click-through. Always up to date. Never in the way.
 
+🌐 **[Website](https://mkazemie.github.io/google-calendar-desktop-widget/)** · 📥 **[Download](https://github.com/mkazemie/google-calendar-desktop-widget/releases/latest)**
+
 <img src="assets/hero.svg" width="100%" alt="Translucent Google Calendar pinned to the desktop while clicks pass through it"/>
 
 </div>
