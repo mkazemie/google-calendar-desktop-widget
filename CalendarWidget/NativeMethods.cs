@@ -105,52 +105,25 @@ internal static class NativeMethods
     public const uint SWP_NOZORDER_NOACTIVATE = 0x0014;
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct POINT { public int X; public int Y; }
-
-    [StructLayout(LayoutKind.Sequential)]
     public struct RECT { public int Left; public int Top; public int Right; public int Bottom; }
 
-    [StructLayout(LayoutKind.Sequential)]
-    public struct MINMAXINFO
-    {
-        public POINT ptReserved;
-        public POINT ptMaxSize;
-        public POINT ptMaxPosition;
-        public POINT ptMinTrackSize;
-        public POINT ptMaxTrackSize;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct MONITORINFO
-    {
-        public int cbSize;
-        public RECT rcMonitor;
-        public RECT rcWork;
-        public int dwFlags;
-    }
+    [DllImport("user32.dll")]
+    private static extern uint GetDpiForWindow(IntPtr hwnd);
 
     [DllImport("user32.dll")]
-    public static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint flags);
-
-    [DllImport("user32.dll")]
-    public static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFO info);
+    private static extern int GetSystemMetricsForDpi(int index, uint dpi);
 
     /// <summary>
-    /// Fill MINMAXINFO so a maximized borderless window exactly covers the work area of
-    /// the monitor it is on. Positions are relative to that monitor's origin — this is
-    /// the multi-monitor-correct recipe (Form.MaximizedBounds gets secondary screens wrong).
+    /// Thickness of the invisible resize frame at this window's DPI. Windows positions a
+    /// maximized WS_THICKFRAME window so this frame hangs OUTSIDE the monitor; the client
+    /// rect must be inset by it in WM_NCCALCSIZE or the content edges land off-screen.
     /// </summary>
-    public static void FillMinMaxInfo(IntPtr hwnd, IntPtr lParam)
+    public static (int X, int Y) MaximizedFrameThickness(IntPtr hwnd)
     {
-        var mi = new MONITORINFO { cbSize = Marshal.SizeOf<MONITORINFO>() };
-        if (!GetMonitorInfo(MonitorFromWindow(hwnd, 2 /*MONITOR_DEFAULTTONEAREST*/), ref mi))
-            return;
-        var mmi = Marshal.PtrToStructure<MINMAXINFO>(lParam);
-        mmi.ptMaxPosition.X = mi.rcWork.Left - mi.rcMonitor.Left;
-        mmi.ptMaxPosition.Y = mi.rcWork.Top - mi.rcMonitor.Top;
-        mmi.ptMaxSize.X = mi.rcWork.Right - mi.rcWork.Left;
-        mmi.ptMaxSize.Y = mi.rcWork.Bottom - mi.rcWork.Top;
-        Marshal.StructureToPtr(mmi, lParam, false);
+        uint dpi = GetDpiForWindow(hwnd);
+        int pad = GetSystemMetricsForDpi(92 /*SM_CXPADDEDBORDER*/, dpi);
+        return (GetSystemMetricsForDpi(32 /*SM_CXSIZEFRAME*/, dpi) + pad,
+                GetSystemMetricsForDpi(33 /*SM_CYSIZEFRAME*/, dpi) + pad);
     }
 
     // window styles that enable native behaviors (Aero Snap, drag-to-top maximize)

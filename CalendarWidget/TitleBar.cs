@@ -110,9 +110,12 @@ public class TitleBar : Form
     /// </summary>
     public void Reposition()
     {
-        if (!IsHandleCreated)
+        if (!IsHandleCreated || !owner.IsHandleCreated)
             return;
-        NativeMethods.SetWindowPos(Handle, IntPtr.Zero, owner.Left, owner.Top, owner.Width, BarHeight,
+        // track the CLIENT origin, not Bounds: when maximized the window rect overhangs
+        // the monitor by the invisible frame, but the client rect stays fully visible
+        var origin = owner.PointToScreen(Point.Empty);
+        NativeMethods.SetWindowPos(Handle, IntPtr.Zero, origin.X, origin.Y, owner.ClientSize.Width, BarHeight,
             NativeMethods.SWP_NOZORDER_NOACTIVATE);
     }
 

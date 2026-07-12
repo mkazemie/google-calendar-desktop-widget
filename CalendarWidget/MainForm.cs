@@ -171,23 +171,27 @@ public class MainForm : Form
         }
 
         // claim the caption/frame area as client: removes the native title bar visuals
-        // while keeping the WS_CAPTION/WS_THICKFRAME behaviors (snap, maximize)
+        // while keeping the WS_CAPTION/WS_THICKFRAME behaviors (snap, maximize).
+        // When maximized, Windows hangs the invisible frame outside the monitor, so the
+        // client must be inset by the frame thickness or content edges get cut off.
         if (m.Msg == NativeMethods.WM_NCCALCSIZE && m.WParam != IntPtr.Zero)
         {
-            m.Result = IntPtr.Zero;
-            return;
-        }
-
-        // maximize = exactly the work area of the monitor the window is currently on
-        if (m.Msg == NativeMethods.WM_GETMINMAXINFO && m.LParam != IntPtr.Zero)
-        {
-            NativeMethods.FillMinMaxInfo(Handle, m.LParam);
+            if (WindowState == FormWindowState.Maximized && m.LParam != IntPtr.Zero)
+            {
+                var rc = Marshal.PtrToStructure<NativeMethods.RECT>(m.LParam);
+                var (fx, fy) = NativeMethods.MaximizedFrameThickness(Handle);
+                rc.Left += fx;
+                rc.Top += fy;
+                rc.Right -= fx;
+                rc.Bottom -= fy;
+                Marshal.StructureToPtr(rc, m.LParam, false);
+            }
             m.Result = IntPtr.Zero;
             return;
         }
 
         // borderless resize: the padding frame around the webview doubles as resize grips
-        if (m.Msg == NativeMethods.WM_NCHITTEST && !isClickThrough)
+        if (m.Msg == NativeMethods.WM_NCHITTEST && !isClickThrough && WindowState == FormWindowState.Normal)
         {
             base.WndProc(ref m);
             if ((int)m.Result == NativeMethods.HTCLIENT)
