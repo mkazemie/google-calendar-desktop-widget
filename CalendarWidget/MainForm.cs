@@ -57,12 +57,8 @@ public class MainForm : Form
         }
     }
 
-    public void ToggleMaximize()
-    {
-        if (isClickThrough)
-            return;  // the widget never sits full-screen
+    public void ToggleMaximize() =>
         WindowState = WindowState == FormWindowState.Maximized ? FormWindowState.Normal : FormWindowState.Maximized;
-    }
 
     protected override void OnLocationChanged(EventArgs e)
     {
@@ -73,9 +69,6 @@ public class MainForm : Form
     protected override void OnSizeChanged(EventArgs e)
     {
         base.OnSizeChanged(e);
-        // Aero Snap can maximize even in widget mode (drag-to-top); undo it there
-        if (isClickThrough && WindowState == FormWindowState.Maximized)
-            WindowState = FormWindowState.Normal;
         titleBar?.Reposition();
     }
 
@@ -135,9 +128,7 @@ public class MainForm : Form
         isClickThrough = enable;
         if (enable)
         {
-            if (WindowState == FormWindowState.Maximized)
-                WindowState = FormWindowState.Normal;  // the widget never sits full-screen
-            SaveBounds();
+            SaveBounds();  // no-op while maximized: the last normal bounds stay saved
             Padding = new Padding(0, TitleBar.BarHeight, 0, 0);  // widget mode: no resize frame
             NativeMethods.AddExStyle(Handle, NativeMethods.WS_EX_NOACTIVATE);
             // only this window's tree goes transparent; the owned TitleBar stays clickable

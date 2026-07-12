@@ -25,6 +25,7 @@ public class TitleBar : Form
     private readonly Action onToggleMaximize;
     private readonly Button btnToggle;
     private readonly Button btnClose;
+    private bool clickThrough;
 
     // the bar must never steal focus from the owner or anything else
     protected override bool ShowWithoutActivation => true;
@@ -115,9 +116,10 @@ public class TitleBar : Form
             NativeMethods.SWP_NOZORDER_NOACTIVATE);
     }
 
-    /// <summary>Widget mode: tint the mouse icon; hide close so the widget can't be exited by a stray click.</summary>
+    /// <summary>Widget mode: tint the mouse icon; hide close; disable drag/maximize (bar becomes buttons-only).</summary>
     public void UpdateState(bool clickThrough)
     {
+        this.clickThrough = clickThrough;
         btnToggle.ForeColor = clickThrough ? IconActive : Fore;
         btnClose.Visible = !clickThrough;
     }
@@ -143,7 +145,9 @@ public class TitleBar : Form
 
     private void StartDrag(object? sender, MouseEventArgs e)
     {
-        if (e.Button != MouseButtons.Left)
+        // widget mode: the bar only hosts the toggle/settings buttons — the pinned
+        // widget must not be movable or maximizable by accident
+        if (clickThrough || e.Button != MouseButtons.Left)
             return;
         if (e.Clicks == 2)
         {
