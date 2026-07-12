@@ -1,4 +1,4 @@
-namespace CalendarWidget;
+﻿namespace CalendarWidget;
 
 /// <summary>
 /// The widget's title bar, visible in BOTH modes. It is a separate top-level window
@@ -24,6 +24,7 @@ public class TitleBar : Form
     private readonly Form owner;
     private readonly Action onToggleMaximize;
     private readonly Button btnToggle;
+    private readonly Button btnClose;
 
     // the bar must never steal focus from the owner or anything else
     protected override bool ShowWithoutActivation => true;
@@ -69,7 +70,7 @@ public class TitleBar : Form
         var iconFont = HoverPanel.CreateIconFont(10f);
         btnToggle = MakeButton("", iconFont, HoverBack);      // mouse: toggle click-through
         var btnMenu = MakeButton("", iconFont, HoverBack);    // hamburger: settings
-        var btnClose = MakeButton("", iconFont, CloseHover);  // ChromeClose glyph
+        btnClose = MakeButton("", iconFont, CloseHover);  // ChromeClose glyph
         btnToggle.Click += (_, _) => onToggle();
         btnMenu.Click += (_, _) => onSettings();
         btnClose.Click += (_, _) => Application.Exit();
@@ -101,12 +102,25 @@ public class TitleBar : Form
         NativeMethods.ApplyRoundedCorners(Handle);
     }
 
-    /// <summary>Snap the bar onto the top edge of the owner window.</summary>
-    public void Reposition() =>
-        Bounds = new Rectangle(owner.Left, owner.Top, owner.Width, BarHeight);
+    /// <summary>
+    /// Snap the bar onto the top edge of the owner window. Called for every move during a
+    /// drag, so it uses raw SetWindowPos — the WinForms Bounds setter would run the full
+    /// managed layout pipeline per pixel and make dragging visibly laggy.
+    /// </summary>
+    public void Reposition()
+    {
+        if (!IsHandleCreated)
+            return;
+        NativeMethods.SetWindowPos(Handle, IntPtr.Zero, owner.Left, owner.Top, owner.Width, BarHeight,
+            NativeMethods.SWP_NOZORDER_NOACTIVATE);
+    }
 
-    /// <summary>Tint the mouse icon while click-through is active.</summary>
-    public void UpdateState(bool clickThrough) => btnToggle.ForeColor = clickThrough ? IconActive : Fore;
+    /// <summary>Widget mode: tint the mouse icon; hide close so the widget can't be exited by a stray click.</summary>
+    public void UpdateState(bool clickThrough)
+    {
+        btnToggle.ForeColor = clickThrough ? IconActive : Fore;
+        btnClose.Visible = !clickThrough;
+    }
 
     private Button MakeButton(string glyph, Font font, Color hover)
     {

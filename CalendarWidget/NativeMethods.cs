@@ -100,7 +100,58 @@ internal static class NativeMethods
 
     public const int WM_NCHITTEST = 0x84;
     public const int WM_NCCALCSIZE = 0x83;
+    public const int WM_GETMINMAXINFO = 0x24;
     public const int HTCLIENT = 1;
+    public const uint SWP_NOZORDER_NOACTIVATE = 0x0014;
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct POINT { public int X; public int Y; }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct RECT { public int Left; public int Top; public int Right; public int Bottom; }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct MINMAXINFO
+    {
+        public POINT ptReserved;
+        public POINT ptMaxSize;
+        public POINT ptMaxPosition;
+        public POINT ptMinTrackSize;
+        public POINT ptMaxTrackSize;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct MONITORINFO
+    {
+        public int cbSize;
+        public RECT rcMonitor;
+        public RECT rcWork;
+        public int dwFlags;
+    }
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint flags);
+
+    [DllImport("user32.dll")]
+    public static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFO info);
+
+    /// <summary>
+    /// Fill MINMAXINFO so a maximized borderless window exactly covers the work area of
+    /// the monitor it is on. Positions are relative to that monitor's origin — this is
+    /// the multi-monitor-correct recipe (Form.MaximizedBounds gets secondary screens wrong).
+    /// </summary>
+    public static void FillMinMaxInfo(IntPtr hwnd, IntPtr lParam)
+    {
+        var mi = new MONITORINFO { cbSize = Marshal.SizeOf<MONITORINFO>() };
+        if (!GetMonitorInfo(MonitorFromWindow(hwnd, 2 /*MONITOR_DEFAULTTONEAREST*/), ref mi))
+            return;
+        var mmi = Marshal.PtrToStructure<MINMAXINFO>(lParam);
+        mmi.ptMaxPosition.X = mi.rcWork.Left - mi.rcMonitor.Left;
+        mmi.ptMaxPosition.Y = mi.rcWork.Top - mi.rcMonitor.Top;
+        mmi.ptMaxSize.X = mi.rcWork.Right - mi.rcWork.Left;
+        mmi.ptMaxSize.Y = mi.rcWork.Bottom - mi.rcWork.Top;
+        Marshal.StructureToPtr(mmi, lParam, false);
+    }
 
     // window styles that enable native behaviors (Aero Snap, drag-to-top maximize)
     // on an otherwise borderless window; the visual frame is removed via WM_NCCALCSIZE

@@ -64,13 +64,9 @@ public class MainForm : Form
         WindowState = WindowState == FormWindowState.Maximized ? FormWindowState.Normal : FormWindowState.Maximized;
     }
 
-    // keep maximize confined to the current monitor's work area (no taskbar overlap):
-    // a borderless-maximized window would otherwise overhang by the invisible frame size
     protected override void OnLocationChanged(EventArgs e)
     {
         base.OnLocationChanged(e);
-        if (WindowState == FormWindowState.Normal)
-            MaximizedBounds = Screen.FromControl(this).WorkingArea;
         titleBar?.Reposition();
     }
 
@@ -180,6 +176,14 @@ public class MainForm : Form
         // while keeping the WS_CAPTION/WS_THICKFRAME behaviors (snap, maximize)
         if (m.Msg == NativeMethods.WM_NCCALCSIZE && m.WParam != IntPtr.Zero)
         {
+            m.Result = IntPtr.Zero;
+            return;
+        }
+
+        // maximize = exactly the work area of the monitor the window is currently on
+        if (m.Msg == NativeMethods.WM_GETMINMAXINFO && m.LParam != IntPtr.Zero)
+        {
+            NativeMethods.FillMinMaxInfo(Handle, m.LParam);
             m.Result = IntPtr.Zero;
             return;
         }
