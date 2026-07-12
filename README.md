@@ -71,8 +71,14 @@ Calendar Widget is free and always will be. If it earns a permanent spot on your
 
 </div>
 
-## License
+## License & commercial use
 
-Licensed under the [Apache License 2.0](LICENSE).
+© 2026 Mahdi Kazemiesfahani.
+
+Google Calendar Desktop Widget is free and open source under the **[GNU Affero General Public License v3.0](LICENSE)**. You may use, study, modify, and share it — as long as you keep it open source under the same license and credit the author.
+
+**Building it into a proprietary or commercial product** (or any closed-source derivative)? The AGPL requires you to either release your product's full source under the AGPL, or obtain a separate commercial license. To discuss commercial licensing, reach out:
+
+📧 **Mahdi Kazemiesfahani — [m.kazemi.esfahani@gmail.com](mailto:m.kazemi.esfahani@gmail.com)**
 
 *This is an unofficial, independent project — not affiliated with or endorsed by Google. Google Calendar is a trademark of Google LLC.*

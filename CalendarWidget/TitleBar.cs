@@ -1,4 +1,8 @@
-﻿namespace CalendarWidget;
+// Google Calendar Desktop Widget
+// Copyright (C) 2026 Mahdi Kazemiesfahani
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+namespace CalendarWidget;
 
 /// <summary>
 /// The widget's title bar, visible in BOTH modes. It is a separate top-level window

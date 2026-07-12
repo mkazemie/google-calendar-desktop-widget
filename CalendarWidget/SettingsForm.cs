@@ -1,3 +1,7 @@
+// Google Calendar Desktop Widget
+// Copyright (C) 2026 Mahdi Kazemiesfahani
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Microsoft.Win32;
 
 namespace CalendarWidget;
