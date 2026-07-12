@@ -7,7 +7,7 @@
 **Your Google Calendar, living on your desktop.**
 Transparent. Click-through. Always up to date. Never in the way.
 
-🌐 **[Website](https://mkazemie.github.io/google-calendar-desktop-widget/)** · 📥 **[Download](https://github.com/mkazemie/google-calendar-desktop-widget/releases/latest)**
+🌐 **[Website](https://mkazemie.github.io/google-calendar-desktop-widget/)** · 📥 **[Download](https://github.com/mkazemie/google-calendar-desktop-widget/releases/latest/download/CalendarWidgetSetup.exe)**
 
 <img src="assets/hero.svg" width="100%" alt="Translucent Google Calendar pinned to the desktop while clicks pass through it"/>
 
@@ -55,7 +55,7 @@ Transparency, hover-panel corner, start-with-Windows, sign-out — all in one sm
 
 ## 📥 Get it
 
-1. **[Download `CalendarWidgetSetup.exe`](https://github.com/mkazemie/google-calendar-desktop-widget/releases/latest)** (≈ 2 MB) and run it — it fetches anything else it needs automatically.
+1. **[Download `CalendarWidgetSetup.exe`](https://github.com/mkazemie/google-calendar-desktop-widget/releases/latest/download/CalendarWidgetSetup.exe)** (≈ 2 MB) and run it — it fetches anything else it needs automatically.
 2. **Sign in** to your Google account on first launch.
 3. Hit the **mouse button** in the title bar — your calendar fades into the desktop. Done.
 
