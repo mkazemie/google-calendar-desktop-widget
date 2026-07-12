@@ -97,7 +97,40 @@ internal static class NativeMethods
     public static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
 
     [DllImport("user32.dll")]
+    public static extern IntPtr GetParent(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    public static extern bool IsWindow(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
     public static extern bool ScreenToClient(IntPtr hWnd, ref Point point);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern int GetClassNameW(IntPtr hWnd, System.Text.StringBuilder lpClassName, int nMaxCount);
+
+    /// <summary>Is this handle a live WorkerW? Used to detect when the shell recreated it and orphaned us.</summary>
+    public static bool IsWorkerW(IntPtr hwnd)
+    {
+        if (hwnd == IntPtr.Zero || !IsWindow(hwnd))
+            return false;
+        var sb = new System.Text.StringBuilder(16);
+        GetClassNameW(hwnd, sb, sb.Capacity);
+        return sb.ToString() == "WorkerW";
+    }
+
+    public const int WM_SETREDRAW = 0x000B;
+    public const int WM_DISPLAYCHANGE = 0x007E;
+
+    /// <summary>Suspend/resume painting so a multi-step reparent+DPI transition doesn't flicker.</summary>
+    public static void SetRedraw(IntPtr hwnd, bool on) =>
+        SendMessage(hwnd, WM_SETREDRAW, new IntPtr(on ? 1 : 0), IntPtr.Zero);
+
+    [DllImport("user32.dll")]
+    private static extern bool RedrawWindow(IntPtr hWnd, IntPtr lprcUpdate, IntPtr hrgnUpdate, uint flags);
+
+    /// <summary>Force a full repaint of the window and all children after resuming redraw.</summary>
+    public static void RepaintAll(IntPtr hwnd) =>
+        RedrawWindow(hwnd, IntPtr.Zero, IntPtr.Zero, 0x1 | 0x4 | 0x80 | 0x100 | 0x400);  // INVALIDATE|ERASE|ALLCHILDREN|UPDATENOW|FRAME
 
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     private static extern IntPtr FindWindowW(string className, string? windowName);
@@ -169,6 +202,14 @@ internal static class NativeMethods
 
     [DllImport("user32.dll")]
     public static extern uint GetDpiForWindow(IntPtr hwnd);
+
+    /// <summary>
+    /// True if the window is maximized, read from Win32 rather than WinForms' WindowState —
+    /// which can still report Normal mid-transition, making WM_NCCALCSIZE skip the frame
+    /// inset and let the title bar slide off the top of the screen.
+    /// </summary>
+    [DllImport("user32.dll")]
+    public static extern bool IsZoomed(IntPtr hWnd);
 
     [DllImport("user32.dll")]
     private static extern int GetSystemMetricsForDpi(int index, uint dpi);

@@ -25,6 +25,7 @@ public class MainForm : Form
     private DateTime? hoverHideDeadline;  // set while the panel is visible but the mouse has left it
     private int guardTick;                // periodic re-assert of click-through styles
     private int styleBurst;               // fast re-assert right after enabling (Chrome recreates windows)
+    private int attachCheckTick;          // throttle for the behind-icons re-attach watchdog
     private bool attachedToDesktop;       // reparented into WorkerW (behind the desktop icons)
     private Rectangle boundsBeforeAttach; // screen bounds to restore on detach (child coords are parent-relative)
     private bool maximizedBeforeAttach;   // attached windows are always Normal; re-maximize on detach
@@ -187,7 +188,7 @@ public class MainForm : Form
         // client must be inset by the frame thickness or content edges get cut off.
         if (m.Msg == NativeMethods.WM_NCCALCSIZE && m.WParam != IntPtr.Zero)
         {
-            if (WindowState == FormWindowState.Maximized && m.LParam != IntPtr.Zero)
+            if (NativeMethods.IsZoomed(Handle) && m.LParam != IntPtr.Zero)
             {
                 var rc = Marshal.PtrToStructure<NativeMethods.RECT>(m.LParam);
                 var (fx, fy) = NativeMethods.MaximizedFrameThickness(Handle);
@@ -202,7 +203,7 @@ public class MainForm : Form
         }
 
         // borderless resize: the padding frame around the webview doubles as resize grips
-        if (m.Msg == NativeMethods.WM_NCHITTEST && !isClickThrough && WindowState == FormWindowState.Normal)
+        if (m.Msg == NativeMethods.WM_NCHITTEST && !isClickThrough && !NativeMethods.IsZoomed(Handle))
         {
             base.WndProc(ref m);
             if ((int)m.Result == NativeMethods.HTCLIENT)
@@ -227,6 +228,11 @@ public class MainForm : Form
             }
             return;
         }
+
+        // a display-config change (resolution, monitor add/remove/power) recreates the
+        // shell's WorkerW; re-attach promptly rather than waiting for the 1s watchdog
+        if (m.Msg == NativeMethods.WM_DISPLAYCHANGE && settings.BehindDesktopIcons && isClickThrough)
+            BeginInvoke(EnsureDesktopAttachment);
 
         base.WndProc(ref m);
     }
@@ -262,6 +268,8 @@ public class MainForm : Form
         if (workerW == IntPtr.Zero)
             return;  // shell didn't cooperate; stay a normal bottom-pinned window
 
+        NativeMethods.SetRedraw(Handle, false);  // freeze painting so the DPI rescale doesn't flash
+
         // a child window must not be "maximized": drop to Normal sized to the work area
         // (no invisible-frame overhang, no WM_NCCALCSIZE maximize inset) and re-maximize
         // on detach. RestoreBounds keeps the pre-maximize rect for later.
@@ -285,11 +293,15 @@ public class MainForm : Form
 
         // reparenting swaps the DPI context to the primary monitor's: WebView2 re-zooms
         // and WinForms may rescale layout. After the DPI messages drain, compensate the
-        // browser zoom and re-assert physical geometry so nothing shifts or resizes.
+        // browser zoom and re-assert physical geometry so nothing shifts or resizes, then
+        // resume painting in one clean repaint (no visible zoom-in/zoom-out).
         BeginInvoke(() =>
         {
             if (!attachedToDesktop)
+            {
+                NativeMethods.SetRedraw(Handle, true);
                 return;
+            }
             uint dpiAfter = Math.Max(1, NativeMethods.GetDpiForWindow(Handle));
             try { webView.ZoomFactor = dpiBefore / (double)dpiAfter; } catch { }
             var p2 = boundsBeforeAttach.Location;
@@ -298,6 +310,8 @@ public class MainForm : Form
                 boundsBeforeAttach.Width, boundsBeforeAttach.Height, NativeMethods.SWP_NOZORDER_NOACTIVATE);
             Padding = new Padding(0, TitleBar.BarHeight, 0, 0);
             titleBar.Reposition();
+            NativeMethods.SetRedraw(Handle, true);
+            NativeMethods.RepaintAll(Handle);
         });
     }
 
@@ -305,6 +319,7 @@ public class MainForm : Form
     {
         if (!attachedToDesktop)
             return;
+        NativeMethods.SetRedraw(Handle, false);
         NativeMethods.SetParent(Handle, IntPtr.Zero);
         attachedToDesktop = false;
         try { webView.ZoomFactor = 1.0; } catch { }
@@ -319,12 +334,40 @@ public class MainForm : Form
         BeginInvoke(() =>
         {
             if (attachedToDesktop)
+            {
+                NativeMethods.SetRedraw(Handle, true);
                 return;
+            }
             if (WindowState == FormWindowState.Normal)
                 Bounds = boundsBeforeAttach;
             Padding = isClickThrough ? new Padding(0, TitleBar.BarHeight, 0, 0) : new Padding(6, TitleBar.BarHeight, 6, 6);
             titleBar.Reposition();
+            NativeMethods.SetRedraw(Handle, true);
+            NativeMethods.RepaintAll(Handle);
         });
+    }
+
+    /// <summary>
+    /// Watchdog: the shell recreates its WorkerW on display changes / monitor power events
+    /// (common with multiple monitors), which orphans our reparented window — it survives
+    /// but floats at stale WorkerW-relative coordinates, so it appears to vanish. Detect the
+    /// orphaning and re-attach to the fresh WorkerW. Runs from the 100 ms poll, throttled.
+    /// </summary>
+    private void EnsureDesktopAttachment()
+    {
+        if (!settings.BehindDesktopIcons || !isClickThrough)
+            return;
+        if (attachedToDesktop && NativeMethods.IsWorkerW(NativeMethods.GetParent(Handle)))
+            return;  // still correctly parented under a live WorkerW
+
+        if (attachedToDesktop)
+        {
+            // orphaned: return to a valid top-level state at known-good screen bounds first
+            NativeMethods.SetParent(Handle, IntPtr.Zero);
+            attachedToDesktop = false;
+            Bounds = boundsBeforeAttach;
+        }
+        AttachToDesktop();
     }
 
     public void SetBehindDesktopIcons(bool behind)
@@ -380,6 +423,13 @@ public class MainForm : Form
         // interactive mode: controls are integrated in the title bar, no corner-hover logic
         if (!isClickThrough)
             return;
+
+        // ~every 1s, make sure we're still behind the icons (the shell can orphan us)
+        if (settings.BehindDesktopIcons && ++attachCheckTick >= 10)
+        {
+            attachCheckTick = 0;
+            EnsureDesktopAttachment();
+        }
 
         // right after enabling: re-assert on every tick until the burst runs out, so
         // windows Chrome recreates for layered rendering go transparent within ~100ms
