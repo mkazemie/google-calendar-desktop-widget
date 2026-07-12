@@ -104,6 +104,46 @@
   footer { margin-top: 76px; border-top: 1px solid var(--line); padding: 30px 0 40px; text-align: center; color: var(--muted); font-size: .85rem; }
   footer p { max-width: 700px; margin: 6px auto; }
 
+  /* interactive demo */
+  .demo-desktop { position: relative; height: 460px; border-radius: 16px; border: 1px solid var(--line); overflow: hidden;
+    background: linear-gradient(135deg, #1a2a6c, #2d1e5f 55%, #0f3057); user-select: none; }
+  .demo-icon { position: absolute; left: 28px; width: 76px; text-align: center; color: rgba(255,255,255,.75);
+    font-size: .78rem; padding: 8px 4px; border-radius: 10px; cursor: pointer; transition: background .15s; z-index: 1; }
+  .demo-icon span { display: block; font-size: 1.9rem; margin-bottom: 2px; }
+  .demo-icon:hover { background: rgba(255,255,255,.14); }
+  .demo-window { position: absolute; top: 34px; right: 34px; bottom: 60px; left: 190px; display: flex; flex-direction: column;
+    border-radius: 10px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,.5); transition: box-shadow .4s; z-index: 2; }
+  .demo-desktop.widget .demo-window { box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+  .demo-desktop.widget .demo-body { pointer-events: none; }
+  .demo-bar { height: 36px; flex: none; background: #202124; color: #e8eaed; display: flex; align-items: center; gap: 10px;
+    padding: 0 12px; font-size: .84rem; }
+  .demo-logo { width: 15px; height: 15px; border-radius: 4px; background: var(--blue); flex: none; }
+  .demo-mouse { margin-left: auto; background: none; border: 0; color: #e8eaed; cursor: pointer; padding: 4px 6px; border-radius: 6px; display: flex; }
+  .demo-mouse:hover { background: rgba(255,255,255,.12); }
+  .demo-desktop.widget .demo-mouse { color: var(--blue-soft); animation: pulse 2.2s infinite; }
+  @keyframes pulse { 0%,100% { filter: drop-shadow(0 0 0 rgba(138,180,248,0)) } 50% { filter: drop-shadow(0 0 6px rgba(138,180,248,.9)) } }
+  .demo-burger { letter-spacing: 1px; font-size: 1.1rem; opacity: .9; }
+  .demo-body { flex: 1; position: relative; background:
+      linear-gradient(rgba(60,64,67,.14) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(60,64,67,.14) 1px, transparent 1px), #fff;
+    background-size: 25% 25%, 25% 25%, auto; opacity: .85; transition: opacity .25s; }
+  .demo-ev { position: absolute; width: 19%; border-radius: 6px; color: #fff; font-size: .74rem; line-height: 1.25;
+    padding: 7px 9px; box-shadow: 0 1px 4px rgba(0,0,0,.18); }
+  .demo-ev small { opacity: .8; }
+  .demo-now { position: absolute; left: 25%; right: 50%; top: 68%; border-top: 2.5px solid #ea4335; }
+  .demo-now::before { content: ""; position: absolute; left: -5px; top: -6.5px; width: 10px; height: 10px; border-radius: 50%; background: #ea4335; }
+  .demo-badge { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); background: rgba(32,33,36,.92);
+    color: #e8eaed; font-size: .82rem; padding: 7px 18px; border-radius: 16px; white-space: nowrap; z-index: 3; }
+  .demo-menu { position: absolute; display: none; z-index: 4; min-width: 190px; background: #2b2d33; border: 1px solid #3d4046;
+    border-radius: 9px; padding: 6px; box-shadow: 0 14px 40px rgba(0,0,0,.5); font-size: .84rem; color: #e8eaed; }
+  .demo-menu div { padding: 6px 12px; border-radius: 6px; display: flex; justify-content: space-between; cursor: default; }
+  .demo-menu div:hover { background: rgba(255,255,255,.09); }
+  .demo-menu em { font-style: normal; color: var(--muted); }
+  .demo-menu hr { border: 0; border-top: 1px solid #3d4046; margin: 5px 8px; }
+  .demo-controls { display: flex; gap: 18px; align-items: center; justify-content: center; flex-wrap: wrap; margin-top: 18px; color: var(--muted); font-size: .92rem; }
+  .demo-controls input[type="range"] { width: 220px; accent-color: var(--blue); }
+  .demo-controls output { color: var(--blue-soft); font-weight: 600; }
+
   .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s, transform .6s; }
   .reveal.on { opacity: 1; transform: none; }
   @media (prefers-reduced-motion: reduce) {
@@ -121,6 +161,7 @@
     <div class="nav-links">
       <a href="#features">Features</a>
       <a href="#how">How it works</a>
+      <a href="#try">Try it</a>
       <a href="https://github.com/mkazemie/google-calendar-desktop-widget">GitHub</a>
       <a class="btn btn-blue btn-small" href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/latest">Download</a>
     </div>
@@ -148,7 +189,7 @@
     <h2>Why you'll love it</h2>
     <p class="lead">Stop alt-tabbing to check what's next. Your schedule is always one glance away — and completely out of your way.</p>
     <div class="grid">
-      <div class="card reveal"><div class="ico">🪟</div><h3>Truly click-through</h3><p>Your clicks land on whatever is behind it — desktop icons, files, other apps. The widget is invisible to your mouse.</p></div>
+      <div class="card reveal"><div class="ico">🪟</div><h3>Truly click-through</h3><p>Clicks, drags, even <b>right-clicks</b> land on whatever is behind it — desktop icons, files, the wallpaper menu. The widget is invisible to your mouse.</p></div>
       <div class="card reveal"><div class="ico">🔄</div><h3>Live, not a snapshot</h3><p>It <b>is</b> Google Calendar. Add an event from your phone and watch it appear on your desktop seconds later.</p></div>
       <div class="card reveal"><div class="ico">✏️</div><h3>Edit in place</h3><p>One click makes it a normal window: add events, drag meetings around, then fade it back into the wallpaper.</p></div>
       <div class="card reveal"><div class="ico">👻</div><h3>As subtle as you want</h3><p>Transparency from 0 to 95&nbsp;% — from solid window to a ghost that melts into your wallpaper.</p></div>
@@ -161,8 +202,70 @@
 <section id="how">
   <div class="wrap">
     <h2>Two modes, one button</h2>
-    <p class="lead">A mouse icon in the title bar flips between a ghosted widget and a fully interactive calendar.</p>
-    <div class="reveal"><img src="assets/modes.svg" alt="Widget mode is ghosted and click-through; interactive mode is a normal window for editing events" width="1200" height="400"></div>
+    <p class="lead">The mouse icon in the title bar stays clickable even in widget mode — a full, editable calendar is always exactly one click away.</p>
+    <div class="reveal"><img src="assets/modes.svg" alt="Clicking the title-bar mouse button toggles between interactive mode and a ghosted, click-through widget mode" width="1200" height="420"></div>
+  </div>
+</section>
+
+<section id="action">
+  <div class="wrap">
+    <h2>Invisible to your mouse — even right-click</h2>
+    <p class="lead">Right-click your wallpaper and Windows answers, not the calendar. The desktop context menu opens straight through it.</p>
+    <div class="reveal"><img src="assets/rightclick.svg" alt="Right-clicking the desktop through the transparent calendar opens the normal Windows context menu" width="1200" height="560" loading="lazy"></div>
+  </div>
+</section>
+
+<section id="panel">
+  <div class="wrap">
+    <h2>A tiny control panel runs everything</h2>
+    <p class="lead">Transparency, hover-panel corner, start-with-Windows, sign-out — drag the slider and the calendar melts into your wallpaper in real time.</p>
+    <div class="reveal"><img src="assets/panel.svg" alt="The control panel with a transparency slider; dragging it fades the calendar between solid and ghost" width="1200" height="560" loading="lazy"></div>
+  </div>
+</section>
+
+<section id="try">
+  <div class="wrap">
+    <h2>Feel it — right here</h2>
+    <p class="lead">Drag the slider, flip the mode, and try <b>right-clicking the wallpaper</b> below. This is what the widget feels like on your desktop.</p>
+    <div class="demo reveal">
+      <div class="demo-desktop" id="demoDesktop">
+        <div class="demo-icon" style="top:36px"><span>📁</span>Projects</div>
+        <div class="demo-icon" style="top:126px"><span>🖼️</span>Photos</div>
+        <div class="demo-icon under" id="demoUnder" style="top:216px; left:240px" title="I'm behind the calendar — you can still reach me in widget mode"><span>📝</span>Notes</div>
+        <div class="demo-window" id="demoWin">
+          <div class="demo-bar">
+            <span class="demo-logo"></span> Google Calendar
+            <button class="demo-mouse" id="demoToggle" title="Toggle widget / interactive mode" aria-label="Toggle widget or interactive mode">
+              <svg width="14" height="18" viewBox="0 0 14 18"><rect x="1" y="1" width="12" height="16" rx="6" fill="none" stroke="currentColor" stroke-width="1.6"/><line x1="7" y1="4" x2="7" y2="8" stroke="currentColor" stroke-width="1.6"/></svg>
+            </button>
+            <span class="demo-burger">≡</span>
+          </div>
+          <div class="demo-body" id="demoBody">
+            <div class="demo-ev" style="left:6%; top:8%;  background:#1a73e8">Team sync<br><small>9:00 – 9:45</small></div>
+            <div class="demo-ev" style="left:30%; top:30%; background:#0b8043">Deep work<br><small>10:00 – 12:00</small></div>
+            <div class="demo-ev" style="left:54%; top:55%; background:#f4511e">Lunch w/ Sara<br><small>12:30</small></div>
+            <div class="demo-ev" style="left:76%; top:18%; background:#8e24aa">Design review<br><small>9:30</small></div>
+            <div class="demo-now"></div>
+          </div>
+        </div>
+        <div class="demo-badge" id="demoBadge">Widget mode — click-through</div>
+        <div class="demo-menu" id="demoMenu">
+          <div>View <em>›</em></div>
+          <div>Sort by <em>›</em></div>
+          <div>Refresh</div>
+          <hr>
+          <div>New <em>›</em></div>
+          <hr>
+          <div>Display settings</div>
+          <div>Personalize</div>
+        </div>
+      </div>
+      <div class="demo-controls">
+        <label for="demoRange">Transparency <output id="demoOut">15%</output></label>
+        <input type="range" id="demoRange" min="0" max="95" value="15">
+        <button class="btn btn-ghost btn-small" id="demoToggle2">🖱️ Toggle widget / interactive</button>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -218,6 +321,47 @@
     for (const e of entries) if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); }
   }, { threshold: 0.12 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  /* ---- interactive demo ---- */
+  const desk = document.getElementById('demoDesktop');
+  const body = document.getElementById('demoBody');
+  const badge = document.getElementById('demoBadge');
+  const range = document.getElementById('demoRange');
+  const out = document.getElementById('demoOut');
+  const menu = document.getElementById('demoMenu');
+  let widget = true;
+
+  function apply() {
+    desk.classList.toggle('widget', widget);
+    if (widget) {
+      body.style.opacity = Math.max(0.05, 1 - range.value / 100);
+      badge.textContent = 'Widget mode — click-through (try right-clicking the wallpaper)';
+    } else {
+      body.style.opacity = 0.98;
+      badge.textContent = 'Interactive mode — a normal window: edit, drag, plan';
+    }
+    out.textContent = range.value + '%';
+  }
+  function toggle() { widget = !widget; hideMenu(); apply(); }
+
+  range.addEventListener('input', apply);
+  document.getElementById('demoToggle').addEventListener('click', e => { e.stopPropagation(); toggle(); });
+  document.getElementById('demoToggle2').addEventListener('click', toggle);
+
+  /* right-click pass-through demo: in widget mode the desktop answers */
+  desk.addEventListener('contextmenu', e => {
+    if (!widget) return;               // interactive mode: the "calendar" owns the mouse
+    e.preventDefault();
+    const r = desk.getBoundingClientRect();
+    menu.style.display = 'block';
+    menu.style.left = Math.min(e.clientX - r.left, r.width - menu.offsetWidth - 8) + 'px';
+    menu.style.top = Math.min(e.clientY - r.top, r.height - menu.offsetHeight - 8) + 'px';
+  });
+  function hideMenu() { menu.style.display = 'none'; }
+  document.addEventListener('click', hideMenu);
+  document.addEventListener('scroll', hideMenu, { passive: true });
+
+  apply();
 </script>
 </body>
 </html>

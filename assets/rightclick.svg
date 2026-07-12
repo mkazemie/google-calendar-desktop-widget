@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <linearGradient id="rbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a2a6c"/><stop offset="0.6" stop-color="#2d1e5f"/><stop offset="1" stop-color="#0f3057"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="560" rx="16" fill="url(#rbg)"/>
+  <circle cx="200" cy="140" r="150" fill="#4facfe" opacity="0.12"/>
+  <circle cx="1020" cy="420" r="130" fill="#9d50bb" opacity="0.12"/>
+
+  <!-- desktop icons under the calendar -->
+  <g>
+    <rect x="60" y="90" width="48" height="48" rx="9" fill="#f6bf26" opacity="0.8"/>
+    <text x="84" y="158" fill="#ffffff" opacity="0.6" font-size="11" text-anchor="middle">Work</text>
+    <rect x="60" y="190" width="48" height="48" rx="9" fill="#4facfe" opacity="0.8"/>
+    <text x="84" y="258" fill="#ffffff" opacity="0.6" font-size="11" text-anchor="middle">Media</text>
+  </g>
+
+  <!-- translucent calendar filling the desktop -->
+  <rect x="146" y="42" width="1016" height="474" rx="12" fill="#000000" opacity="0.25"/>
+  <rect x="140" y="36" width="1016" height="30" rx="8" fill="#202124" opacity="0.96"/>
+  <rect x="140" y="54" width="1016" height="12" fill="#202124" opacity="0.96"/>
+  <rect x="152" y="43" width="15" height="15" rx="4" fill="#1a73e8"/>
+  <text x="176" y="57" fill="#e8eaed" font-size="12">Google Calendar — widget mode</text>
+  <circle cx="1108" cy="51" r="3" fill="#8ab4f8"/>
+  <path d="M1104 46 q4 -3.6 8 0" stroke="#8ab4f8" stroke-width="1.5" fill="none"/>
+  <g stroke="#e8eaed" stroke-width="1.6" opacity="0.9">
+    <line x1="1128" y1="47" x2="1142" y2="47"/><line x1="1128" y1="51" x2="1142" y2="51"/><line x1="1128" y1="55" x2="1142" y2="55"/>
+  </g>
+
+  <g opacity="0.72">
+    <rect x="140" y="66" width="1016" height="444" fill="#ffffff"/>
+    <g stroke="#dadce0" stroke-width="1">
+      <line x1="140" y1="140" x2="1156" y2="140"/><line x1="140" y1="214" x2="1156" y2="214"/>
+      <line x1="140" y1="288" x2="1156" y2="288"/><line x1="140" y1="362" x2="1156" y2="362"/>
+      <line x1="140" y1="436" x2="1156" y2="436"/>
+      <line x1="343" y1="66" x2="343" y2="510"/><line x1="546" y1="66" x2="546" y2="510"/>
+      <line x1="749" y1="66" x2="749" y2="510"/><line x1="952" y1="66" x2="952" y2="510"/>
+    </g>
+    <rect x="160" y="90" width="160" height="44" rx="6" fill="#1a73e8"/>
+    <text x="170" y="108" fill="#ffffff" font-size="11">Team sync · 9:00</text>
+    <rect x="363" y="160" width="160" height="66" rx="6" fill="#0b8043"/>
+    <text x="373" y="178" fill="#ffffff" font-size="11">Deep work · 10:00</text>
+    <rect x="769" y="120" width="160" height="54" rx="6" fill="#8e24aa"/>
+    <text x="779" y="138" fill="#ffffff" font-size="11">Design review · 9:30</text>
+    <rect x="972" y="230" width="160" height="44" rx="6" fill="#f4511e"/>
+    <text x="982" y="248" fill="#ffffff" font-size="11">Lunch · 12:30</text>
+    <rect x="972" y="380" width="160" height="44" rx="6" fill="#f6bf26"/>
+    <text x="982" y="398" fill="#3c4043" font-size="11">Gym · 17:00</text>
+    <line x1="546" y1="330" x2="749" y2="330" stroke="#ea4335" stroke-width="2.5"/>
+    <circle cx="546" cy="330" r="5" fill="#ea4335"/>
+  </g>
+
+  <!-- right-click ripple -->
+  <circle cx="520" cy="200" r="3" fill="none" stroke="#ffffff" stroke-width="2.5" opacity="0">
+    <animate attributeName="r" values="3;3;28;28" keyTimes="0;0.14;0.22;1" dur="9s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;0;0.85;0;0" keyTimes="0;0.14;0.16;0.22;1" dur="9s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Windows 11 desktop context menu -->
+  <g opacity="0">
+    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.18;0.22;0.80;0.86;1" dur="9s" repeatCount="indefinite"/>
+    <rect x="535" y="215" width="230" height="286" rx="10" fill="#000000" opacity="0.4"/>
+    <rect x="530" y="210" width="230" height="286" rx="10" fill="#2b2d33" stroke="#3d4046" stroke-width="1"/>
+    <!-- hover highlight walking down the items -->
+    <rect x="536" y="272" width="218" height="26" rx="6" fill="#ffffff" opacity="0">
+      <animate attributeName="y" values="272;272;272;272;370;370;396;396" keyTimes="0;0.32;0.34;0.45;0.47;0.57;0.59;1" dur="9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;0;0.1;0.1;0.1;0.1;0;0" keyTimes="0;0.30;0.33;0.46;0.60;0.78;0.84;1" dur="9s" repeatCount="indefinite"/>
+    </rect>
+    <g fill="#e8eaed" font-size="12.5">
+      <text x="550" y="237">View</text>
+      <text x="550" y="263">Sort by</text>
+      <text x="550" y="289">Refresh</text>
+      <text x="550" y="325">Next desktop background</text>
+      <text x="550" y="351">New</text>
+      <text x="550" y="387">Display settings</text>
+      <text x="550" y="413">Personalize</text>
+      <text x="550" y="449">Open in Terminal</text>
+      <text x="550" y="475">Show more options</text>
+    </g>
+    <g fill="#9aa0a6" font-size="12" text-anchor="end">
+      <text x="746" y="237">›</text>
+      <text x="746" y="263">›</text>
+      <text x="746" y="351">›</text>
+    </g>
+    <line x1="540" y1="303" x2="750" y2="303" stroke="#3d4046" stroke-width="1"/>
+    <line x1="540" y1="365" x2="750" y2="365" stroke="#3d4046" stroke-width="1"/>
+    <line x1="540" y1="427" x2="750" y2="427" stroke="#3d4046" stroke-width="1"/>
+  </g>
+
+  <!-- cursor -->
+  <g>
+    <animateTransform attributeName="transform" type="translate"
+      values="760 140; 520 200; 520 200; 604 289; 604 387; 604 413; 604 413; 760 140"
+      keyTimes="0;0.12;0.20;0.32;0.46;0.58;0.80;1" dur="9s" repeatCount="indefinite"/>
+    <path d="M0 0 L0 22 L6 16 L10 26 L14.5 24 L10.5 14 L18 14 Z" fill="#ffffff" stroke="#3c4043" stroke-width="1.4"/>
+  </g>
+
+  <!-- caption -->
+  <rect x="330" y="522" width="540" height="32" rx="16" fill="#202124" opacity="0.92"/>
+  <text x="600" y="543" fill="#e8eaed" font-size="14" text-anchor="middle">Right-click your wallpaper — the desktop menu opens straight through</text>
+</svg>

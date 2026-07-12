@@ -12,14 +12,19 @@
     </linearGradient>
   </defs>
   <rect width="1200" height="640" fill="url(#wall)"/>
-  <circle cx="240" cy="180" r="190" fill="url(#glow)"/>
-  <circle cx="480" cy="460" r="150" fill="url(#glow)" opacity="0.7"/>
-  <circle cx="120" cy="520" r="90" fill="#4facfe" opacity="0.12"/>
+  <g>
+    <animateTransform attributeName="transform" type="translate" values="0 0; 22 -14; 0 0" dur="18s" repeatCount="indefinite"/>
+    <circle cx="240" cy="180" r="190" fill="url(#glow)"/>
+    <circle cx="480" cy="460" r="150" fill="url(#glow)" opacity="0.7"/>
+    <circle cx="120" cy="520" r="90" fill="#4facfe" opacity="0.12"/>
+  </g>
 
   <!-- desktop icons (visible THROUGH the widget) -->
   <g opacity="0.9">
     <rect x="60" y="60" width="52" height="52" rx="10" fill="#ffffff" opacity="0.16"/>
-    <rect x="60" y="150" width="52" height="52" rx="10" fill="#ffffff" opacity="0.16"/>
+    <rect x="60" y="150" width="52" height="52" rx="10" fill="#ffffff" opacity="0.16">
+      <animate attributeName="opacity" values="0.16;0.16;0.5;0.16;0.16" keyTimes="0;0.14;0.17;0.25;1" dur="14s" repeatCount="indefinite"/>
+    </rect>
     <rect x="60" y="240" width="52" height="52" rx="10" fill="#ffffff" opacity="0.16"/>
     <text x="86" y="132" fill="#ffffff" opacity="0.55" font-size="11" text-anchor="middle">Projects</text>
     <text x="86" y="222" fill="#ffffff" opacity="0.55" font-size="11" text-anchor="middle">Photos</text>
@@ -37,7 +42,11 @@
     <rect x="637" y="57" width="10" height="3" rx="1" fill="#ffffff"/>
     <rect x="637" y="62" width="10" height="6" rx="1" fill="#ffffff" opacity="0.85"/>
     <text x="660" y="67" fill="#e8eaed" font-size="13">Google Calendar</text>
-    <!-- bar buttons: mouse (active blue) + menu -->
+    <!-- bar buttons: mouse (active blue) + menu — always clickable, even in widget mode -->
+    <circle cx="1042" cy="62" r="6" fill="none" stroke="#8ab4f8" stroke-width="2">
+      <animate attributeName="r" values="6;15" dur="2.4s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6;0" dur="2.4s" repeatCount="indefinite"/>
+    </circle>
     <circle cx="1042" cy="62" r="3.5" fill="#8ab4f8"/>
     <path d="M1038 56 q4 -4 8 0" stroke="#8ab4f8" stroke-width="1.6" fill="none"/>
     <g stroke="#e8eaed" stroke-width="1.8" opacity="0.9">
@@ -99,18 +108,61 @@
 
     <!-- "now" line -->
     <line x1="838" y1="344" x2="938" y2="344" stroke="#ea4335" stroke-width="2.5"/>
-    <circle cx="838" cy="344" r="5" fill="#ea4335"/>
+    <circle cx="838" cy="344" r="5" fill="#ea4335">
+      <animate attributeName="r" values="5;6.5;5" dur="2s" repeatCount="indefinite"/>
+    </circle>
   </g>
 
-  <!-- cursor clicking a desktop icon THROUGH the widget -->
-  <g>
-    <circle cx="700" cy="452" r="16" fill="#ffffff" opacity="0.18"/>
-    <circle cx="700" cy="452" r="26" fill="none" stroke="#ffffff" opacity="0.25" stroke-width="2"/>
-    <path d="M694 440 l0 22 6 -6 4 10 5 -2 -4 -10 8 0 z" fill="#ffffff" stroke="#3c4043" stroke-width="1.4"/>
+  <!-- Windows desktop context menu, opened by right-clicking THROUGH the widget -->
+  <g opacity="0">
+    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.42;0.45;0.78;0.83;1" dur="14s" repeatCount="indefinite"/>
+    <rect x="810" y="332" width="210" height="180" rx="9" fill="#000000" opacity="0.35" transform="translate(4 5)"/>
+    <rect x="806" y="328" width="210" height="180" rx="9" fill="#2b2d33" stroke="#3d4046" stroke-width="1"/>
+    <g fill="#e8eaed" font-size="12.5">
+      <text x="824" y="352">View</text>
+      <text x="824" y="376">Sort by</text>
+      <text x="824" y="400">Refresh</text>
+      <text x="824" y="434">New</text>
+      <text x="824" y="468">Display settings</text>
+      <text x="824" y="492">Personalize</text>
+    </g>
+    <g fill="#9aa0a6" font-size="12" text-anchor="end">
+      <text x="1000" y="352">›</text>
+      <text x="1000" y="376">›</text>
+      <text x="1000" y="434">›</text>
+    </g>
+    <line x1="814" y1="412" x2="1008" y2="412" stroke="#3d4046" stroke-width="1"/>
+    <line x1="814" y1="446" x2="1008" y2="446" stroke="#3d4046" stroke-width="1"/>
   </g>
+
+  <!-- click ripples -->
+  <circle cx="86" cy="176" r="3" fill="none" stroke="#ffffff" stroke-width="2.5" opacity="0">
+    <animate attributeName="r" values="3;3;26;26" keyTimes="0;0.14;0.22;1" dur="14s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;0;0.8;0;0" keyTimes="0;0.14;0.15;0.22;1" dur="14s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="800" cy="320" r="3" fill="none" stroke="#ffffff" stroke-width="2.5" opacity="0">
+    <animate attributeName="r" values="3;3;26;26" keyTimes="0;0.41;0.49;1" dur="14s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;0;0.8;0;0" keyTimes="0;0.41;0.42;0.49;1" dur="14s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- moving cursor -->
   <g>
-    <rect x="560" y="580" width="330" height="34" rx="17" fill="#202124" opacity="0.92"/>
-    <text x="725" y="602" fill="#e8eaed" font-size="14" text-anchor="middle">Your clicks pass straight through to the desktop</text>
+    <animateTransform attributeName="transform" type="translate"
+      values="920 310; 86 176; 86 176; 800 320; 800 320; 920 310"
+      keyTimes="0;0.13;0.27;0.40;0.80;1" dur="14s" repeatCount="indefinite"/>
+    <path d="M0 0 L0 22 L6 16 L10 26 L14.5 24 L10.5 14 L18 14 Z" fill="#ffffff" stroke="#3c4043" stroke-width="1.4"/>
+  </g>
+
+  <!-- captions (crossfade with the two beats) -->
+  <g>
+    <animate attributeName="opacity" values="1;1;0;0;1" keyTimes="0;0.38;0.43;0.93;1" dur="14s" repeatCount="indefinite"/>
+    <rect x="560" y="580" width="360" height="34" rx="17" fill="#202124" opacity="0.92"/>
+    <text x="740" y="602" fill="#e8eaed" font-size="14" text-anchor="middle">Your clicks pass straight through to the desktop</text>
+  </g>
+  <g opacity="0">
+    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.43;0.47;0.78;0.83;1" dur="14s" repeatCount="indefinite"/>
+    <rect x="510" y="580" width="460" height="34" rx="17" fill="#202124" opacity="0.92"/>
+    <text x="740" y="602" fill="#e8eaed" font-size="14" text-anchor="middle">Even right-click opens the desktop menu — through the calendar</text>
   </g>
 
   <!-- taskbar -->

@@ -21,7 +21,7 @@ And because it's the live Google Calendar — not a copy — **it updates in rea
 
 ## ✨ Why you'll love it
 
-- 🪟 **Truly click-through** — your clicks land on whatever is behind it: desktop icons, files, other apps. Zero interference.
+- 🪟 **Truly click-through** — clicks, drags, even *right-clicks* land on whatever is behind it: desktop icons, files, the wallpaper menu. Zero interference.
 - 🔄 **Live, not a snapshot** — it *is* Google Calendar, synced across all your devices in real time.
 - ✏️ **Edit in place** — one click on the title bar makes it a normal window: add events, drag meetings around, then toggle back.
 - 👻 **As subtle as you want** — transparency from 0 to 95 %, so it melts into your wallpaper.
@@ -29,8 +29,28 @@ And because it's the live Google Calendar — not a copy — **it updates in rea
 - 🖥️ **Feels native** — snap it, maximize it, drag it between monitors like any Windows 11 app.
 - 🚀 **Set and forget** — starts with Windows, sits quietly in the tray, remembers your sign-in.
 
+## 🖱️ One button, two modes
+
+The mouse button in the top-right corner **stays clickable even in widget mode** — flipping back to a full, editable calendar is always exactly one click away.
+
 <div align="center">
-<img src="assets/modes.svg" width="100%" alt="Widget mode: ghosted and click-through. Interactive mode: a normal window for editing."/>
+<img src="assets/modes.svg" width="100%" alt="Clicking the title-bar mouse button toggles between interactive mode (a normal window) and widget mode (ghosted, click-through, pinned to the desktop)."/>
+</div>
+
+## 👆 Yes — even right-click goes through
+
+The widget is completely invisible to your mouse. Right-click your wallpaper and Windows answers, not the calendar — the desktop context menu opens straight through it, exactly as if the calendar weren't there.
+
+<div align="center">
+<img src="assets/rightclick.svg" width="100%" alt="Right-clicking the desktop through the transparent calendar opens the normal Windows context menu."/>
+</div>
+
+## 🎛️ A tiny control panel runs everything
+
+Transparency, hover-panel corner, start-with-Windows, sign-out — all in one small panel. Drag the slider and watch the calendar melt into your wallpaper in real time.
+
+<div align="center">
+<img src="assets/panel.svg" width="100%" alt="The control panel with a transparency slider; dragging it fades the calendar between solid and ghost."/>
 </div>
 
 ## 📥 Get it
