@@ -25,7 +25,7 @@ public class MainForm : Form
 
     public MainForm()
     {
-        Text = "Google Calendar Widget";
+        Text = "Google Calendar Desktop Widget";
         FormBorderStyle = FormBorderStyle.None;  // always borderless; TitleBar is the caption in interactive mode
         BackColor = Color.FromArgb(32, 33, 36);  // shows as the frame around the webview in interactive mode
         ShowInTaskbar = false;
@@ -96,7 +96,7 @@ public class MainForm : Form
         SetClickThrough(!firstRun);
         if (firstRun)
         {
-            tray.BalloonTipTitle = "Calendar widget";
+            tray.BalloonTipTitle = "Google Calendar Desktop Widget";
             tray.BalloonTipText = "Sign in to Google Calendar, then use the tray menu or the "
                 + "hover panel (bottom-right of the screen) to enable click-through mode.";
             tray.ShowBalloonTip(10000);
@@ -115,7 +115,7 @@ public class MainForm : Form
         catch (Exception ex)
         {
             MessageBox.Show("Failed to start the embedded browser (WebView2 runtime missing?):\n\n" + ex.Message,
-                "Calendar widget", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                "Google Calendar Desktop Widget", MessageBoxButtons.OK, MessageBoxIcon.Error);
             Application.Exit();
         }
     }
@@ -377,7 +377,7 @@ public class MainForm : Form
         menu.Items.Add("Exit", null, (_, _) => Application.Exit());
 
         tray.Icon = Icon ?? SystemIcons.Application;
-        tray.Text = "Google Calendar widget";
+        tray.Text = "Google Calendar Desktop Widget";
         tray.ContextMenuStrip = menu;
         tray.Visible = true;
         tray.DoubleClick += (_, _) => ShowSettings();

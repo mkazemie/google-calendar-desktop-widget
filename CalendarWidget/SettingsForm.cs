@@ -23,7 +23,7 @@ public class SettingsForm : Form
     public SettingsForm(MainForm main, AppSettings settings)
     {
         this.main = main;
-        Text = "Calendar widget";
+        Text = "Google Calendar Desktop Widget";
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MinimizeBox = false;
         MaximizeBox = false;
@@ -178,7 +178,7 @@ public class SettingsForm : Form
         var wipeBtn = new TaskDialogButton("Sign out & delete all data");
         var page = new TaskDialogPage
         {
-            Caption = "Calendar widget",
+            Caption = "Google Calendar Desktop Widget",
             Heading = "Sign out of Google?",
             Text = "Keep account: Google remembers this account, so signing back in is quicker.\n\n"
                  + "Delete all data: wipes the widget's entire browser profile (accounts, cookies, cache) — "

@@ -60,7 +60,7 @@ public class TitleBar : Form
 
         var title = new Label
         {
-            Text = "Google Calendar",
+            Text = "Google Calendar Desktop Widget",
             ForeColor = Fore,
             Font = new Font("Segoe UI", 9.5f),
             AutoSize = true,

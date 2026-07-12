@@ -2,7 +2,7 @@
 
 <img src="assets/logo.svg" width="88" alt="Calendar Widget logo"/>
 
-# Calendar Widget
+# Google Calendar Desktop Widget
 
 **Your Google Calendar, living on your desktop.**
 Transparent. Click-through. Always up to date. Never in the way.
@@ -13,7 +13,7 @@ Transparent. Click-through. Always up to date. Never in the way.
 
 ## Your schedule, always one glance away
 
-Stop alt-tabbing to check what's next. Calendar Widget pins the **real Google Calendar** straight onto your desktop wallpaper — softly transparent, pinned beneath all your windows, and completely invisible to your mouse. You click, drag, and work right *through* it, like it's part of the background.
+Stop alt-tabbing to check what's next. Google Calendar Desktop Widget pins the **real Google Calendar** straight onto your desktop wallpaper — softly transparent, pinned beneath all your windows, and completely invisible to your mouse. You click, drag, and work right *through* it, like it's part of the background.
 
 And because it's the live Google Calendar — not a copy — **it updates in real time**. Add an event from your phone, accept an invite on your laptop, and watch it appear on your desktop seconds later.
 
@@ -33,7 +33,7 @@ And because it's the live Google Calendar — not a copy — **it updates in rea
 
 ## 📥 Get it
 
-1. **Download** `CalendarWidgetSetup.exe` (≈ 2 MB) and run it — it fetches anything else it needs automatically.
+1. **[Download `CalendarWidgetSetup.exe`](https://github.com/mkazemie/google-calendar-desktop-widget/releases/latest)** (≈ 2 MB) and run it — it fetches anything else it needs automatically.
 2. **Sign in** to your Google account on first launch.
 3. Hit the **mouse button** in the title bar — your calendar fades into the desktop. Done.
 
@@ -52,3 +52,5 @@ Calendar Widget is free and always will be. If it earns a permanent spot on your
 ## License
 
 Licensed under the [Apache License 2.0](LICENSE).
+
+*This is an unofficial, independent project — not affiliated with or endorsed by Google. Google Calendar is a trademark of Google LLC.*

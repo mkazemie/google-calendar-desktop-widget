@@ -3,7 +3,7 @@
 ; Desktop Runtime or the WebView2 runtime, they are downloaded and installed
 ; during setup instead of being bundled into the exe.
 
-#define MyAppName "Calendar Widget"
+#define MyAppName "Google Calendar Desktop Widget"
 #define MyAppVersion "1.0.0"
 #define MyAppExeName "CalendarWidget.exe"
 
