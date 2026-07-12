@@ -168,7 +168,7 @@ internal static class NativeMethods
     public struct RECT { public int Left; public int Top; public int Right; public int Bottom; }
 
     [DllImport("user32.dll")]
-    private static extern uint GetDpiForWindow(IntPtr hwnd);
+    public static extern uint GetDpiForWindow(IntPtr hwnd);
 
     [DllImport("user32.dll")]
     private static extern int GetSystemMetricsForDpi(int index, uint dpi);

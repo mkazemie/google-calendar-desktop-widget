@@ -10,7 +10,11 @@ public class MainForm : Form
 
     private readonly AppSettings settings = AppSettings.Load();
     private readonly bool firstRun = AppSettings.IsFirstRun;
-    private readonly WebView2 webView = new() { Dock = DockStyle.Fill };
+    private readonly WebView2 webView = new()
+    {
+        Dock = DockStyle.Fill,
+        DefaultBackgroundColor = Color.FromArgb(32, 33, 36),  // no white flash while pages load
+    };
     private readonly NotifyIcon tray = new();
     private readonly System.Windows.Forms.Timer hoverPoll = new() { Interval = 100 };
     private readonly HoverPanel hoverPanel;
@@ -23,6 +27,8 @@ public class MainForm : Form
     private int styleBurst;               // fast re-assert right after enabling (Chrome recreates windows)
     private bool attachedToDesktop;       // reparented into WorkerW (behind the desktop icons)
     private Rectangle boundsBeforeAttach; // screen bounds to restore on detach (child coords are parent-relative)
+    private bool maximizedBeforeAttach;   // attached windows are always Normal; re-maximize on detach
+    private Rectangle normalBoundsBeforeAttach;  // the pre-maximize rect to give back to RestoreBounds
     private readonly HashSet<IntPtr> clickThroughApplied = [];  // windows WE made transparent
 
     public MainForm()
@@ -255,14 +261,44 @@ public class MainForm : Form
         IntPtr workerW = NativeMethods.FindDesktopWorkerW();
         if (workerW == IntPtr.Zero)
             return;  // shell didn't cooperate; stay a normal bottom-pinned window
+
+        // a child window must not be "maximized": drop to Normal sized to the work area
+        // (no invisible-frame overhang, no WM_NCCALCSIZE maximize inset) and re-maximize
+        // on detach. RestoreBounds keeps the pre-maximize rect for later.
+        maximizedBeforeAttach = WindowState == FormWindowState.Maximized;
+        if (maximizedBeforeAttach)
+        {
+            normalBoundsBeforeAttach = RestoreBounds;
+            var wa = Screen.FromControl(this).WorkingArea;
+            WindowState = FormWindowState.Normal;
+            Bounds = wa;
+        }
         boundsBeforeAttach = Bounds;
+
+        uint dpiBefore = NativeMethods.GetDpiForWindow(Handle);
         var pt = boundsBeforeAttach.Location;
         NativeMethods.SetParent(Handle, workerW);
         NativeMethods.ScreenToClient(workerW, ref pt);  // child coordinates are WorkerW-relative
         NativeMethods.SetWindowPos(Handle, IntPtr.Zero, pt.X, pt.Y,
             boundsBeforeAttach.Width, boundsBeforeAttach.Height, NativeMethods.SWP_NOZORDER_NOACTIVATE);
         attachedToDesktop = true;
-        titleBar.Reposition();
+
+        // reparenting swaps the DPI context to the primary monitor's: WebView2 re-zooms
+        // and WinForms may rescale layout. After the DPI messages drain, compensate the
+        // browser zoom and re-assert physical geometry so nothing shifts or resizes.
+        BeginInvoke(() =>
+        {
+            if (!attachedToDesktop)
+                return;
+            uint dpiAfter = Math.Max(1, NativeMethods.GetDpiForWindow(Handle));
+            try { webView.ZoomFactor = dpiBefore / (double)dpiAfter; } catch { }
+            var p2 = boundsBeforeAttach.Location;
+            NativeMethods.ScreenToClient(workerW, ref p2);
+            NativeMethods.SetWindowPos(Handle, IntPtr.Zero, p2.X, p2.Y,
+                boundsBeforeAttach.Width, boundsBeforeAttach.Height, NativeMethods.SWP_NOZORDER_NOACTIVATE);
+            Padding = new Padding(0, TitleBar.BarHeight, 0, 0);
+            titleBar.Reposition();
+        });
     }
 
     private void DetachFromDesktop()
@@ -270,9 +306,25 @@ public class MainForm : Form
         if (!attachedToDesktop)
             return;
         NativeMethods.SetParent(Handle, IntPtr.Zero);
-        Bounds = boundsBeforeAttach;
         attachedToDesktop = false;
-        titleBar.Reposition();
+        try { webView.ZoomFactor = 1.0; } catch { }
+        Bounds = boundsBeforeAttach;
+        if (maximizedBeforeAttach)
+        {
+            Bounds = normalBoundsBeforeAttach;  // seed RestoreBounds with the original rect
+            WindowState = FormWindowState.Maximized;
+            maximizedBeforeAttach = false;
+        }
+        // same DPI-context swap in reverse; re-assert geometry after messages drain
+        BeginInvoke(() =>
+        {
+            if (attachedToDesktop)
+                return;
+            if (WindowState == FormWindowState.Normal)
+                Bounds = boundsBeforeAttach;
+            Padding = isClickThrough ? new Padding(0, TitleBar.BarHeight, 0, 0) : new Padding(6, TitleBar.BarHeight, 6, 6);
+            titleBar.Reposition();
+        });
     }
 
     public void SetBehindDesktopIcons(bool behind)
