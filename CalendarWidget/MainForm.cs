@@ -20,6 +20,7 @@ public class MainForm : Form
     private bool isClickThrough;
     private DateTime? hoverHideDeadline;  // set while the panel is visible but the mouse has left it
     private int guardTick;                // periodic re-assert of click-through styles
+    private int styleBurst;               // fast re-assert right after enabling (Chrome recreates windows)
     private readonly HashSet<IntPtr> clickThroughApplied = [];  // windows WE made transparent
 
     public MainForm()
@@ -131,13 +132,19 @@ public class MainForm : Form
             SaveBounds();  // no-op while maximized: the last normal bounds stay saved
             Padding = new Padding(0, TitleBar.BarHeight, 0, 0);  // widget mode: no resize frame
             NativeMethods.AddExStyle(Handle, NativeMethods.WS_EX_NOACTIVATE);
-            // only this window's tree goes transparent; the owned TitleBar stays clickable
-            NativeMethods.EnableClickThrough(Handle, clickThroughApplied);
+            // opacity first: going layered makes Chrome recreate its input windows, which
+            // would shed a just-applied WS_EX_TRANSPARENT. Then style the whole tree and
+            // keep re-asserting on every poll tick (~100ms) for the next ~2s to catch any
+            // window Chrome recreates asynchronously — only this window's tree goes
+            // transparent; the owned TitleBar stays clickable.
             Opacity = settings.Transparency / 255.0;
+            NativeMethods.EnableClickThrough(Handle, clickThroughApplied);
+            styleBurst = 20;
             NativeMethods.SendToBottom(Handle);
         }
         else
         {
+            styleBurst = 0;
             NativeMethods.DisableClickThrough(clickThroughApplied);
             NativeMethods.RemoveExStyle(Handle, NativeMethods.WS_EX_NOACTIVATE);
             Opacity = 1.0;
@@ -257,10 +264,17 @@ public class MainForm : Form
         if (!isClickThrough)
             return;
 
-        // every ~2s, re-assert click-through on the whole child tree: Chrome can recreate
-        // its input windows (renderer restart, navigation) and WinForms style updates can
-        // wipe manually-set ex-styles. AddExStyle no-ops when the bit is already set.
-        if (++guardTick >= 20)
+        // right after enabling: re-assert on every tick until the burst runs out, so
+        // windows Chrome recreates for layered rendering go transparent within ~100ms
+        if (styleBurst > 0)
+        {
+            styleBurst--;
+            NativeMethods.EnableClickThrough(Handle, clickThroughApplied);
+        }
+        // every ~2s after that: Chrome can still recreate input windows (renderer restart,
+        // navigation) and WinForms style updates can wipe manually-set ex-styles.
+        // EnableClickThrough no-ops for windows that already carry the style.
+        else if (++guardTick >= 20)
         {
             guardTick = 0;
             NativeMethods.EnableClickThrough(Handle, clickThroughApplied);
