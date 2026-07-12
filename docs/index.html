@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Google Calendar Desktop Widget for Windows — free, transparent, click-through</title>
+<meta name="description" content="Pin the real Google Calendar to your Windows desktop as a transparent, click-through widget. Live sync from all your devices, edit in place, free and open source.">
+<link rel="canonical" href="https://mkazemie.github.io/google-calendar-desktop-widget/">
+<link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+<meta name="theme-color" content="#17181c">
+<!-- social preview -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Google Calendar Desktop Widget for Windows">
+<meta property="og:description" content="Your Google Calendar, living on your desktop — transparent, click-through, always up to date, never in the way. Free and open source.">
+<meta property="og:url" content="https://mkazemie.github.io/google-calendar-desktop-widget/">
+<meta property="og:image" content="https://mkazemie.github.io/google-calendar-desktop-widget/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Google Calendar Desktop Widget for Windows">
+<meta name="twitter:description" content="Transparent, click-through Google Calendar pinned to your desktop. Live sync, free, open source.">
+<meta name="twitter:image" content="https://mkazemie.github.io/google-calendar-desktop-widget/assets/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Google Calendar Desktop Widget",
+  "operatingSystem": "Windows 10, Windows 11",
+  "applicationCategory": "UtilitiesApplication",
+  "description": "A free, open-source Windows app that pins the real Google Calendar to your desktop as a transparent, click-through widget with live sync.",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "downloadUrl": "https://github.com/mkazemie/google-calendar-desktop-widget/releases/latest",
+  "url": "https://mkazemie.github.io/google-calendar-desktop-widget/",
+  "image": "https://mkazemie.github.io/google-calendar-desktop-widget/assets/og.png",
+  "author": { "@type": "Person", "name": "Mahdi Kazemi Esfahani" }
+}
+</script>
+<style>
+  :root {
+    --bg: #101116; --card: #1b1d24; --card2: #22242e;
+    --text: #e8eaed; --muted: #9aa0a6; --line: #2d3038;
+    --blue: #1a73e8; --blue-soft: #8ab4f8; --red-soft: #f28b82;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: "Segoe UI", system-ui, -apple-system, sans-serif; line-height: 1.6; }
+  a { color: var(--blue-soft); text-decoration: none; }
+  img { max-width: 100%; height: auto; display: block; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+  /* nav */
+  nav { position: sticky; top: 0; z-index: 10; background: rgba(16,17,22,.85); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+  .nav-inner { display: flex; align-items: center; gap: 14px; padding: 14px 0; }
+  .nav-inner img { width: 30px; }
+  .nav-name { font-weight: 600; font-size: 1.02rem; }
+  .nav-links { margin-left: auto; display: flex; gap: 22px; align-items: center; font-size: .95rem; }
+  .nav-links a { color: var(--muted); }
+  .nav-links a:hover { color: var(--text); }
+
+  .btn { display: inline-block; padding: 12px 26px; border-radius: 26px; font-weight: 600; transition: transform .15s, box-shadow .15s; }
+  .btn-blue { background: var(--blue); color: #fff; box-shadow: 0 4px 18px rgba(26,115,232,.35); }
+  .btn-ghost { border: 1px solid var(--line); color: var(--text); }
+  .btn:hover { transform: translateY(-2px); }
+  .btn-small { padding: 8px 18px; font-size: .9rem; }
+
+  /* hero */
+  header { text-align: center; padding: 72px 0 30px; background: radial-gradient(ellipse 90% 60% at 50% -10%, rgba(26,115,232,.22), transparent); }
+  h1 { font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.15; font-weight: 700; max-width: 780px; margin: 0 auto; }
+  h1 em { font-style: normal; color: var(--blue-soft); }
+  .sub { color: var(--muted); font-size: 1.15rem; max-width: 640px; margin: 18px auto 30px; }
+  .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
+  .fineprint { color: var(--muted); font-size: .86rem; }
+  .hero-img { margin: 44px auto 0; max-width: 980px; border-radius: 14px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.5); animation: float 7s ease-in-out infinite; }
+  @keyframes float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-10px) } }
+
+  section { padding: 76px 0 0; }
+  h2 { font-size: clamp(1.5rem, 3.4vw, 2.1rem); text-align: center; margin-bottom: 10px; }
+  .lead { color: var(--muted); text-align: center; max-width: 640px; margin: 0 auto 40px; }
+
+  /* features */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 26px; transition: transform .2s, border-color .2s; }
+  .card:hover { transform: translateY(-4px); border-color: #3a3f4b; }
+  .card .ico { font-size: 1.7rem; margin-bottom: 10px; }
+  .card h3 { font-size: 1.05rem; margin-bottom: 6px; }
+  .card p { color: var(--muted); font-size: .95rem; }
+
+  /* steps */
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; counter-reset: step; }
+  .step { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 26px; text-align: center; }
+  .step::before { counter-increment: step; content: counter(step); display: inline-flex; width: 40px; height: 40px; border-radius: 50%; background: var(--blue); color: #fff; font-weight: 700; align-items: center; justify-content: center; margin-bottom: 12px; }
+  .step p { color: var(--muted); font-size: .95rem; }
+  .step strong { display: block; color: var(--text); margin-bottom: 4px; }
+
+  /* faq */
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 22px; margin-bottom: 10px; }
+  summary { cursor: pointer; font-weight: 600; }
+  details p { color: var(--muted); padding: 10px 0 4px; }
+
+  /* support */
+  .support { text-align: center; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 44px 24px; }
+  .support p { color: var(--muted); max-width: 520px; margin: 8px auto 22px; }
+  .heart { color: var(--red-soft); }
+
+  footer { margin-top: 76px; border-top: 1px solid var(--line); padding: 30px 0 40px; text-align: center; color: var(--muted); font-size: .85rem; }
+  footer p { max-width: 700px; margin: 6px auto; }
+
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s, transform .6s; }
+  .reveal.on { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-img { animation: none; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-inner">
+    <img src="assets/logo.svg" alt="">
+    <span class="nav-name">Google Calendar Desktop Widget</span>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="https://github.com/mkazemie/google-calendar-desktop-widget">GitHub</a>
+      <a class="btn btn-blue btn-small" href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/latest">Download</a>
+    </div>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap">
+    <h1>Your Google Calendar, <em>living on your desktop</em></h1>
+    <p class="sub">Transparent. Click-through. Always up to date. Never in the way.
+    The real Google Calendar, pinned to your Windows wallpaper.</p>
+    <div class="cta-row">
+      <a class="btn btn-blue" href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/latest">⬇&nbsp; Download free</a>
+      <a class="btn btn-ghost" href="https://github.com/mkazemie/google-calendar-desktop-widget">View on GitHub</a>
+    </div>
+    <p class="fineprint">Free &amp; open source · Windows 10/11 · ~2&nbsp;MB installer</p>
+    <div class="hero-img">
+      <img src="assets/hero.svg" alt="Transparent Google Calendar widget pinned to a Windows desktop while mouse clicks pass through it" width="1200" height="640">
+    </div>
+  </div>
+</header>
+
+<section id="features">
+  <div class="wrap">
+    <h2>Why you'll love it</h2>
+    <p class="lead">Stop alt-tabbing to check what's next. Your schedule is always one glance away — and completely out of your way.</p>
+    <div class="grid">
+      <div class="card reveal"><div class="ico">🪟</div><h3>Truly click-through</h3><p>Your clicks land on whatever is behind it — desktop icons, files, other apps. The widget is invisible to your mouse.</p></div>
+      <div class="card reveal"><div class="ico">🔄</div><h3>Live, not a snapshot</h3><p>It <b>is</b> Google Calendar. Add an event from your phone and watch it appear on your desktop seconds later.</p></div>
+      <div class="card reveal"><div class="ico">✏️</div><h3>Edit in place</h3><p>One click makes it a normal window: add events, drag meetings around, then fade it back into the wallpaper.</p></div>
+      <div class="card reveal"><div class="ico">👻</div><h3>As subtle as you want</h3><p>Transparency from 0 to 95&nbsp;% — from solid window to a ghost that melts into your wallpaper.</p></div>
+      <div class="card reveal"><div class="ico">📌</div><h3>Stays in the background</h3><p>Pinned beneath every window. It never pops over your work, never steals focus, never interrupts.</p></div>
+      <div class="card reveal"><div class="ico">🖥️</div><h3>Feels native</h3><p>Snap it, maximize it, drag it across monitors like any Windows 11 app. Starts with Windows, lives in the tray.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <h2>Two modes, one button</h2>
+    <p class="lead">A mouse icon in the title bar flips between a ghosted widget and a fully interactive calendar.</p>
+    <div class="reveal"><img src="assets/modes.svg" alt="Widget mode is ghosted and click-through; interactive mode is a normal window for editing events" width="1200" height="400"></div>
+  </div>
+</section>
+
+<section id="get">
+  <div class="wrap">
+    <h2>Up and running in a minute</h2>
+    <p class="lead">No account to create, no configuration required.</p>
+    <div class="steps">
+      <div class="step reveal"><strong>Download &amp; run</strong><p>Grab the ~2&nbsp;MB installer. It fetches anything else it needs automatically.</p></div>
+      <div class="step reveal"><strong>Sign in once</strong><p>Log into your Google account — your session is remembered on your machine.</p></div>
+      <div class="step reveal"><strong>Toggle &amp; forget</strong><p>Hit the mouse button in the title bar. Your calendar fades into the desktop.</p></div>
+    </div>
+    <div class="cta-row" style="margin-top:34px">
+      <a class="btn btn-blue" href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/latest">⬇&nbsp; Download CalendarWidgetSetup.exe</a>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap" style="max-width:760px">
+    <h2>Questions, answered</h2>
+    <p class="lead"></p>
+    <details class="reveal"><summary>Is it really free?</summary><p>Yes — free and open source (Apache 2.0), with no ads, accounts, or telemetry. If you love it, there's an optional donation link. That's it.</p></details>
+    <details class="reveal"><summary>Is this an official Google app?</summary><p>No. It's an independent open-source project that displays the real calendar.google.com in its own window. Not affiliated with or endorsed by Google.</p></details>
+    <details class="reveal"><summary>Windows says the installer is unrecognized — why?</summary><p>The installer isn't code-signed (certificates cost money; this app is free). Click "More info → Run anyway". The full source code is on GitHub, so you can audit or build it yourself.</p></details>
+    <details class="reveal"><summary>Where is my Google login stored?</summary><p>Only on your machine, in the app's private browser profile — the same way Chrome stores your session. You can sign out (or wipe everything) from the app's settings, and the uninstaller offers to remove all data.</p></details>
+    <details class="reveal"><summary>Does it work with multiple monitors?</summary><p>Yes — drag it to any monitor, snap it, or maximize it there. It remembers its position between restarts.</p></details>
+    <details class="reveal"><summary>What does it need to run?</summary><p>Windows 10 or 11. The installer automatically fetches the .NET 8 runtime and WebView2 (built into Windows 11) if they're missing.</p></details>
+  </div>
+</section>
+
+<section>
+  <div class="wrap" style="max-width:760px">
+    <div class="support reveal">
+      <h2><span class="heart">♥</span> Support the project</h2>
+      <p>Google Calendar Desktop Widget is free and always will be. If it earns a permanent spot on your desktop, you can fuel its development.</p>
+      <a class="btn btn-blue" href="https://paypal.me/MahdiKazemiesfahani">☕ Donate via PayPal</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><a href="https://github.com/mkazemie/google-calendar-desktop-widget">GitHub</a> ·
+       <a href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/latest">Download</a> ·
+       <a href="https://github.com/mkazemie/google-calendar-desktop-widget/blob/main/LICENSE">Apache 2.0 License</a></p>
+    <p>This is an unofficial, independent project — not affiliated with or endorsed by Google. Google Calendar is a trademark of Google LLC.</p>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver(entries => {
+    for (const e of entries) if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); }
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>

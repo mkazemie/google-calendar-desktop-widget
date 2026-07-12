@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mkazemie.github.io/google-calendar-desktop-widget/sitemap.xml
