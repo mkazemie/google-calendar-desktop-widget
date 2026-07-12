@@ -33,26 +33,36 @@ public class SettingsForm : Form
         BackColor = Back;
         ForeColor = Fore;
         Font = new Font("Segoe UI", 10f);
-        ClientSize = new Size(340, 304);
+        ClientSize = new Size(340, 380);
         try { Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { /* keep default */ }
 
         // ---- transparency ----
-        var valAlpha = ValueLabel(settings.Transparency.ToString(), 16);
+        var valAlpha = ValueLabel(settings.TransparencyPercent + "%", 16);
         Controls.Add(SectionLabel("TRANSPARENCY", 16));
         Controls.Add(valAlpha);
-        var sldAlpha = Slider(40, 80, 255, settings.Transparency);
+        var sldAlpha = Slider(40, 0, 95, settings.TransparencyPercent);
         sldAlpha.ValueChanged += (_, _) =>
         {
-            valAlpha.Text = sldAlpha.Value.ToString();
-            main.SetTransparency(sldAlpha.Value);
+            valAlpha.Text = sldAlpha.Value + "%";
+            main.SetTransparencyPercent(sldAlpha.Value);
         };
         Controls.Add(sldAlpha);
 
-        // ---- hover panel corner ----
-        Controls.Add(SectionLabel("PANEL CORNER", 100));
+        // ---- corner hover panel ----
+        Controls.Add(SectionLabel("HOVER PANEL", 100));
+        var cbCorner = new CheckBox
+        {
+            Text = "Show hover panel in a screen corner",
+            AutoSize = true,
+            Location = new Point(20, 124),
+            ForeColor = Fore,
+            Checked = settings.CornerPanelEnabled,
+        };
+        Controls.Add(cbCorner);
         var cmbCorner = new ComboBox
         {
-            Location = new Point(20, 124),
+            Location = new Point(20, 156),
+            Enabled = settings.CornerPanelEnabled,
             Width = 300,
             DropDownStyle = ComboBoxStyle.DropDownList,
             FlatStyle = FlatStyle.Flat,
@@ -63,13 +73,18 @@ public class SettingsForm : Form
         cmbCorner.SelectedIndex = Math.Max(0, Array.IndexOf(CornerIds, settings.PanelCorner));
         cmbCorner.SelectedIndexChanged += (_, _) => main.SetPanelCorner(CornerIds[cmbCorner.SelectedIndex]);
         Controls.Add(cmbCorner);
+        cbCorner.CheckedChanged += (_, _) =>
+        {
+            cmbCorner.Enabled = cbCorner.Checked;
+            main.SetCornerPanelEnabled(cbCorner.Checked);
+        };
 
         // ---- startup ----
         var cbStartup = new CheckBox
         {
             Text = "Start with Windows",
             AutoSize = true,
-            Location = new Point(20, 168),
+            Location = new Point(20, 200),
             ForeColor = Fore,
         };
         cbStartup.Checked = IsStartupEnabled();
@@ -82,14 +97,30 @@ public class SettingsForm : Form
             Text = "Tip: for a dark widget, enable dark mode inside Google Calendar's own settings (gear icon).",
             ForeColor = Muted,
             Font = new Font("Segoe UI", 9f),
-            Location = new Point(20, 200),
+            Location = new Point(20, 232),
             Size = new Size(300, 40),
         });
+
+        // ---- support the project ----
+        var btnDonate = new Button
+        {
+            Text = "♥  Support development (PayPal)",
+            Location = new Point(20, 280),
+            Size = new Size(300, 36),
+            FlatStyle = FlatStyle.Flat,
+            BackColor = CardBack,
+            ForeColor = Color.FromArgb(242, 139, 130),  // soft red, matching the dark palette
+        };
+        btnDonate.FlatAppearance.BorderColor = Border;
+        btnDonate.FlatAppearance.MouseOverBackColor = Color.FromArgb(60, 64, 67);
+        btnDonate.Click += (_, _) => System.Diagnostics.Process.Start(
+            new System.Diagnostics.ProcessStartInfo("https://paypal.me/MahdiKazemiesfahani") { UseShellExecute = true });
+        Controls.Add(btnDonate);
 
         var btnExit = new Button
         {
             Text = "Exit widget",
-            Location = new Point(20, 252),
+            Location = new Point(20, 328),
             Size = new Size(140, 36),
             FlatStyle = FlatStyle.Flat,
             BackColor = CardBack,
@@ -103,7 +134,7 @@ public class SettingsForm : Form
         btnAccount = new Button
         {
             Text = "Sign in",  // refreshed from the real cookie state whenever the form is shown
-            Location = new Point(180, 252),
+            Location = new Point(180, 328),
             Size = new Size(140, 36),
             FlatStyle = FlatStyle.Flat,
             BackColor = CardBack,

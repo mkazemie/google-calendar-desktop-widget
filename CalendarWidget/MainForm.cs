@@ -232,11 +232,19 @@ public class MainForm : Form
         }
     }
 
-    public void SetTransparency(int alpha)
+    public void SetTransparencyPercent(int percent)
     {
-        settings.Transparency = Math.Clamp(alpha, 80, 255);
+        settings.TransparencyPercent = percent;
         if (isClickThrough)
             Opacity = settings.Transparency / 255.0;
+        settings.Save();
+    }
+
+    public void SetCornerPanelEnabled(bool enabled)
+    {
+        settings.CornerPanelEnabled = enabled;
+        if (!enabled)
+            hoverPanel.Hide();
         settings.Save();
     }
 
@@ -283,6 +291,9 @@ public class MainForm : Form
             guardTick = 0;
             NativeMethods.EnableClickThrough(Handle, clickThroughApplied);
         }
+
+        if (!settings.CornerPanelEnabled)
+            return;
 
         var rect = GetPanelRect();
 

@@ -1,10 +1,22 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace CalendarWidget;
 
 public class AppSettings
 {
-    public int Transparency { get; set; } = 220;  // 80..255
+    public int Transparency { get; set; } = 220;  // stored as window alpha, 13..255
+
+    /// <summary>UI-facing value: how transparent the widget is, 0..95 % (95 keeps it faintly visible).</summary>
+    [JsonIgnore]
+    public int TransparencyPercent
+    {
+        get => Math.Clamp((int)Math.Round((1 - Transparency / 255.0) * 100), 0, 95);
+        set => Transparency = (int)Math.Round(255 * (100 - Math.Clamp(value, 0, 95)) / 100.0);
+    }
+
+    // hover panel in a screen corner (click-through mode); redundant with the title bar, so toggleable
+    public bool CornerPanelEnabled { get; set; } = true;
 
     // which screen corner hosts the hover panel: BottomRight, BottomLeft, TopRight, TopLeft
     public string PanelCorner { get; set; } = "BottomRight";
