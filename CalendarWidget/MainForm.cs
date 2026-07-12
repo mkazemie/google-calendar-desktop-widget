@@ -27,6 +27,7 @@ public class MainForm : Form
     private int styleBurst;               // fast re-assert right after enabling (Chrome recreates windows)
     private int attachCheckTick;          // throttle for the behind-icons re-attach watchdog
     private bool attachedToDesktop;       // reparented into WorkerW (behind the desktop icons)
+    private IntPtr attachedWorkerW;       // the specific WorkerW we parented into; its destruction = orphaned
     private Rectangle boundsBeforeAttach; // screen bounds to restore on detach (child coords are parent-relative)
     private bool maximizedBeforeAttach;   // attached windows are always Normal; re-maximize on detach
     private Rectangle normalBoundsBeforeAttach;  // the pre-maximize rect to give back to RestoreBounds
@@ -290,6 +291,7 @@ public class MainForm : Form
         NativeMethods.SetWindowPos(Handle, IntPtr.Zero, pt.X, pt.Y,
             boundsBeforeAttach.Width, boundsBeforeAttach.Height, NativeMethods.SWP_NOZORDER_NOACTIVATE);
         attachedToDesktop = true;
+        attachedWorkerW = workerW;
 
         // reparenting swaps the DPI context to the primary monitor's: WebView2 re-zooms
         // and WinForms may rescale layout. After the DPI messages drain, compensate the
@@ -322,6 +324,7 @@ public class MainForm : Form
         NativeMethods.SetRedraw(Handle, false);
         NativeMethods.SetParent(Handle, IntPtr.Zero);
         attachedToDesktop = false;
+        attachedWorkerW = IntPtr.Zero;
         try { webView.ZoomFactor = 1.0; } catch { }
         Bounds = boundsBeforeAttach;
         if (maximizedBeforeAttach)
@@ -352,19 +355,25 @@ public class MainForm : Form
     /// (common with multiple monitors), which orphans our reparented window — it survives
     /// but floats at stale WorkerW-relative coordinates, so it appears to vanish. Detect the
     /// orphaning and re-attach to the fresh WorkerW. Runs from the 100 ms poll, throttled.
+    ///
+    /// The orphaning signal is the DESTRUCTION of the WorkerW we attached to
+    /// (`IsWindow(attachedWorkerW)`), NOT `GetParent(Handle)`: a WinForms window keeps its
+    /// top-level style after SetParent, so GetParent returns 0 even while correctly parented
+    /// — checking it would re-attach every tick and flicker the WebView white.
     /// </summary>
     private void EnsureDesktopAttachment()
     {
         if (!settings.BehindDesktopIcons || !isClickThrough)
             return;
-        if (attachedToDesktop && NativeMethods.IsWorkerW(NativeMethods.GetParent(Handle)))
-            return;  // still correctly parented under a live WorkerW
+        if (attachedToDesktop && NativeMethods.IsWindow(attachedWorkerW))
+            return;  // the WorkerW we're parented into is still alive — nothing to do
 
         if (attachedToDesktop)
         {
-            // orphaned: return to a valid top-level state at known-good screen bounds first
+            // our WorkerW was destroyed: return to a valid top-level state at known-good bounds
             NativeMethods.SetParent(Handle, IntPtr.Zero);
             attachedToDesktop = false;
+            attachedWorkerW = IntPtr.Zero;
             Bounds = boundsBeforeAttach;
         }
         AttachToDesktop();
