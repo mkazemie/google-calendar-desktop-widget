@@ -37,7 +37,7 @@ public class SettingsForm : Form
         BackColor = Back;
         ForeColor = Fore;
         Font = new Font("Segoe UI", 10f);
-        ClientSize = new Size(340, 416);
+        ClientSize = new Size(340, 504);
         try { Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { /* keep default */ }
 
         // ---- transparency ----
@@ -64,20 +64,47 @@ public class SettingsForm : Form
         cbBehind.CheckedChanged += (_, _) => main.SetBehindDesktopIcons(cbBehind.Checked);
         Controls.Add(cbBehind);
 
+        // ---- edge shadows: dark fades behind desktop icons ----
+        Controls.Add(SectionLabel("EDGE SHADOWS (WIDGET MODE)", 140));
+        var sldShadow = new EdgeShadowSlider
+        {
+            Location = new Point(8, 160),  // track spans x 20..320, flush with the labels
+            Width = 324,
+            BackColor = Back,
+            LeftPercent = settings.EdgeShadowLeftPercent,
+            RightPercent = settings.EdgeShadowRightPercent,
+        };
+        var valShadowLeft = SideValueLabel(20, ContentAlignment.TopLeft);
+        var valShadowRight = SideValueLabel(170, ContentAlignment.TopRight);
+        void ShowShadowValues()
+        {
+            valShadowLeft.Text = SideValue("Left", sldShadow.LeftPercent);
+            valShadowRight.Text = SideValue("Right", sldShadow.RightPercent);
+        }
+        ShowShadowValues();
+        sldShadow.ValuesChanged += (_, _) =>
+        {
+            ShowShadowValues();
+            main.SetEdgeShadows(sldShadow.LeftPercent, sldShadow.RightPercent);
+        };
+        Controls.Add(sldShadow);
+        Controls.Add(valShadowLeft);
+        Controls.Add(valShadowRight);
+
         // ---- corner hover panel ----
-        Controls.Add(SectionLabel("HOVER PANEL", 140));
+        Controls.Add(SectionLabel("HOVER PANEL", 228));
         var cbCorner = new CheckBox
         {
             Text = "Show hover panel in a screen corner",
             AutoSize = true,
-            Location = new Point(20, 164),
+            Location = new Point(20, 252),
             ForeColor = Fore,
             Checked = settings.CornerPanelEnabled,
         };
         Controls.Add(cbCorner);
         var cmbCorner = new ComboBox
         {
-            Location = new Point(20, 196),
+            Location = new Point(20, 284),
             Enabled = settings.CornerPanelEnabled,
             Width = 300,
             DropDownStyle = ComboBoxStyle.DropDownList,
@@ -100,7 +127,7 @@ public class SettingsForm : Form
         {
             Text = "Start with Windows",
             AutoSize = true,
-            Location = new Point(20, 240),
+            Location = new Point(20, 328),
             ForeColor = Fore,
         };
         cbStartup.Checked = IsStartupEnabled();
@@ -113,7 +140,7 @@ public class SettingsForm : Form
             Text = "Tip: for a dark widget, enable dark mode inside Google Calendar's own settings (gear icon).",
             ForeColor = Muted,
             Font = new Font("Segoe UI", 9f),
-            Location = new Point(20, 272),
+            Location = new Point(20, 360),
             Size = new Size(300, 40),
         });
 
@@ -121,7 +148,7 @@ public class SettingsForm : Form
         var btnDonate = new Button
         {
             Text = "♥  Support development (PayPal)",
-            Location = new Point(20, 316),
+            Location = new Point(20, 404),
             Size = new Size(300, 36),
             FlatStyle = FlatStyle.Flat,
             BackColor = CardBack,
@@ -136,7 +163,7 @@ public class SettingsForm : Form
         var btnExit = new Button
         {
             Text = "Exit widget",
-            Location = new Point(20, 364),
+            Location = new Point(20, 452),
             Size = new Size(140, 36),
             FlatStyle = FlatStyle.Flat,
             BackColor = CardBack,
@@ -150,7 +177,7 @@ public class SettingsForm : Form
         btnAccount = new Button
         {
             Text = "Sign in",  // refreshed from the real cookie state whenever the form is shown
-            Location = new Point(180, 364),
+            Location = new Point(180, 452),
             Size = new Size(140, 36),
             FlatStyle = FlatStyle.Flat,
             BackColor = CardBack,
@@ -249,6 +276,18 @@ public class SettingsForm : Form
         Anchor = AnchorStyles.Top | AnchorStyles.Right,
         Location = new Point(290, y),
     };
+
+    // value caption under one end of the edge-shadow slider
+    private Label SideValueLabel(int x, ContentAlignment align) => new()
+    {
+        ForeColor = Accent,
+        Font = new Font("Segoe UI", 9f),
+        Location = new Point(x, 186),
+        Size = new Size(150, 20),
+        TextAlign = align,
+    };
+
+    private static string SideValue(string side, int percent) => percent == 0 ? side + " off" : $"{side} {percent}%";
 
     private TrackBar Slider(int y, int min, int max, int value) => new()
     {

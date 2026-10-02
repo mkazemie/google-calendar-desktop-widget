@@ -120,6 +120,7 @@ public class MainForm : Form
         {
             var env = await CoreWebView2Environment.CreateAsync(null, AppSettings.WebViewDataFolder);
             await webView.EnsureCoreWebView2Async(env);
+            webView.CoreWebView2.DOMContentLoaded += (_, _) => ApplyEdgeShadows();
             webView.CoreWebView2.Navigate(CalendarUrl);
 
             // WebView2's child windows didn't exist during the startup toggle; cover them now
@@ -170,8 +171,9 @@ public class MainForm : Form
             Activate();
         }
         hoverPanel.UpdateState(enable);
-        titleBar.UpdateState(enable);
+        titleBar.UpdateState(enable, Opacity);
         titleBar.Reposition();
+        ApplyEdgeShadows();  // widget mode only: they'd hide content while interacting
         settings.Save();
     }
 
@@ -258,7 +260,61 @@ public class MainForm : Form
     {
         settings.TransparencyPercent = percent;
         if (isClickThrough)
+        {
             Opacity = settings.Transparency / 255.0;
+            titleBar.UpdateState(true, Opacity);
+        }
+        settings.Save();
+    }
+
+    // ---------------- edge shadows (icon backdrop) ----------------
+
+    // cosine ease from opaque black to clear: no visible edge where the fade starts or ends.
+    // Invariant formatting — a decimal comma would silently break the CSS.
+    private static readonly string ShadowStops = string.Join(", ", Enumerable.Range(0, 11).Select(i =>
+        FormattableString.Invariant($"rgba(0,0,0,{(1 + Math.Cos(Math.PI * i / 10)) / 2:0.###}) {i * 10}%")));
+
+    /// <summary>
+    /// Widget mode: dark gradients over the calendar's left/right edges so desktop icons on
+    /// top of it read against a smooth backdrop instead of calendar text. Drawn INSIDE the
+    /// page as fixed, pointer-events:none overlays — a WinForms control can't be translucent
+    /// over WebView2's own HWND. Re-run on every DOMContentLoaded, since a navigation
+    /// (sign-in, reload) starts a fresh document without them.
+    /// </summary>
+    private void ApplyEdgeShadows()
+    {
+        if (webView.CoreWebView2 is null)
+            return;
+        int left = isClickThrough ? Math.Clamp(settings.EdgeShadowLeftPercent, 0, 100) : 0;
+        int right = isClickThrough ? Math.Clamp(settings.EdgeShadowRightPercent, 0, 100) : 0;
+        // style via CSSOM properties (not a <style> tag or style attribute): Google's CSP allows it
+        _ = webView.CoreWebView2.ExecuteScriptAsync($$"""
+            (() => {
+              const shade = (id, side, width) => {
+                let el = document.getElementById(id);
+                if (!width) { el?.remove(); return; }
+                if (!el) {
+                  el = document.createElement('div');
+                  el.id = id;
+                  document.documentElement.appendChild(el);
+                }
+                Object.assign(el.style, {
+                  position: 'fixed', top: '0', bottom: '0', [side]: '0', width: width + 'vw',
+                  pointerEvents: 'none', zIndex: '2147483647',
+                  background: `linear-gradient(to ${side === 'left' ? 'right' : 'left'}, {{ShadowStops}})`,
+                });
+              };
+              shade('cw-shadow-left', 'left', {{left}});
+              shade('cw-shadow-right', 'right', {{right}});
+            })();
+            """);
+    }
+
+    public void SetEdgeShadows(int leftPercent, int rightPercent)
+    {
+        settings.EdgeShadowLeftPercent = leftPercent;
+        settings.EdgeShadowRightPercent = rightPercent;
+        ApplyEdgeShadows();
         settings.Save();
     }
 

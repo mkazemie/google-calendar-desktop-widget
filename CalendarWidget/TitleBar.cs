@@ -10,6 +10,8 @@ namespace CalendarWidget;
 /// never subject to the click-through styling applied to the main window's tree — the
 /// controls keep working while the calendar underneath passes clicks to the desktop.
 /// Dragging it forwards a native caption drag to the owner, so Aero Snap works.
+/// In widget mode the window clips itself (Region) to just its buttons: the rest of the
+/// strip shows the main window beneath and passes clicks through like the calendar does.
 /// </summary>
 public class TitleBar : Form
 {
@@ -28,6 +30,7 @@ public class TitleBar : Form
     private readonly Form owner;
     private readonly Action onToggleMaximize;
     private readonly Button btnToggle;
+    private readonly Button btnMenu;
     private readonly Button btnClose;
     private bool clickThrough;
 
@@ -74,7 +77,7 @@ public class TitleBar : Form
 
         var iconFont = HoverPanel.CreateIconFont(10f);
         btnToggle = MakeButton("", iconFont, HoverBack);      // mouse: toggle click-through
-        var btnMenu = MakeButton("", iconFont, HoverBack);    // hamburger: settings
+        btnMenu = MakeButton("", iconFont, HoverBack);        // hamburger: settings
         btnClose = MakeButton("", iconFont, CloseHover);  // ChromeClose glyph
         btnToggle.Click += (_, _) => onToggle();
         btnMenu.Click += (_, _) => onSettings();
@@ -88,12 +91,7 @@ public class TitleBar : Form
         Controls.AddRange([iconBox, title, btnToggle, btnMenu, btnClose]);
 
         // right-align the buttons whenever the bar resizes with the window
-        Resize += (_, _) =>
-        {
-            btnClose.Location = new Point(Width - BtnW, 0);
-            btnMenu.Location = new Point(Width - 2 * BtnW, 0);
-            btnToggle.Location = new Point(Width - 3 * BtnW, 0);
-        };
+        Resize += (_, _) => LayoutButtons();
 
         // dragging the bar (or the title/icon on it) moves the owner window
         MouseDown += StartDrag;
@@ -123,12 +121,33 @@ public class TitleBar : Form
             NativeMethods.SWP_NOZORDER_NOACTIVATE);
     }
 
-    /// <summary>Widget mode: tint the mouse icon; hide close; disable drag/maximize (bar becomes buttons-only).</summary>
-    public void UpdateState(bool clickThrough)
+    /// <summary>
+    /// Widget mode: tint the mouse icon; hide close; disable drag/maximize; shrink to the
+    /// buttons and take the widget's opacity so the bar reads as part of the calendar.
+    /// </summary>
+    public void UpdateState(bool clickThrough, double widgetOpacity)
     {
         this.clickThrough = clickThrough;
         btnToggle.ForeColor = clickThrough ? IconActive : Fore;
         btnClose.Visible = !clickThrough;
+        LayoutButtons();
+        Opacity = clickThrough ? widgetOpacity : 1.0;
+    }
+
+    private void LayoutButtons()
+    {
+        // decided by mode, not Button.Visible: that reads false until the bar is first shown
+        Button[] shown = clickThrough ? [btnToggle, btnMenu] : [btnToggle, btnMenu, btnClose];
+        for (int i = 0; i < shown.Length; i++)
+            shown[i].Location = new Point(Width - (shown.Length - i) * BtnW, 0);
+
+        // widget mode: the window is ONLY its buttons — outside them hit-testing falls
+        // through to whatever is below (the click-through calendar, desktop icons in
+        // live-wallpaper mode). A region, not HTTRANSPARENT: that only forwards clicks to
+        // windows on this thread, never to the desktop.
+        Region = clickThrough
+            ? new Region(new Rectangle(Width - shown.Length * BtnW, 0, shown.Length * BtnW, BarHeight))
+            : null;
     }
 
     private Button MakeButton(string glyph, Font font, Color hover)

@@ -22,6 +22,12 @@ public class AppSettings
     // widget mode sits behind the desktop icons (live-wallpaper style, WorkerW reparenting)
     public bool BehindDesktopIcons { get; set; }
 
+    // widget mode darkens the calendar's edges (fading from black to clear) so desktop icons
+    // on top read against a smooth backdrop instead of calendar text; width in % of the
+    // calendar, 0 = off. Their sum stays <= 100 - EdgeShadowSlider.MinGap.
+    public int EdgeShadowLeftPercent { get; set; }
+    public int EdgeShadowRightPercent { get; set; }
+
     // hover panel in a screen corner (click-through mode); redundant with the title bar, so toggleable
     public bool CornerPanelEnabled { get; set; } = true;
 
