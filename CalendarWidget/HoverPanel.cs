@@ -2,8 +2,6 @@
 // Copyright (C) 2026 Mahdi Kazemiesfahani
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Drawing.Text;
-
 namespace CalendarWidget;
 
 /// <summary>
@@ -13,16 +11,15 @@ namespace CalendarWidget;
 /// </summary>
 public class HoverPanel : Form
 {
-    // compact enough to sit on the window's title bar in interactive mode
-    public const int PanelW = 96;
-    public const int PanelH = 30;
-
-    private static readonly Color PanelBack = Color.FromArgb(32, 33, 36);
-    private static readonly Color HoverBack = Color.FromArgb(60, 64, 67);
-    private static readonly Color IconIdle = Color.FromArgb(232, 234, 237);
-    private static readonly Color IconActive = Color.FromArgb(138, 180, 248);
+    // 96-DPI design size; scaled to the target monitor's DPI (see SizeFor)
+    private const int LogicalW = 96;
+    private const int LogicalH = 30;
 
     private readonly Button btnToggle;
+    private readonly Button btnMenu;
+    private int layoutDpi;
+    private Theme theme = Theme.Dark;
+    private bool clickThrough;
 
     // shown next to a click-through widget: it must never steal focus
     protected override bool ShowWithoutActivation => true;
@@ -39,16 +36,14 @@ public class HoverPanel : Form
 
     public HoverPanel(Action onToggle, Action onSettings)
     {
+        AutoScaleMode = AutoScaleMode.None;  // ApplyScale lays the panel out for its DPI
         FormBorderStyle = FormBorderStyle.None;
         StartPosition = FormStartPosition.Manual;
         ShowInTaskbar = false;
         TopMost = true;
-        BackColor = PanelBack;
-        ClientSize = new Size(PanelW, PanelH);
 
-        var iconFont = CreateIconFont(11f);
-        btnToggle = MakeIconButton("\uE962", 0, iconFont);              // mouse glyph: do clicks pass through?
-        var btnMenu = MakeIconButton("\uE700", PanelW / 2, iconFont);   // hamburger glyph
+        btnToggle = MakeIconButton("");  // mouse glyph: do clicks pass through?
+        btnMenu = MakeIconButton("");    // hamburger glyph
         btnToggle.Click += (_, _) => onToggle();
         btnMenu.Click += (_, _) => onSettings();
 
@@ -58,7 +53,12 @@ public class HoverPanel : Form
 
         Controls.Add(btnToggle);
         Controls.Add(btnMenu);
+        ApplyScale(DeviceDpi);
+        ApplyTheme(theme);
     }
+
+    /// <summary>Panel size in pixels on a monitor with this DPI.</summary>
+    public static Size SizeFor(int dpi) => new(UiScale.Px(LogicalW, dpi), UiScale.Px(LogicalH, dpi));
 
     protected override void OnHandleCreated(EventArgs e)
     {
@@ -66,34 +66,70 @@ public class HoverPanel : Form
         NativeMethods.ApplyRoundedCorners(Handle);
     }
 
-    /// <summary>Tint the mouse icon while click-through is active so the widget state is visible at a glance.</summary>
-    public void UpdateState(bool clickThrough) => btnToggle.ForeColor = clickThrough ? IconActive : IconIdle;
+    // MainForm places the panel with ShowAt; cancel WinForms' own rescale on top of that
+    protected override void OnDpiChanged(DpiChangedEventArgs e)
+    {
+        e.Cancel = true;
+        base.OnDpiChanged(e);
+        ApplyScale(e.DeviceDpiNew);
+    }
 
-    private Button MakeIconButton(string glyph, int x, Font font)
+    /// <summary>Show at <paramref name="bounds"/>, laid out for that monitor's DPI.</summary>
+    public void ShowAt(Rectangle bounds, int dpi)
+    {
+        ApplyScale(dpi);
+        // create the window before sizing it: creation clamps it to the system minimum
+        // window size (~136x39 at 100 %, bigger than the panel); later resizes aren't clamped
+        if (!IsHandleCreated)
+            CreateHandle();
+        Bounds = bounds;
+        if (!Visible)
+            Show();  // no-activate: ShowWithoutActivation
+    }
+
+    private void ApplyScale(int dpi)
+    {
+        if (dpi == layoutDpi)
+            return;  // ShowAt runs on every reveal; only a new DPI needs a new layout
+        layoutDpi = dpi;
+        var size = SizeFor(dpi);
+        ClientSize = size;
+        btnToggle.Bounds = new Rectangle(0, 0, size.Width / 2, size.Height);
+        btnMenu.Bounds = new Rectangle(size.Width / 2, 0, size.Width - size.Width / 2, size.Height);
+        btnToggle.Font = btnMenu.Font = UiScale.IconFont(11f, dpi);
+    }
+
+    /// <summary>Match the calendar's light/dark theme.</summary>
+    public void ApplyTheme(Theme t)
+    {
+        theme = t;
+        BackColor = t.Back;
+        foreach (var b in new[] { btnToggle, btnMenu })
+        {
+            b.BackColor = t.Back;
+            b.ForeColor = t.Fore;
+            b.FlatAppearance.MouseOverBackColor = t.Hover;
+            b.FlatAppearance.MouseDownBackColor = t.Hover;
+        }
+        UpdateState(clickThrough);
+    }
+
+    /// <summary>Tint the mouse icon while click-through is active so the widget state is visible at a glance.</summary>
+    public void UpdateState(bool clickThrough)
+    {
+        this.clickThrough = clickThrough;
+        btnToggle.ForeColor = clickThrough ? theme.Accent : theme.Fore;
+    }
+
+    private static Button MakeIconButton(string glyph)
     {
         var b = new Button
         {
-            Bounds = new Rectangle(x, 0, PanelW / 2, PanelH),
             Text = glyph,
-            Font = font,
             FlatStyle = FlatStyle.Flat,
-            BackColor = PanelBack,
-            ForeColor = IconIdle,
             TabStop = false,
         };
         b.FlatAppearance.BorderSize = 0;
-        b.FlatAppearance.MouseOverBackColor = HoverBack;
-        b.FlatAppearance.MouseDownBackColor = HoverBack;
         return b;
-    }
-
-    internal static Font CreateIconFont(float size)
-    {
-        // Segoe Fluent Icons ships with Windows 11; MDL2 Assets is the Windows 10 fallback
-        using var installed = new InstalledFontCollection();
-        string name = installed.Families.Any(f => f.Name == "Segoe Fluent Icons")
-            ? "Segoe Fluent Icons"
-            : "Segoe MDL2 Assets";
-        return new Font(name, size);
     }
 }

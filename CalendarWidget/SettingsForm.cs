@@ -6,12 +6,37 @@ using Microsoft.Win32;
 
 namespace CalendarWidget;
 
+/// <summary>
+/// Settings window. Laid out in code at 96 DPI and scaled to the DPI of the monitor it is
+/// on (<see cref="LayoutForDpi"/>): positions and font sizes scale together, and each row
+/// is placed below the measured height of the one above, so nothing overlaps at any scale.
+/// </summary>
 public class SettingsForm : Form
 {
     private const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
     private const string RunValueName = "CalendarWidget";
 
+    // 96-DPI design metrics
+    private const int LogicalWidth = 340;  // client width
+    private const int Gutter = 20;         // left/right margin
+
     private readonly MainForm main;
+
+    private readonly Label lblAlpha = SectionLabel("TRANSPARENCY");
+    private readonly Label valAlpha = ValueLabel(ContentAlignment.TopRight);
+    private readonly TrackBar sldAlpha;
+    private readonly CheckBox cbBehind;
+    private readonly Label lblShadow = SectionLabel("EDGE SHADOWS");
+    private readonly EdgeShadowSlider sldShadow;
+    private readonly Label valShadowLeft = ValueLabel(ContentAlignment.TopLeft);
+    private readonly Label valShadowRight = ValueLabel(ContentAlignment.TopRight);
+    private readonly Label lblCorner = SectionLabel("HOVER PANEL");
+    private readonly CheckBox cbCorner;
+    private readonly ComboBox cmbCorner;
+    private readonly CheckBox cbStartup;
+    private readonly Label lblTip;
+    private readonly Button btnDonate;
+    private readonly Button btnExit;
     private readonly Button btnAccount;
 
     private static readonly Color Back = Color.FromArgb(32, 33, 36);
@@ -28,54 +53,44 @@ public class SettingsForm : Form
     {
         this.main = main;
         Text = "Google Calendar Desktop Widget";
+        AutoScaleMode = AutoScaleMode.None;  // LayoutForDpi scales everything itself
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MinimizeBox = false;
         MaximizeBox = false;
         ShowInTaskbar = false;
         TopMost = true;
-        StartPosition = FormStartPosition.CenterScreen;
+        StartPosition = FormStartPosition.Manual;  // centered by ShowAndActivate / OnHandleCreated
         BackColor = Back;
         ForeColor = Fore;
-        Font = new Font("Segoe UI", 10f);
-        ClientSize = new Size(340, 504);
         try { Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { /* keep default */ }
 
         // ---- transparency ----
-        var valAlpha = ValueLabel(settings.TransparencyPercent + "%", 16);
-        Controls.Add(SectionLabel("TRANSPARENCY", 16));
-        Controls.Add(valAlpha);
-        var sldAlpha = Slider(40, 0, 95, settings.TransparencyPercent);
+        valAlpha.Text = settings.TransparencyPercent + "%";
+        sldAlpha = new TrackBar
+        {
+            Minimum = 0,
+            Maximum = 95,
+            Value = Math.Clamp(settings.TransparencyPercent, 0, 95),
+            TickStyle = TickStyle.None,
+            BackColor = Back,
+        };
         sldAlpha.ValueChanged += (_, _) =>
         {
             valAlpha.Text = sldAlpha.Value + "%";
             main.SetTransparencyPercent(sldAlpha.Value);
         };
-        Controls.Add(sldAlpha);
 
         // ---- live-wallpaper mode ----
-        var cbBehind = new CheckBox
-        {
-            Text = "Sit behind desktop icons (live wallpaper)",
-            AutoSize = true,
-            Location = new Point(20, 96),
-            ForeColor = Fore,
-            Checked = settings.BehindDesktopIcons,
-        };
+        cbBehind = Check("Sit behind desktop icons (live wallpaper)", settings.BehindDesktopIcons);
         cbBehind.CheckedChanged += (_, _) => main.SetBehindDesktopIcons(cbBehind.Checked);
-        Controls.Add(cbBehind);
 
         // ---- edge shadows: dark fades behind desktop icons ----
-        Controls.Add(SectionLabel("EDGE SHADOWS (WIDGET MODE)", 140));
-        var sldShadow = new EdgeShadowSlider
+        sldShadow = new EdgeShadowSlider
         {
-            Location = new Point(8, 160),  // track spans x 20..320, flush with the labels
-            Width = 324,
             BackColor = Back,
             LeftPercent = settings.EdgeShadowLeftPercent,
             RightPercent = settings.EdgeShadowRightPercent,
         };
-        var valShadowLeft = SideValueLabel(20, ContentAlignment.TopLeft);
-        var valShadowRight = SideValueLabel(170, ContentAlignment.TopRight);
         void ShowShadowValues()
         {
             valShadowLeft.Text = SideValue("Left", sldShadow.LeftPercent);
@@ -87,26 +102,12 @@ public class SettingsForm : Form
             ShowShadowValues();
             main.SetEdgeShadows(sldShadow.LeftPercent, sldShadow.RightPercent);
         };
-        Controls.Add(sldShadow);
-        Controls.Add(valShadowLeft);
-        Controls.Add(valShadowRight);
 
         // ---- corner hover panel ----
-        Controls.Add(SectionLabel("HOVER PANEL", 228));
-        var cbCorner = new CheckBox
+        cbCorner = Check("Show hover panel in a screen corner", settings.CornerPanelEnabled);
+        cmbCorner = new ComboBox
         {
-            Text = "Show hover panel in a screen corner",
-            AutoSize = true,
-            Location = new Point(20, 252),
-            ForeColor = Fore,
-            Checked = settings.CornerPanelEnabled,
-        };
-        Controls.Add(cbCorner);
-        var cmbCorner = new ComboBox
-        {
-            Location = new Point(20, 284),
             Enabled = settings.CornerPanelEnabled,
-            Width = 300,
             DropDownStyle = ComboBoxStyle.DropDownList,
             FlatStyle = FlatStyle.Flat,
             BackColor = CardBack,
@@ -115,7 +116,6 @@ public class SettingsForm : Form
         cmbCorner.Items.AddRange(CornerNames);
         cmbCorner.SelectedIndex = Math.Max(0, Array.IndexOf(CornerIds, settings.PanelCorner));
         cmbCorner.SelectedIndexChanged += (_, _) => main.SetPanelCorner(CornerIds[cmbCorner.SelectedIndex]);
-        Controls.Add(cmbCorner);
         cbCorner.CheckedChanged += (_, _) =>
         {
             cmbCorner.Enabled = cbCorner.Checked;
@@ -123,70 +123,133 @@ public class SettingsForm : Form
         };
 
         // ---- startup ----
-        var cbStartup = new CheckBox
-        {
-            Text = "Start with Windows",
-            AutoSize = true,
-            Location = new Point(20, 328),
-            ForeColor = Fore,
-        };
-        cbStartup.Checked = IsStartupEnabled();
+        cbStartup = Check("Start with Windows", IsStartupEnabled());
         cbStartup.CheckedChanged += (_, _) => SetStartup(cbStartup.Checked);
-        Controls.Add(cbStartup);
 
-        // ---- tip + exit ----
-        Controls.Add(new Label
+        // ---- tip ----
+        lblTip = new Label
         {
             Text = "Tip: for a dark widget, enable dark mode inside Google Calendar's own settings (gear icon).",
             ForeColor = Muted,
-            Font = new Font("Segoe UI", 9f),
-            Location = new Point(20, 360),
-            Size = new Size(300, 40),
-        });
+        };
 
         // ---- support the project ----
-        var btnDonate = new Button
-        {
-            Text = "♥  Support development (PayPal)",
-            Location = new Point(20, 404),
-            Size = new Size(300, 36),
-            FlatStyle = FlatStyle.Flat,
-            BackColor = CardBack,
-            ForeColor = Color.FromArgb(242, 139, 130),  // soft red, matching the dark palette
-        };
-        btnDonate.FlatAppearance.BorderColor = Border;
-        btnDonate.FlatAppearance.MouseOverBackColor = Color.FromArgb(60, 64, 67);
+        btnDonate = ActionButton("♥  Support development (PayPal)", Color.FromArgb(242, 139, 130));  // soft red, matching the dark palette
         btnDonate.Click += (_, _) => System.Diagnostics.Process.Start(
             new System.Diagnostics.ProcessStartInfo("https://paypal.me/MahdiKazemiesfahani") { UseShellExecute = true });
-        Controls.Add(btnDonate);
 
-        var btnExit = new Button
-        {
-            Text = "Exit widget",
-            Location = new Point(20, 452),
-            Size = new Size(140, 36),
-            FlatStyle = FlatStyle.Flat,
-            BackColor = CardBack,
-            ForeColor = Fore,
-        };
-        btnExit.FlatAppearance.BorderColor = Border;
-        btnExit.FlatAppearance.MouseOverBackColor = Color.FromArgb(60, 64, 67);
+        btnExit = ActionButton("Exit widget", Fore);
         btnExit.Click += (_, _) => Application.Exit();
-        Controls.Add(btnExit);
 
-        btnAccount = new Button
-        {
-            Text = "Sign in",  // refreshed from the real cookie state whenever the form is shown
-            Location = new Point(180, 452),
-            Size = new Size(140, 36),
-            FlatStyle = FlatStyle.Flat,
-            BackColor = CardBack,
-            ForeColor = Fore,
-        };
-        btnAccount.FlatAppearance.BorderColor = Border;
-        btnAccount.FlatAppearance.MouseOverBackColor = Color.FromArgb(60, 64, 67);
+        btnAccount = ActionButton("Sign in", Fore);  // refreshed from the real cookie state whenever the form is shown
         btnAccount.Click += OnAccountClick;
-        Controls.Add(btnAccount);
+
+        Controls.AddRange([lblAlpha, valAlpha, sldAlpha, cbBehind, lblShadow, sldShadow, valShadowLeft, valShadowRight,
+            lblCorner, cbCorner, cmbCorner, cbStartup, lblTip, btnDonate, btnExit, btnAccount]);
+
+        LayoutForDpi(DeviceDpi);  // provisional (system DPI); redone once the window's monitor is known
+    }
+
+    /// <summary>
+    /// Lay the window out for <paramref name="dpi"/>. Every size is a 96-DPI value scaled by
+    /// dpi/96 and fonts are sized in pixels for the same DPI, so text and boxes always scale
+    /// together. Rows advance by measured heights rather than fixed offsets.
+    /// </summary>
+    private void LayoutForDpi(int dpi)
+    {
+        int S(int v) => UiScale.Px(v, dpi);
+
+        var body = UiScale.Font(10f, dpi);
+        var small = UiScale.Font(9f, dpi);
+        var section = UiScale.Font(8.5f, dpi, FontStyle.Bold);
+
+        SuspendLayout();
+        // every control gets its font explicitly: on a DPI change WinForms hands children
+        // LOCAL fonts of its own, after which they would no longer follow the form's font
+        Font = body;
+        foreach (Control c in Controls)
+            c.Font = body;
+        lblAlpha.Font = valAlpha.Font = lblShadow.Font = lblCorner.Font = section;
+        valShadowLeft.Font = valShadowRight.Font = lblTip.Font = small;
+
+        int x = S(Gutter);
+        int w = S(LogicalWidth - 2 * Gutter);
+        int half = w / 2;
+
+        // place a control at its preferred height for the given width; returns the next free y
+        int Row(Control c, int left, int top, int width, int gapAfter)
+        {
+            int h = c.GetPreferredSize(new Size(width, 0)).Height;
+            c.SetBounds(left, top, width, h);
+            return top + h + S(gapAfter);
+        }
+
+        int y = S(16);
+        Row(valAlpha, x + half, y, half, 0);  // same line as its section label, right-aligned
+        y = Row(lblAlpha, x, y, half, 4);
+        // the native trackbar insets its thumb travel; widen it so the track lines up with the text
+        sldAlpha.SetBounds(x - S(6), y, w + S(12), 0);  // height: the trackbar's own (AutoSize)
+        y += sldAlpha.Height + S(8);
+        y = Row(cbBehind, x, y, w, 20);
+
+        y = Row(lblShadow, x, y, w, 4);
+        int shadowPad = S(EdgeShadowSlider.LogicalHeight / 2);  // the slider pads its track ends by its half height
+        sldShadow.SetBounds(x - shadowPad, y, w + 2 * shadowPad, S(EdgeShadowSlider.LogicalHeight));
+        y += sldShadow.Height + S(2);
+        Row(valShadowRight, x + half, y, half, 0);
+        y = Row(valShadowLeft, x, y, half, 20);
+
+        y = Row(lblCorner, x, y, w, 6);
+        y = Row(cbCorner, x, y, w, 8);
+        cmbCorner.SetBounds(x, y, w, cmbCorner.PreferredHeight);
+        y += cmbCorner.PreferredHeight + S(16);
+
+        y = Row(cbStartup, x, y, w, 12);
+        y = Row(lblTip, x, y, w, 12);  // wraps to as many lines as the text needs
+
+        btnDonate.SetBounds(x, y, w, S(36));
+        y += S(36 + 12);
+        int bw = (w - S(20)) / 2;
+        btnExit.SetBounds(x, y, bw, S(36));
+        btnAccount.SetBounds(x + w - bw, y, bw, S(36));
+        y += S(36 + 16);
+
+        ClientSize = new Size(S(LogicalWidth), y);
+        ResumeLayout();
+    }
+
+    /// <summary>Show — the first time centered on the monitor under the mouse — and bring to front.</summary>
+    public void ShowAndActivate()
+    {
+        if (!IsHandleCreated)
+            CenterIn(Screen.FromPoint(Cursor.Position));  // so the window is created at that monitor's DPI
+        Show();
+        Activate();
+    }
+
+    private void CenterIn(Screen screen)
+    {
+        var wa = screen.WorkingArea;
+        Location = new Point(wa.Left + Math.Max(0, (wa.Width - Width) / 2), wa.Top + Math.Max(0, (wa.Height - Height) / 2));
+    }
+
+    protected override void OnHandleCreated(EventArgs e)
+    {
+        base.OnHandleCreated(e);
+        NativeMethods.ApplyDarkTitleBar(Handle);
+        // the handle carries the real monitor DPI: final layout, re-centered for the new size
+        LayoutForDpi(DeviceDpi);
+        CenterIn(Screen.FromHandle(Handle));
+    }
+
+    // dragged onto a monitor with another scale. Cancelled so WinForms doesn't also rescale
+    // controls and fonts; we lay out from scratch and take only the suggested position.
+    protected override void OnDpiChanged(DpiChangedEventArgs e)
+    {
+        e.Cancel = true;
+        base.OnDpiChanged(e);
+        LayoutForDpi(e.DeviceDpiNew);
+        Location = e.SuggestedRectangle.Location;
     }
 
     protected override void OnVisibleChanged(EventArgs e)
@@ -194,6 +257,8 @@ public class SettingsForm : Form
         base.OnVisibleChanged(e);
         if (Visible)
             RefreshAccountButton();
+        else
+            main.EndPreview();  // interactive mode returns to fully opaque once Settings closes
     }
 
     private async void RefreshAccountButton()
@@ -241,12 +306,6 @@ public class SettingsForm : Form
         RefreshAccountButton();
     }
 
-    protected override void OnHandleCreated(EventArgs e)
-    {
-        base.OnHandleCreated(e);
-        NativeMethods.ApplyDarkTitleBar(Handle);
-    }
-
     // closing the settings window only hides it; the widget keeps running
     protected override void OnFormClosing(FormClosingEventArgs e)
     {
@@ -258,47 +317,28 @@ public class SettingsForm : Form
         base.OnFormClosing(e);
     }
 
-    private Label SectionLabel(string text, int y) => new()
-    {
-        Text = text,
-        ForeColor = Muted,
-        Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
-        AutoSize = true,
-        Location = new Point(20, y),
-    };
+    private static Label SectionLabel(string text) => new() { Text = text, ForeColor = Muted };
 
-    private Label ValueLabel(string text, int y) => new()
-    {
-        Text = text,
-        ForeColor = Accent,
-        Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
-        AutoSize = true,
-        Anchor = AnchorStyles.Top | AnchorStyles.Right,
-        Location = new Point(290, y),
-    };
+    // live value next to a section label, or under one end of the edge-shadow slider
+    private static Label ValueLabel(ContentAlignment align) => new() { ForeColor = Accent, TextAlign = align };
 
-    // value caption under one end of the edge-shadow slider
-    private Label SideValueLabel(int x, ContentAlignment align) => new()
+    private static CheckBox Check(string text, bool isChecked) => new() { Text = text, ForeColor = Fore, Checked = isChecked };
+
+    private static Button ActionButton(string text, Color fore)
     {
-        ForeColor = Accent,
-        Font = new Font("Segoe UI", 9f),
-        Location = new Point(x, 186),
-        Size = new Size(150, 20),
-        TextAlign = align,
-    };
+        var b = new Button
+        {
+            Text = text,
+            FlatStyle = FlatStyle.Flat,
+            BackColor = CardBack,
+            ForeColor = fore,
+        };
+        b.FlatAppearance.BorderColor = Border;
+        b.FlatAppearance.MouseOverBackColor = Color.FromArgb(60, 64, 67);
+        return b;
+    }
 
     private static string SideValue(string side, int percent) => percent == 0 ? side + " off" : $"{side} {percent}%";
-
-    private TrackBar Slider(int y, int min, int max, int value) => new()
-    {
-        Location = new Point(14, y),
-        Width = 312,
-        Minimum = min,
-        Maximum = max,
-        Value = Math.Clamp(value, min, max),
-        TickStyle = TickStyle.None,
-        BackColor = Back,
-    };
 
     private static bool IsStartupEnabled()
     {

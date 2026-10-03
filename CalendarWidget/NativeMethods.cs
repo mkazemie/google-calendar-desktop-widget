@@ -207,6 +207,23 @@ internal static class NativeMethods
     [DllImport("user32.dll")]
     public static extern uint GetDpiForWindow(IntPtr hwnd);
 
+    [DllImport("user32.dll")]
+    private static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint flags);
+
+    [DllImport("shcore.dll")]
+    private static extern int GetDpiForMonitor(IntPtr hmonitor, int dpiType, out uint dpiX, out uint dpiY);
+
+    /// <summary>
+    /// DPI of the monitor the window is (mostly) on. Unlike GetDpiForWindow this is the
+    /// physical monitor's scale even while we're reparented into the WorkerW, whose DPI
+    /// context is the primary monitor's.
+    /// </summary>
+    public static int MonitorDpi(IntPtr hwnd)
+    {
+        IntPtr monitor = MonitorFromWindow(hwnd, 2 /*MONITOR_DEFAULTTONEAREST*/);
+        return GetDpiForMonitor(monitor, 0 /*MDT_EFFECTIVE_DPI*/, out uint dpi, out _) == 0 ? (int)dpi : 96;
+    }
+
     /// <summary>
     /// True if the window is maximized, read from Win32 rather than WinForms' WindowState —
     /// which can still report Normal mid-transition, making WM_NCCALCSIZE skip the frame

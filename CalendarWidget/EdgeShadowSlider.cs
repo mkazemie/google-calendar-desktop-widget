@@ -17,8 +17,10 @@ public class EdgeShadowSlider : Control
 {
     public const int MinGap = 10;  // % of the calendar kept clear between the two shadows
 
+    // 96-DPI design metrics; everything is drawn scaled to the control's DPI
     private const int ThumbR = 8;
-    private const int Pad = ThumbR + 4;  // room for the focus ring at the track ends
+    private const int Track = 6;
+    public const int LogicalHeight = 2 * (ThumbR + 4);  // room for the focus ring at the track ends
 
     private static readonly Color TrackColor = Color.FromArgb(60, 64, 67);
     private static readonly Color Accent = Color.FromArgb(138, 180, 248);
@@ -34,9 +36,12 @@ public class EdgeShadowSlider : Control
     {
         SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer
             | ControlStyles.UserPaint | ControlStyles.ResizeRedraw | ControlStyles.Selectable, true);
-        Height = 2 * Pad;
+        Height = LogicalHeight;
         Cursor = Cursors.Hand;
     }
+
+    private float K => DeviceDpi / 96f;
+    private float Pad => (ThumbR + 4) * K;
 
     public int LeftPercent
     {
@@ -53,7 +58,7 @@ public class EdgeShadowSlider : Control
     private float XAt(int percent) => Pad + percent * (Width - 2 * Pad) / 100f;
 
     private int PercentAt(int x) =>
-        Math.Clamp((int)Math.Round((x - Pad) * 100f / Math.Max(1, Width - 2 * Pad)), 0, 100);
+        Math.Clamp((int)Math.Round((x - Pad) * 100f / Math.Max(1f, Width - 2 * Pad)), 0, 100);
 
     private void SetFromUser(int newLeft, int newRight)
     {
@@ -130,7 +135,7 @@ public class EdgeShadowSlider : Control
         float cy = Height / 2f;
         float x0 = XAt(0), x1 = XAt(100), xl = XAt(left), xr = XAt(100 - right);
 
-        using (var track = new Pen(TrackColor, 6) { StartCap = LineCap.Round, EndCap = LineCap.Round })
+        using (var track = new Pen(TrackColor, Track * K) { StartCap = LineCap.Round, EndCap = LineCap.Round })
             g.DrawLine(track, x0, cy, x1, cy);
 
         // each shaded span fades from its edge toward its thumb, previewing the shadow itself
@@ -141,24 +146,25 @@ public class EdgeShadowSlider : Control
         DrawThumb(g, xr, cy, ring: Focused && !activeLeft);
     }
 
-    private static void DrawFade(Graphics g, float edge, float thumb, float cy)
+    private void DrawFade(Graphics g, float edge, float thumb, float cy)
     {
         if (Math.Abs(thumb - edge) < 1)
             return;
         using var brush = new LinearGradientBrush(new PointF(edge, cy), new PointF(thumb, cy),
             Accent, Color.FromArgb(0, Accent)) { WrapMode = WrapMode.TileFlipX };  // flip: the rounded cap past the edge stays opaque
-        using var pen = new Pen(brush, 6) { StartCap = LineCap.Round, EndCap = LineCap.Round };
+        using var pen = new Pen(brush, Track * K) { StartCap = LineCap.Round, EndCap = LineCap.Round };
         g.DrawLine(pen, edge, cy, thumb, cy);
     }
 
-    private static void DrawThumb(Graphics g, float x, float cy, bool ring)
+    private void DrawThumb(Graphics g, float x, float cy, bool ring)
     {
+        float r = ThumbR * K;
         using (var fill = new SolidBrush(Accent))
-            g.FillEllipse(fill, x - ThumbR, cy - ThumbR, 2 * ThumbR, 2 * ThumbR);
+            g.FillEllipse(fill, x - r, cy - r, 2 * r, 2 * r);
         if (!ring)
             return;
-        const int r = ThumbR + 3;
-        using var pen = new Pen(Color.FromArgb(140, Accent), 1.5f);
-        g.DrawEllipse(pen, x - r, cy - r, 2 * r, 2 * r);
+        float rr = (ThumbR + 3) * K;
+        using var pen = new Pen(Color.FromArgb(140, Accent), 1.5f * K);
+        g.DrawEllipse(pen, x - rr, cy - rr, 2 * rr, 2 * rr);
     }
 }

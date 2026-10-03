@@ -10,6 +10,8 @@
     <AssemblyName>CalendarWidget</AssemblyName>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <ApplicationIcon>app.ico</ApplicationIcon>
+    <!-- Windows 8+ compatibility: layered child windows (transparency behind desktop icons) -->
+    <ApplicationManifest>app.manifest</ApplicationManifest>
     <!-- precompile to native code on publish: much faster cold start at login -->
     <PublishReadyToRun>true</PublishReadyToRun>
     <TieredCompilationQuickJitForLoops>true</TieredCompilationQuickJitForLoops>

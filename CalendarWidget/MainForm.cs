@@ -2,7 +2,9 @@
 // Copyright (C) 2026 Mahdi Kazemiesfahani
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
 
@@ -24,8 +26,11 @@ public class MainForm : Form
     private readonly HoverPanel hoverPanel;
     private readonly TitleBar titleBar;
     private SettingsForm? settingsForm;
+    private WebView2? stripBackdrop;      // the strip's color behind the desktop icons: see EnsureStripBackdrop
 
+    private Theme theme;                  // chrome colors, following the calendar page's background
     private bool isClickThrough;
+    private bool previewLook;             // interactive mode showing the widget look while Settings is open
     private DateTime? hoverHideDeadline;  // set while the panel is visible but the mouse has left it
     private int guardTick;                // periodic re-assert of click-through styles
     private int styleBurst;               // fast re-assert right after enabling (Chrome recreates windows)
@@ -41,19 +46,28 @@ public class MainForm : Form
     {
         Text = "Google Calendar Desktop Widget";
         FormBorderStyle = FormBorderStyle.None;  // always borderless; TitleBar is the caption in interactive mode
-        BackColor = Color.FromArgb(32, 33, 36);  // shows as the frame around the webview in interactive mode
         ShowInTaskbar = false;
         StartPosition = FormStartPosition.Manual;
         Bounds = InitialBounds();
         try { Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { /* keep default */ }
 
         // the bar is a separate owned window floating over the form's top edge; the padding
-        // reserves that strip so the calendar never renders underneath it
+        // reserves that strip so the calendar never renders underneath it. The bar sizes
+        // itself for its monitor's DPI and reports changes, so the strip always matches.
         titleBar = new TitleBar(this, ToggleClickThrough, ShowSettings, ToggleMaximize);
-        Padding = new Padding(0, TitleBar.BarHeight, 0, 0);
+        titleBar.BarHeightChanged += (_, _) =>
+        {
+            ApplyPadding();
+            titleBar.Reposition();
+        };
+        ApplyPadding();
         Controls.Add(webView);
 
         hoverPanel = new HoverPanel(ToggleClickThrough, ShowSettings);
+
+        // last known calendar theme, so the chrome starts in the right colors before the page loads
+        theme = Theme.FromHex(settings.ThemeColor) ?? Theme.Dark;
+        ApplyThemeColors();
 
         SetupTray();
         hoverPoll.Tick += (_, _) => CheckMouseHover();
@@ -92,16 +106,91 @@ public class MainForm : Form
         if (settings.WinW > 0)
             return new Rectangle(settings.WinX, settings.WinY, settings.WinW, settings.WinH);
 
-        // default: right side of the primary work area
+        // default: right side of the primary work area (no handle yet: DeviceDpi is the primary's)
         var wa = Screen.PrimaryScreen!.WorkingArea;
-        int w = Math.Min(1000, wa.Width / 2);
-        return new Rectangle(wa.Right - w - 20, wa.Top + 20, w, wa.Height - 40);
+        int gap = LogicalToDeviceUnits(20);
+        int w = Math.Min(LogicalToDeviceUnits(1000), wa.Width / 2);
+        return new Rectangle(wa.Right - w - gap, wa.Top + gap, w, wa.Height - 2 * gap);
+    }
+
+    // moved to a monitor with another scale: keep the resize frame matched to it (the bar
+    // rescales itself on its own DPI change and reports back through BarHeightChanged)
+    protected override void OnDpiChanged(DpiChangedEventArgs e)
+    {
+        base.OnDpiChanged(e);
+        ApplyPadding();
+        titleBar.Reposition();
+    }
+
+    /// <summary>
+    /// The title bar's strip on top; in interactive mode also a thin side/bottom frame that
+    /// doubles as resize grips (see WM_NCHITTEST). Scaled to the current DPI.
+    /// </summary>
+    private Padding ModePadding()
+    {
+        int bar = titleBar.BarHeight;
+        if (isClickThrough)
+            return new Padding(0, bar, 0, 0);
+        int frame = LogicalToDeviceUnits(6);
+        return new Padding(frame, bar, frame, frame);
+    }
+
+    private void ApplyPadding()
+    {
+        Padding = ModePadding();
+        stripBackdrop?.SetBounds(0, 0, ClientSize.Width, titleBar.BarHeight);  // fills the reserved strip exactly
+    }
+
+    /// <summary>
+    /// Behind the desktop icons only DirectComposition content shows: on current Windows 11
+    /// the desktop window (Progman) has no GDI surface (WS_EX_NOREDIRECTIONBITMAP), so inside
+    /// the WorkerW nothing GDI-painted is visible — not even in a layered child — and the
+    /// strip beside the title bar's buttons (this form's BackColor) shows the wallpaper
+    /// instead. A WebView2 that never navigates renders only its DefaultBackgroundColor,
+    /// through DirectComposition like the calendar, so it fills the strip in the theme color,
+    /// takes the widget's opacity and sits under the icons. It costs one small renderer
+    /// process, so it's created on the first attach only, then kept (elsewhere it looks
+    /// identical to the painted strip).
+    /// </summary>
+    private async void EnsureStripBackdrop()
+    {
+        var env = webView.CoreWebView2?.Environment;
+        if (stripBackdrop is not null || env is null)
+            return;  // no environment yet: OnLoad calls again once the calendar's WebView is up
+        stripBackdrop = new WebView2
+        {
+            Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right,
+            DefaultBackgroundColor = theme.Back,
+            TabStop = false,
+        };
+        Controls.Add(stripBackdrop);
+        ApplyPadding();
+        try
+        {
+            await stripBackdrop.EnsureCoreWebView2Async(env);
+        }
+        catch (Exception)
+        {
+            // purely cosmetic: without it the strip just shows the wallpaper; retry on next attach
+            Controls.Remove(stripBackdrop);
+            stripBackdrop.Dispose();
+            stripBackdrop = null;
+            return;
+        }
+        // its Chrome windows were created just now: make them click-through like the rest
+        if (isClickThrough)
+        {
+            NativeMethods.EnableClickThrough(Handle, clickThroughApplied);
+            styleBurst = 20;
+        }
     }
 
     protected override async void OnLoad(EventArgs e)
     {
         base.OnLoad(e);
 
+        // start the bar on the owner's monitor so it is created at that monitor's DPI
+        titleBar.Location = PointToScreen(Point.Empty);
         titleBar.Show(this);  // owned: always floats directly above the main window
         titleBar.Reposition();
 
@@ -120,12 +209,16 @@ public class MainForm : Form
         {
             var env = await CoreWebView2Environment.CreateAsync(null, AppSettings.WebViewDataFolder);
             await webView.EnsureCoreWebView2Async(env);
+            webView.CoreWebView2.WebMessageReceived += OnWebMessage;
+            await webView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(ThemeProbeScript);
             webView.CoreWebView2.DOMContentLoaded += (_, _) => ApplyEdgeShadows();
             webView.CoreWebView2.Navigate(CalendarUrl);
 
             // WebView2's child windows didn't exist during the startup toggle; cover them now
             if (isClickThrough)
                 NativeMethods.EnableClickThrough(Handle, clickThroughApplied);
+            if (attachedToDesktop)
+                EnsureStripBackdrop();  // the startup attach ran before there was a WebView2 environment
         }
         catch (Exception ex)
         {
@@ -142,19 +235,17 @@ public class MainForm : Form
     private void SetClickThrough(bool enable)
     {
         isClickThrough = enable;
+        previewLook = false;  // widget mode shows the real look; interactive starts opaque again
         if (enable)
         {
             SaveBounds();  // no-op while maximized: the last normal bounds stay saved
-            Padding = new Padding(0, TitleBar.BarHeight, 0, 0);  // widget mode: no resize frame
-            NativeMethods.AddExStyle(Handle, NativeMethods.WS_EX_NOACTIVATE);
+            ApplyPadding();  // widget mode: no resize frame
             // opacity first: going layered makes Chrome recreate its input windows, which
-            // would shed a just-applied WS_EX_TRANSPARENT. Then style the whole tree and
-            // keep re-asserting on every poll tick (~100ms) for the next ~2s to catch any
-            // window Chrome recreates asynchronously — only this window's tree goes
-            // transparent; the owned TitleBar stays clickable.
-            Opacity = settings.Transparency / 255.0;
-            NativeMethods.EnableClickThrough(Handle, clickThroughApplied);
-            styleBurst = 20;
+            // would shed a just-applied WS_EX_TRANSPARENT. SetOpacity then styles the whole
+            // tree and keeps re-asserting on every poll tick (~100ms) for the next ~2s to
+            // catch any window Chrome recreates asynchronously — only this window's tree
+            // goes transparent; the owned TitleBar stays clickable.
+            SetOpacity(settings.Transparency / 255.0);
             NativeMethods.SendToBottom(Handle);
             if (settings.BehindDesktopIcons)
                 AttachToDesktop();
@@ -165,8 +256,8 @@ public class MainForm : Form
             styleBurst = 0;
             NativeMethods.DisableClickThrough(clickThroughApplied);
             NativeMethods.RemoveExStyle(Handle, NativeMethods.WS_EX_NOACTIVATE);
-            Opacity = 1.0;
-            Padding = new Padding(6, TitleBar.BarHeight, 6, 6);  // side/bottom frame = resize grips
+            SetOpacity(1.0);
+            ApplyPadding();  // side/bottom frame = resize grips
             hoverPanel.Hide();
             Activate();
         }
@@ -218,7 +309,7 @@ public class MainForm : Form
                 int x = unchecked((short)(long)m.LParam);
                 int y = unchecked((short)((long)m.LParam >> 16));
                 var pt = PointToClient(new Point(x, y));
-                const int grip = 8;
+                int grip = LogicalToDeviceUnits(8);
                 bool left = pt.X < grip, right = pt.X >= ClientSize.Width - grip;
                 bool top = pt.Y < grip, bottom = pt.Y >= ClientSize.Height - grip;
                 int hit =
@@ -259,12 +350,126 @@ public class MainForm : Form
     public void SetTransparencyPercent(int percent)
     {
         settings.TransparencyPercent = percent;
+        if (!isClickThrough)
+            previewLook = true;  // interactive mode: show the result while Settings is open
+        ApplyLook();
+        settings.Save();
+    }
+
+    /// <summary>
+    /// Window alpha. Switching between opaque and translucent makes WinForms rewrite the
+    /// ex-style from CreateParams — wiping our manual WS_EX_NOACTIVATE/TRANSPARENT — and
+    /// makes Chrome recreate its input windows, so widget mode re-asserts both right after.
+    /// </summary>
+    private void SetOpacity(double value)
+    {
+        try
+        {
+            Opacity = value;
+        }
+        catch (Win32Exception)
+        {
+            // SetLayeredWindowAttributes refused — e.g. layering a child of the desktop's
+            // WorkerW without Windows 8+ semantics (see app.manifest). Transparency is
+            // cosmetic; it must never take the widget down.
+        }
         if (isClickThrough)
         {
-            Opacity = settings.Transparency / 255.0;
-            titleBar.UpdateState(true, Opacity);
+            NativeMethods.AddExStyle(Handle, NativeMethods.WS_EX_NOACTIVATE);
+            NativeMethods.EnableClickThrough(Handle, clickThroughApplied);
+            styleBurst = 20;
         }
+    }
+
+    /// <summary>
+    /// The widget look — transparency and edge shadows. On in widget mode; in interactive
+    /// mode only while Settings previews a change (until it closes: <see cref="EndPreview"/>).
+    /// </summary>
+    private void ApplyLook()
+    {
+        SetOpacity(isClickThrough || previewLook ? settings.Transparency / 255.0 : 1.0);
+        titleBar.UpdateState(isClickThrough, Opacity);
+        ApplyEdgeShadows();
+    }
+
+    /// <summary>Settings closed: interactive mode drops the previewed widget look again.</summary>
+    public void EndPreview()
+    {
+        if (!previewLook || IsDisposed)
+            return;
+        previewLook = false;
+        ApplyLook();
+    }
+
+    // ---------------- theme (chrome follows the calendar's light/dark look) ----------------
+
+    /// <summary>
+    /// Injected into every page: reports the first opaque background behind the page's
+    /// top-left corner — the color right under the title bar — whenever it changes, so the
+    /// bar, the strip beside it and the frame match Google Calendar's light or dark theme
+    /// (also on the sign-in pages). Polled because a theme switch can restyle the page
+    /// without a navigation; one getComputedStyle walk per second is negligible.
+    /// </summary>
+    internal const string ThemeProbeScript = """
+        (() => {
+          if (window !== window.top || !window.chrome?.webview) return;
+          const opaque = c => {
+            const m = /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)$/.exec(c);
+            return m && (m[4] === undefined || +m[4] >= 0.9) ? [+m[1], +m[2], +m[3]] : null;
+          };
+          let last = '';
+          const probe = () => {
+            let rgb = null;
+            // pointer-events:none overlays (our edge shadows) are skipped by elementFromPoint
+            for (let el = document.elementFromPoint(1, 1); el && !rgb; el = el.parentElement)
+              rgb = opaque(getComputedStyle(el).backgroundColor);
+            for (const el of [document.body, document.documentElement])
+              if (!rgb && el) rgb = opaque(getComputedStyle(el).backgroundColor);
+            if (!rgb || rgb.join() === last) return;
+            last = rgb.join();
+            window.chrome.webview.postMessage({ theme: rgb });
+          };
+          addEventListener('DOMContentLoaded', probe);
+          addEventListener('load', probe);
+          setInterval(probe, 1000);
+        })();
+        """;
+
+    private void OnWebMessage(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
+    {
+        // {"theme":[r,g,b]} from ThemeProbeScript
+        try
+        {
+            using var doc = JsonDocument.Parse(e.WebMessageAsJson);
+            if (doc.RootElement.TryGetProperty("theme", out var rgb) && rgb.GetArrayLength() == 3)
+                SetTheme(Theme.FromBackground(Color.FromArgb(Channel(rgb[0]), Channel(rgb[1]), Channel(rgb[2]))));
+        }
+        catch (Exception ex) when (ex is JsonException or InvalidOperationException or FormatException)
+        {
+            // not a theme message
+        }
+
+        static int Channel(JsonElement v) => Math.Clamp(v.GetInt32(), 0, 255);
+    }
+
+    private void SetTheme(Theme t)
+    {
+        if (t == theme)
+            return;
+        theme = t;
+        ApplyThemeColors();
+        settings.ThemeColor = t.ToHex();
         settings.Save();
+    }
+
+    private void ApplyThemeColors()
+    {
+        BackColor = theme.Back;                     // the strip beside the bar's buttons + the resize frame
+        webView.DefaultBackgroundColor = theme.Back;  // shown while a page loads: no off-theme flash
+        if (stripBackdrop is not null)
+            stripBackdrop.DefaultBackgroundColor = theme.Back;  // the same strip, behind the desktop icons
+        titleBar.ApplyTheme(theme);
+        hoverPanel.ApplyTheme(theme);
     }
 
     // ---------------- edge shadows (icon backdrop) ----------------
@@ -285,8 +490,9 @@ public class MainForm : Form
     {
         if (webView.CoreWebView2 is null)
             return;
-        int left = isClickThrough ? Math.Clamp(settings.EdgeShadowLeftPercent, 0, 100) : 0;
-        int right = isClickThrough ? Math.Clamp(settings.EdgeShadowRightPercent, 0, 100) : 0;
+        bool widgetLook = isClickThrough || previewLook;
+        int left = widgetLook ? Math.Clamp(settings.EdgeShadowLeftPercent, 0, 100) : 0;
+        int right = widgetLook ? Math.Clamp(settings.EdgeShadowRightPercent, 0, 100) : 0;
         // style via CSSOM properties (not a <style> tag or style attribute): Google's CSP allows it
         _ = webView.CoreWebView2.ExecuteScriptAsync($$"""
             (() => {
@@ -314,7 +520,9 @@ public class MainForm : Form
     {
         settings.EdgeShadowLeftPercent = leftPercent;
         settings.EdgeShadowRightPercent = rightPercent;
-        ApplyEdgeShadows();
+        if (!isClickThrough)
+            previewLook = true;  // interactive mode: show the result while Settings is open
+        ApplyLook();
         settings.Save();
     }
 
@@ -352,6 +560,7 @@ public class MainForm : Form
             boundsBeforeAttach.Width, boundsBeforeAttach.Height, NativeMethods.SWP_NOZORDER_NOACTIVATE);
         attachedToDesktop = true;
         attachedWorkerW = workerW;
+        EnsureStripBackdrop();  // the painted strip is invisible from here on
 
         // reparenting swaps the DPI context to the primary monitor's: WebView2 re-zooms
         // and WinForms may rescale layout. After the DPI messages drain, compensate the
@@ -370,7 +579,7 @@ public class MainForm : Form
             NativeMethods.ScreenToClient(workerW, ref p2);
             NativeMethods.SetWindowPos(Handle, IntPtr.Zero, p2.X, p2.Y,
                 boundsBeforeAttach.Width, boundsBeforeAttach.Height, NativeMethods.SWP_NOZORDER_NOACTIVATE);
-            Padding = new Padding(0, TitleBar.BarHeight, 0, 0);
+            ApplyPadding();
             titleBar.Reposition();
             NativeMethods.SetRedraw(Handle, true);
             NativeMethods.RepaintAll(Handle);
@@ -403,7 +612,7 @@ public class MainForm : Form
             }
             if (WindowState == FormWindowState.Normal)
                 Bounds = boundsBeforeAttach;
-            Padding = isClickThrough ? new Padding(0, TitleBar.BarHeight, 0, 0) : new Padding(6, TitleBar.BarHeight, 6, 6);
+            ApplyPadding();
             titleBar.Reposition();
             NativeMethods.SetRedraw(Handle, true);
             NativeMethods.RepaintAll(Handle);
@@ -460,38 +669,60 @@ public class MainForm : Form
     public void SetCornerPanelEnabled(bool enabled)
     {
         settings.CornerPanelEnabled = enabled;
-        if (!enabled)
-            hoverPanel.Hide();
+        PreviewHoverPanel();  // shows it briefly when enabled, hides it when disabled
         settings.Save();
     }
 
     // ---------------- hover panel ----------------
 
-    private Rectangle GetPanelRect()
+    /// <summary>Where the panel goes on the widget's monitor, sized for that monitor's DPI.</summary>
+    private (Rectangle Bounds, int Dpi) GetPanelPlacement()
     {
         var wa = Screen.FromControl(this).WorkingArea;
+        int dpi = NativeMethods.MonitorDpi(Handle);
+        var size = HoverPanel.SizeFor(dpi);
         int x = settings.PanelCorner is "BottomLeft" or "TopLeft"
-            ? wa.Left + 40
-            : wa.Right - HoverPanel.PanelW - 40;
+            ? wa.Left + UiScale.Px(40, dpi)
+            : wa.Right - size.Width - UiScale.Px(40, dpi);
         int y = settings.PanelCorner is "TopLeft" or "TopRight"
-            ? wa.Top + 30
-            : wa.Bottom - HoverPanel.PanelH - 30;
-        return new Rectangle(x, y, HoverPanel.PanelW, HoverPanel.PanelH);
+            ? wa.Top + UiScale.Px(30, dpi)
+            : wa.Bottom - size.Height - UiScale.Px(30, dpi);
+        return (new Rectangle(new Point(x, y), size), dpi);
     }
 
     public void SetPanelCorner(string corner)
     {
         settings.PanelCorner = corner;
         settings.Save();
-        if (hoverPanel.Visible)
-            hoverPanel.Hide();  // next hover poll re-shows it at the new corner
+        PreviewHoverPanel();
+    }
+
+    /// <summary>Flash the panel at its corner for 2 s so a settings change is visible in either mode.</summary>
+    private void PreviewHoverPanel()
+    {
+        if (!settings.CornerPanelEnabled)
+        {
+            hoverPanel.Hide();
+            return;
+        }
+        var (bounds, dpi) = GetPanelPlacement();
+        hoverPanel.ShowAt(bounds, dpi);
+        hoverHideDeadline = DateTime.Now.AddSeconds(2);  // CheckMouseHover hides it unless hovered
     }
 
     private void CheckMouseHover()
     {
-        // interactive mode: controls are integrated in the title bar, no corner-hover logic
+        // interactive mode: controls are integrated in the title bar; the corner panel only
+        // shows as a settings preview, which just has to time out
         if (!isClickThrough)
+        {
+            if (hoverPanel.Visible && (hoverHideDeadline is null || DateTime.Now >= hoverHideDeadline))
+            {
+                hoverPanel.Hide();
+                hoverHideDeadline = null;
+            }
             return;
+        }
 
         // ~every 1s, make sure we're still behind the icons (the shell can orphan us)
         if (settings.BehindDesktopIcons && ++attachCheckTick >= 10)
@@ -519,16 +750,13 @@ public class MainForm : Form
         if (!settings.CornerPanelEnabled)
             return;
 
-        var rect = GetPanelRect();
+        var (rect, dpi) = GetPanelPlacement();
 
         if (rect.Contains(Cursor.Position))
         {
             hoverHideDeadline = null;
             if (!hoverPanel.Visible)
-            {
-                hoverPanel.Location = rect.Location;
-                hoverPanel.Show();  // no-activate: HoverPanel overrides ShowWithoutActivation
-            }
+                hoverPanel.ShowAt(rect, dpi);  // no-activate: HoverPanel overrides ShowWithoutActivation
         }
         else if (hoverPanel.Visible)
         {
@@ -610,8 +838,7 @@ public class MainForm : Form
     public void ShowSettings()
     {
         settingsForm ??= new SettingsForm(this, settings);
-        settingsForm.Show();
-        settingsForm.Activate();
+        settingsForm.ShowAndActivate();
     }
 
     private void SaveBounds()

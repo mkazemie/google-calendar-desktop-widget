@@ -34,6 +34,10 @@ public class AppSettings
     // which screen corner hosts the hover panel: BottomRight, BottomLeft, TopRight, TopLeft
     public string PanelCorner { get; set; } = "BottomRight";
 
+    // last background color seen under the title bar ("#RRGGBB"), so the chrome starts in the
+    // calendar's light/dark theme instead of flashing the default until the page loads
+    public string? ThemeColor { get; set; }
+
     // saved window bounds (borderless state); Width == 0 means "not set yet"
     public int WinX { get; set; }
     public int WinY { get; set; }

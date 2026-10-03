@@ -12,27 +12,36 @@ namespace CalendarWidget;
 /// Dragging it forwards a native caption drag to the owner, so Aero Snap works.
 /// In widget mode the window clips itself (Region) to just its buttons: the rest of the
 /// strip shows the main window beneath and passes clicks through like the calendar does.
+/// Colors follow the calendar's theme (<see cref="ApplyTheme"/>); sizes follow the DPI of
+/// the monitor the bar is on (<see cref="BarHeight"/> changes with it).
 /// </summary>
 public class TitleBar : Form
 {
-    public const int BarHeight = 34;
-    private const int BtnW = 46;
+    // 96-DPI design metrics, scaled to the bar's monitor in ApplyScale
+    private const int LogicalHeight = 34;
+    private const int LogicalBtnW = 46;
 
-    private static readonly Color BarBack = Color.FromArgb(32, 33, 36);
-    private static readonly Color HoverBack = Color.FromArgb(60, 64, 67);
     private static readonly Color CloseHover = Color.FromArgb(196, 43, 28);  // Win11 close-button red
-    private static readonly Color Fore = Color.FromArgb(232, 234, 237);
-    private static readonly Color IconActive = Color.FromArgb(138, 180, 248);
 
     private const int WM_NCLBUTTONDOWN = 0xA1;
     private const int HTCAPTION = 2;
 
     private readonly Form owner;
     private readonly Action onToggleMaximize;
+    private readonly PictureBox iconBox;
+    private readonly Label title;
     private readonly Button btnToggle;
     private readonly Button btnMenu;
     private readonly Button btnClose;
+    private Theme theme = Theme.Dark;
     private bool clickThrough;
+    private int btnW = LogicalBtnW;
+
+    /// <summary>Bar height in pixels at the bar's DPI; the owner reserves a strip this tall.</summary>
+    public int BarHeight { get; private set; } = LogicalHeight;
+
+    /// <summary>Raised when a DPI change resized the bar, so the owner can resize its strip.</summary>
+    public event EventHandler? BarHeightChanged;
 
     // the bar must never steal focus from the owner or anything else
     protected override bool ShowWithoutActivation => true;
@@ -52,36 +61,30 @@ public class TitleBar : Form
         this.owner = owner;
         this.onToggleMaximize = onToggleMaximize;
 
+        AutoScaleMode = AutoScaleMode.None;  // ApplyScale lays the bar out for its DPI
         FormBorderStyle = FormBorderStyle.None;
         StartPosition = FormStartPosition.Manual;
         ShowInTaskbar = false;
-        BackColor = BarBack;
-        Height = BarHeight;
 
-        var iconBox = new PictureBox
-        {
-            Bounds = new Rectangle(12, (BarHeight - 16) / 2, 16, 16),
-            SizeMode = PictureBoxSizeMode.Zoom,
-        };
+        iconBox = new PictureBox { SizeMode = PictureBoxSizeMode.Zoom };
         try { iconBox.Image = Icon.ExtractAssociatedIcon(Application.ExecutablePath)?.ToBitmap(); } catch { }
 
-        var title = new Label
+        title = new Label
         {
             Text = "Google Calendar Desktop Widget",
-            ForeColor = Fore,
-            Font = new Font("Segoe UI", 9.5f),
-            AutoSize = true,
-            Location = new Point(36, (BarHeight - 17) / 2),
+            AutoEllipsis = true,  // a narrow widget truncates the title instead of hiding it under the buttons
             BackColor = Color.Transparent,
         };
 
-        var iconFont = HoverPanel.CreateIconFont(10f);
-        btnToggle = MakeButton("", iconFont, HoverBack);      // mouse: toggle click-through
-        btnMenu = MakeButton("", iconFont, HoverBack);        // hamburger: settings
-        btnClose = MakeButton("", iconFont, CloseHover);  // ChromeClose glyph
+        btnToggle = MakeButton("");  // mouse: toggle click-through
+        btnMenu = MakeButton("");    // hamburger: settings
+        btnClose = MakeButton("");   // ChromeClose
         btnToggle.Click += (_, _) => onToggle();
         btnMenu.Click += (_, _) => onSettings();
         btnClose.Click += (_, _) => Application.Exit();
+        // Win11 caption style: white glyph on the red hover
+        btnClose.MouseEnter += (_, _) => btnClose.ForeColor = Color.White;
+        btnClose.MouseLeave += (_, _) => btnClose.ForeColor = theme.Fore;
 
         var tips = new ToolTip();
         tips.SetToolTip(btnToggle, "Toggle click-through (pass clicks to the desktop or not)");
@@ -97,12 +100,69 @@ public class TitleBar : Form
         MouseDown += StartDrag;
         title.MouseDown += StartDrag;
         iconBox.MouseDown += StartDrag;
+
+        ApplyScale();
+        ApplyTheme(theme);
     }
 
     protected override void OnHandleCreated(EventArgs e)
     {
         base.OnHandleCreated(e);
         NativeMethods.ApplyRoundedCorners(Handle);
+        ApplyScale();  // DeviceDpi is the real monitor's only once the handle exists
+    }
+
+    // moved onto a monitor with another scale: re-lay out ourselves. Cancelled so WinForms
+    // doesn't also rescale controls/fonts on top; Reposition() owns the bounds.
+    protected override void OnDpiChanged(DpiChangedEventArgs e)
+    {
+        e.Cancel = true;
+        base.OnDpiChanged(e);
+        ApplyScale();
+    }
+
+    private void ApplyScale()
+    {
+        int dpi = DeviceDpi;
+        int S(int v) => UiScale.Px(v, dpi);
+
+        var titleFont = UiScale.Font(9.5f, dpi);
+        var iconFont = UiScale.IconFont(10f, dpi);
+
+        int oldHeight = BarHeight;
+        BarHeight = S(LogicalHeight);
+        btnW = S(LogicalBtnW);
+
+        iconBox.Bounds = new Rectangle(S(12), (BarHeight - S(16)) / 2, S(16), S(16));
+        title.Font = titleFont;
+        int titleH = title.PreferredHeight;
+        title.SetBounds(S(36), (BarHeight - titleH) / 2, title.Width, titleH);
+        foreach (var b in new[] { btnToggle, btnMenu, btnClose })
+        {
+            b.Font = iconFont;
+            b.Size = new Size(btnW, BarHeight);
+        }
+        Height = BarHeight;
+        LayoutButtons();
+
+        if (BarHeight != oldHeight)
+            BarHeightChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>Recolor to match the calendar page: background, glyphs, hover highlight.</summary>
+    public void ApplyTheme(Theme t)
+    {
+        theme = t;
+        BackColor = t.Back;
+        title.ForeColor = t.Fore;
+        foreach (var b in new[] { btnToggle, btnMenu, btnClose })
+        {
+            b.BackColor = t.Back;
+            b.ForeColor = t.Fore;
+            b.FlatAppearance.MouseOverBackColor = b == btnClose ? CloseHover : t.Hover;
+            b.FlatAppearance.MouseDownBackColor = b == btnClose ? CloseHover : t.Hover;
+        }
+        btnToggle.ForeColor = clickThrough ? t.Accent : t.Fore;
     }
 
     /// <summary>
@@ -123,49 +183,46 @@ public class TitleBar : Form
 
     /// <summary>
     /// Widget mode: tint the mouse icon; hide close; disable drag/maximize; shrink to the
-    /// buttons and take the widget's opacity so the bar reads as part of the calendar.
+    /// buttons. The bar always takes the widget's current opacity so it reads as part of
+    /// the calendar — also in interactive mode while Settings previews a transparency.
     /// </summary>
     public void UpdateState(bool clickThrough, double widgetOpacity)
     {
         this.clickThrough = clickThrough;
-        btnToggle.ForeColor = clickThrough ? IconActive : Fore;
+        btnToggle.ForeColor = clickThrough ? theme.Accent : theme.Fore;
         btnClose.Visible = !clickThrough;
         LayoutButtons();
-        Opacity = clickThrough ? widgetOpacity : 1.0;
+        Opacity = widgetOpacity;
     }
 
     private void LayoutButtons()
     {
         // decided by mode, not Button.Visible: that reads false until the bar is first shown
         Button[] shown = clickThrough ? [btnToggle, btnMenu] : [btnToggle, btnMenu, btnClose];
+        int buttonsLeft = Width - shown.Length * btnW;
         for (int i = 0; i < shown.Length; i++)
-            shown[i].Location = new Point(Width - (shown.Length - i) * BtnW, 0);
+            shown[i].Location = new Point(buttonsLeft + i * btnW, 0);
+        title.Width = Math.Max(0, buttonsLeft - title.Left);
 
         // widget mode: the window is ONLY its buttons — outside them hit-testing falls
         // through to whatever is below (the click-through calendar, desktop icons in
         // live-wallpaper mode). A region, not HTTRANSPARENT: that only forwards clicks to
         // windows on this thread, never to the desktop.
         Region = clickThrough
-            ? new Region(new Rectangle(Width - shown.Length * BtnW, 0, shown.Length * BtnW, BarHeight))
+            ? new Region(new Rectangle(buttonsLeft, 0, shown.Length * btnW, BarHeight))
             : null;
     }
 
-    private Button MakeButton(string glyph, Font font, Color hover)
+    private static Button MakeButton(string glyph)
     {
         var b = new Button
         {
-            Size = new Size(BtnW, BarHeight),
             Text = glyph,
-            Font = font,
             FlatStyle = FlatStyle.Flat,
-            BackColor = BarBack,
-            ForeColor = Fore,
             TabStop = false,
             Anchor = AnchorStyles.Top | AnchorStyles.Right,
         };
         b.FlatAppearance.BorderSize = 0;
-        b.FlatAppearance.MouseOverBackColor = hover;
-        b.FlatAppearance.MouseDownBackColor = hover;
         return b;
     }
 
