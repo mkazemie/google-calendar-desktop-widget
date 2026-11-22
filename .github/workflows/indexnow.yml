@@ -1,0 +1,36 @@
+# Google Calendar Desktop Widget
+# Copyright (C) 2026 Mahdi Kazemiesfahani
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Tell Bing and the other IndexNow search engines that the website changed, so a
+# new release or page edit is re-crawled within days instead of weeks. Google does
+# not use IndexNow; it finds changes through the sitemap. The key file proving the
+# site is ours is docs/<key>.txt.
+
+name: Notify search engines
+
+on:
+  push:
+    branches: [main]
+    paths: ["docs/**"]
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  indexnow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for GitHub Pages to publish the change
+        run: sleep 120
+
+      - name: Ping IndexNow
+        run: |
+          site=https://mkazemie.github.io/google-calendar-desktop-widget/
+          key=69b14d16933c52a766be8cfc58db6c5a
+          code=$(curl -sS -G -o /dev/null -w "%{http_code}" "https://api.indexnow.org/indexnow" \
+            --data-urlencode "url=$site" \
+            --data-urlencode "key=$key" \
+            --data-urlencode "keyLocation=$site$key.txt")
+          echo "IndexNow answered HTTP $code"
+          [ "$code" -lt 400 ]
