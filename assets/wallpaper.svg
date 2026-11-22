@@ -1,0 +1,209 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <linearGradient id="wbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a2a6c"/><stop offset="0.6" stop-color="#2d1e5f"/><stop offset="1" stop-color="#0f3057"/>
+    </linearGradient>
+    <!-- edge shadow: black fading to clear along a cosine curve, like the app's -->
+    <linearGradient id="shade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity="1"/>
+      <stop offset="0.1" stop-color="#000" stop-opacity="0.976"/>
+      <stop offset="0.2" stop-color="#000" stop-opacity="0.905"/>
+      <stop offset="0.3" stop-color="#000" stop-opacity="0.794"/>
+      <stop offset="0.4" stop-color="#000" stop-opacity="0.655"/>
+      <stop offset="0.5" stop-color="#000" stop-opacity="0.5"/>
+      <stop offset="0.6" stop-color="#000" stop-opacity="0.345"/>
+      <stop offset="0.7" stop-color="#000" stop-opacity="0.206"/>
+      <stop offset="0.8" stop-color="#000" stop-opacity="0.095"/>
+      <stop offset="0.9" stop-color="#000" stop-opacity="0.024"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="fade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8ab4f8"/><stop offset="1" stop-color="#8ab4f8" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="lift" x="-30%" y="-10%" width="160%" height="120%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1.2" flood-color="#000" flood-opacity="0.85"/>
+    </filter>
+    <!-- desktop icons, drawn twice: under the calendar, then on top of it -->
+    <g id="icons" font-size="11" fill="#ffffff" text-anchor="middle">
+      <rect x="50" y="104" width="20" height="8" rx="2" fill="#e0a800"/>
+      <rect x="50" y="108" width="48" height="34" rx="4" fill="#f6bf26"/>
+      <text x="74" y="160">Projects</text>
+      <rect x="50" y="186" width="48" height="38" rx="5" fill="#4facfe"/>
+      <circle cx="63" cy="198" r="4.5" fill="#ffffff" opacity="0.9"/>
+      <path d="M52 222 l14 -14 10 9 7 -6 13 11 z" fill="#1a57b8"/>
+      <text x="74" y="242">Photos</text>
+      <rect x="56" y="264" width="36" height="46" rx="4" fill="#f1f3f4"/>
+      <g stroke="#9aa0a6" stroke-width="2">
+        <line x1="63" y1="276" x2="85" y2="276"/><line x1="63" y1="284" x2="85" y2="284"/><line x1="63" y1="292" x2="79" y2="292"/>
+      </g>
+      <text x="74" y="326">Notes</text>
+      <rect x="55" y="346" width="38" height="5" rx="2" fill="#b0bec5"/>
+      <path d="M58 353 h32 l-3 36 a3 3 0 0 1 -3 3 h-20 a3 3 0 0 1 -3 -3 z" fill="#cfd8dc"/>
+      <text x="74" y="408">Recycle Bin</text>
+    </g>
+  </defs>
+
+  <rect width="1200" height="560" rx="16" fill="url(#wbg)"/>
+  <circle cx="240" cy="160" r="170" fill="#4facfe" opacity="0.12"/>
+  <circle cx="1010" cy="430" r="140" fill="#9d50bb" opacity="0.12"/>
+
+  <!-- icons on the plain desktop: the calendar starts out on top of them -->
+  <use href="#icons"/>
+
+  <!-- the calendar, filling the desktop in widget mode -->
+  <g opacity="0.84">
+    <!-- title bar in widget mode: just its two buttons, in the calendar's own (light) theme -->
+    <path d="M30 54 v-22 a8 8 0 0 1 8 -8 h1124 a8 8 0 0 1 8 8 v22 z" fill="#f8fafd"/>
+    <g transform="translate(1101 39)" fill="none" stroke="#1a73e8" stroke-width="1.5">
+      <rect x="-4.5" y="-7" width="9" height="14" rx="4.5"/><line x1="0" y1="-4.5" x2="0" y2="-1.5" stroke-linecap="round"/>
+    </g>
+    <g stroke="#3c4043" stroke-width="1.5" stroke-linecap="round">
+      <line x1="1140" y1="34.5" x2="1154" y2="34.5"/><line x1="1140" y1="39" x2="1154" y2="39"/><line x1="1140" y1="43.5" x2="1154" y2="43.5"/>
+    </g>
+
+    <!-- calendar page header -->
+    <rect x="30" y="54" width="1140" height="454" fill="#f8fafd"/>
+    <g stroke="#444746" stroke-width="1.6" stroke-linecap="round">
+      <line x1="138" y1="68" x2="152" y2="68"/><line x1="138" y1="73" x2="152" y2="73"/><line x1="138" y1="78" x2="152" y2="78"/>
+    </g>
+    <g transform="translate(166 65)">
+      <rect width="16" height="16" rx="4" fill="#1a73e8"/><rect x="3" y="4" width="10" height="8.5" fill="#ffffff"/><rect x="3" y="4" width="10" height="2.6" fill="#174ea6"/>
+    </g>
+    <text x="190" y="79" fill="#1f1f1f" font-size="15">Calendar</text>
+    <rect x="270" y="61" width="56" height="24" rx="12" fill="none" stroke="#747775"/>
+    <text x="298" y="77" fill="#1f1f1f" font-size="11.5" text-anchor="middle">Today</text>
+    <text x="344" y="79" fill="#444746" font-size="17">‹</text>
+    <text x="362" y="79" fill="#444746" font-size="17">›</text>
+    <text x="384" y="79" fill="#1f1f1f" font-size="15">November 2026</text>
+
+    <!-- week grid -->
+    <rect x="36" y="92" width="1128" height="416" rx="12" fill="#ffffff"/>
+    <g fill="#444746" font-size="10.5" text-anchor="middle">
+      <text x="198" y="110">MON</text><text x="414" y="110">TUE</text><text x="630" y="110" fill="#1a73e8">WED</text>
+      <text x="846" y="110">THU</text><text x="1062" y="110">FRI</text>
+    </g>
+    <circle cx="630" cy="126" r="14" fill="#1a73e8"/>
+    <g fill="#1f1f1f" font-size="18" text-anchor="middle">
+      <text x="198" y="132">16</text><text x="414" y="132">17</text><text x="630" y="132" fill="#ffffff">18</text>
+      <text x="846" y="132">19</text><text x="1062" y="132">20</text>
+    </g>
+    <g stroke="#dadce0" stroke-width="1">
+      <line x1="36" y1="146" x2="1164" y2="146"/><line x1="90" y1="206" x2="1164" y2="206"/>
+      <line x1="90" y1="266" x2="1164" y2="266"/><line x1="90" y1="326" x2="1164" y2="326"/>
+      <line x1="90" y1="386" x2="1164" y2="386"/><line x1="90" y1="446" x2="1164" y2="446"/>
+      <line x1="90" y1="146" x2="90" y2="508"/><line x1="306" y1="146" x2="306" y2="508"/>
+      <line x1="522" y1="146" x2="522" y2="508"/><line x1="738" y1="146" x2="738" y2="508"/>
+      <line x1="954" y1="146" x2="954" y2="508"/>
+    </g>
+    <g fill="#70757a" font-size="9.5" text-anchor="end">
+      <text x="84" y="209">10 AM</text><text x="84" y="269">11 AM</text><text x="84" y="329">12 PM</text>
+      <text x="84" y="389">1 PM</text><text x="84" y="449">2 PM</text>
+    </g>
+
+    <!-- events -->
+    <g font-size="11.5" fill="#ffffff">
+      <rect x="96" y="148" width="204" height="43" rx="6" fill="#1a73e8"/>
+      <text x="106" y="165" font-weight="600">Team sync</text><text x="106" y="181" font-size="10" opacity="0.85">9:00 – 9:45</text>
+      <rect x="96" y="388" width="204" height="28" rx="6" fill="#039be5"/>
+      <text x="106" y="406" font-weight="600">1:1 with Alex · 13:00</text>
+      <rect x="312" y="208" width="204" height="116" rx="6" fill="#0b8043"/>
+      <text x="322" y="225" font-weight="600">Deep work</text><text x="322" y="241" font-size="10" opacity="0.85">10:00 – 12:00</text>
+      <rect x="312" y="448" width="204" height="43" rx="6" fill="#f6bf26"/>
+      <text x="322" y="465" font-weight="600" fill="#3c4043">Networking</text><text x="322" y="481" font-size="10" fill="#3c4043" opacity="0.85">14:00 – 14:45</text>
+      <rect x="528" y="357" width="204" height="44" rx="6" fill="#f4511e"/>
+      <text x="538" y="374" font-weight="600">Lunch w/ Sara</text><text x="538" y="390" font-size="10" opacity="0.85">12:30 – 13:15</text>
+      <rect x="744" y="177" width="204" height="87" rx="6" fill="#8e24aa"/>
+      <text x="754" y="194" font-weight="600">Design review</text><text x="754" y="210" font-size="10" opacity="0.85">9:30 – 11:00</text>
+      <rect x="960" y="148" width="198" height="86" rx="6" fill="#7986cb"/>
+      <text x="970" y="165" font-weight="600">Flight to Lisbon</text><text x="970" y="181" font-size="10" opacity="0.85">9:00 – 10:30</text>
+    </g>
+    <line x1="522" y1="336" x2="738" y2="336" stroke="#ea4335" stroke-width="2.5"/>
+    <circle cx="522" cy="336" r="5" fill="#ea4335"/>
+
+    <!-- left edge shadow, drawn by the page itself -->
+    <rect x="30" y="54" width="0" height="454" fill="url(#shade)">
+      <animate attributeName="width" values="0;0;342;342;0;0" keyTimes="0;0.38;0.54;0.86;0.92;1" dur="12s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+
+  <!-- selected icon after the double-click -->
+  <rect x="40" y="178" width="68" height="72" rx="5" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-opacity="0.45" opacity="0">
+    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.70;0.705;0.86;0.88;1" dur="12s" repeatCount="indefinite"/>
+  </rect>
+
+  <!-- live-wallpaper mode: the same icons, now ON TOP of the calendar -->
+  <g opacity="0">
+    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.20;0.25;0.88;0.92;1" dur="12s" repeatCount="indefinite"/>
+    <use href="#icons" filter="url(#lift)"/>
+  </g>
+
+  <!-- the two settings involved -->
+  <g>
+    <rect x="868" y="366" width="294" height="120" rx="10" fill="#000000" opacity="0.35"/>
+    <rect x="862" y="360" width="294" height="120" rx="10" fill="#202124" stroke="#3c4043"/>
+    <rect x="882.5" y="381.5" width="13" height="13" rx="3" fill="none" stroke="#9aa0a6" stroke-width="1.3"/>
+    <g opacity="0">
+      <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.195;0.20;0.88;0.89;1" dur="12s" repeatCount="indefinite"/>
+      <rect x="882" y="381" width="14" height="14" rx="3" fill="#8ab4f8"/>
+      <path d="M885 388 l3 3 5 -6" stroke="#202124" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <text x="904" y="392" fill="#e8eaed" font-size="11">Sit behind desktop icons (live wallpaper)</text>
+    <text x="882" y="422" fill="#9aa0a6" font-size="9.5" font-weight="600" letter-spacing="1.4">EDGE SHADOWS</text>
+    <line x1="882" y1="442" x2="1136" y2="442" stroke="#3c4043" stroke-width="6" stroke-linecap="round"/>
+    <rect x="882" y="439" width="0" height="6" rx="3" fill="url(#fade)">
+      <animate attributeName="width" values="0;0;76;76;0;0" keyTimes="0;0.38;0.54;0.86;0.92;1" dur="12s" repeatCount="indefinite"/>
+    </rect>
+    <circle cx="882" cy="442" r="7" fill="#8ab4f8">
+      <animate attributeName="cx" values="882;882;958;958;882;882" keyTimes="0;0.38;0.54;0.86;0.92;1" dur="12s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="1136" cy="442" r="7" fill="#8ab4f8"/>
+    <g fill="#8ab4f8" font-size="10.5">
+      <text x="882" y="468">Left off
+        <animate attributeName="opacity" values="1;1;0;0;1;1" keyTimes="0;0.40;0.41;0.88;0.89;1" dur="12s" repeatCount="indefinite"/>
+      </text>
+      <text x="882" y="468" opacity="0">Left 30%
+        <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.40;0.41;0.88;0.89;1" dur="12s" repeatCount="indefinite"/>
+      </text>
+      <text x="1136" y="468" text-anchor="end">Right off</text>
+    </g>
+  </g>
+
+  <!-- clicks -->
+  <circle cx="889" cy="388" r="3" fill="none" stroke="#ffffff" stroke-width="2.5" opacity="0">
+    <animate attributeName="r" values="3;3;18;18" keyTimes="0;0.19;0.24;1" dur="12s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;0;0.9;0;0" keyTimes="0;0.19;0.195;0.24;1" dur="12s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="74" cy="205" r="3" fill="none" stroke="#ffffff" stroke-width="2.5" opacity="0">
+    <animate attributeName="r" values="3;3;22;22" keyTimes="0;0.70;0.735;1" dur="12s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;0;0.9;0;0" keyTimes="0;0.70;0.705;0.735;1" dur="12s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="74" cy="205" r="3" fill="none" stroke="#ffffff" stroke-width="2.5" opacity="0">
+    <animate attributeName="r" values="3;3;22;22" keyTimes="0;0.735;0.77;1" dur="12s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;0;0.9;0;0" keyTimes="0;0.735;0.74;0.77;1" dur="12s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- cursor: tick the checkbox, drag the left shadow handle, double-click an icon -->
+  <g>
+    <animateTransform attributeName="transform" type="translate"
+      values="720 300; 720 300; 889 388; 889 388; 882 442; 958 442; 958 442; 74 205; 74 205; 720 300; 720 300"
+      keyTimes="0;0.08;0.18;0.28;0.38;0.54;0.58;0.68;0.84;0.96;1" dur="12s" repeatCount="indefinite"/>
+    <path d="M0 0 L0 22 L6 16 L10 26 L14.5 24 L10.5 14 L18 14 Z" fill="#ffffff" stroke="#3c4043" stroke-width="1.4"/>
+  </g>
+
+  <!-- captions -->
+  <rect x="310" y="518" width="580" height="32" rx="16" fill="#202124" opacity="0.92"/>
+  <g fill="#e8eaed" font-size="14" text-anchor="middle">
+    <text x="600" y="539">Widget mode: your calendar floats over the wallpaper
+      <animate attributeName="opacity" values="1;1;0;0;1;1" keyTimes="0;0.19;0.22;0.93;0.97;1" dur="12s" repeatCount="indefinite"/>
+    </text>
+    <text x="600" y="539" opacity="0">Live-wallpaper mode: it slides under your desktop icons
+      <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.21;0.24;0.42;0.45;1" dur="12s" repeatCount="indefinite"/>
+    </text>
+    <text x="600" y="539" opacity="0">Edge shadows keep your icons readable
+      <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.44;0.47;0.67;0.70;1" dur="12s" repeatCount="indefinite"/>
+    </text>
+    <text x="600" y="539" opacity="0">…and every icon stays clickable, right on top of your schedule
+      <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.69;0.72;0.90;0.93;1" dur="12s" repeatCount="indefinite"/>
+    </text>
+  </g>
+</svg>

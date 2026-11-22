@@ -1,256 +1,535 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Google Calendar Desktop Widget for Windows — free, transparent, click-through</title>
-<meta name="description" content="Pin the real Google Calendar to your Windows desktop as a transparent, click-through widget. Live sync from all your devices, edit in place, free and open source.">
+<title>Google Calendar Desktop Widget for Windows 11 &amp; 10 (Free)</title>
+<meta name="description" content="Pin the real Google Calendar to your Windows desktop: a transparent, click-through widget or a live wallpaper under your icons. Live sync. Free &amp; open source.">
 <link rel="canonical" href="https://mkazemie.github.io/google-calendar-desktop-widget/">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
 <meta name="google-site-verification" content="IE4arU-2nH6Y2t__J6Zi2TsHmqVZdebsoz4siPGIXWM">
+<meta name="author" content="Mahdi Kazemiesfahani">
+<meta name="application-name" content="Google Calendar Desktop Widget">
 <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
-<meta name="theme-color" content="#17181c">
+<link rel="alternate" type="application/atom+xml" title="Google Calendar Desktop Widget releases" href="https://github.com/mkazemie/google-calendar-desktop-widget/releases.atom">
+<meta name="theme-color" content="#101116">
+<meta name="color-scheme" content="dark">
 <!-- social preview -->
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="Google Calendar Desktop Widget">
+<meta property="og:locale" content="en_US">
 <meta property="og:title" content="Google Calendar Desktop Widget for Windows">
-<meta property="og:description" content="Your Google Calendar, living on your desktop — transparent, click-through, always up to date, never in the way. Free and open source.">
+<meta property="og:description" content="Your Google Calendar, living on your desktop: transparent, click-through, or a live wallpaper behind your icons. Always up to date, never in the way. Free and open source.">
 <meta property="og:url" content="https://mkazemie.github.io/google-calendar-desktop-widget/">
 <meta property="og:image" content="https://mkazemie.github.io/google-calendar-desktop-widget/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A transparent Google Calendar widget on a Windows desktop">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Google Calendar Desktop Widget for Windows">
-<meta name="twitter:description" content="Transparent, click-through Google Calendar pinned to your desktop. Live sync, free, open source.">
+<meta name="twitter:description" content="Transparent, click-through Google Calendar on your Windows desktop, or a live wallpaper behind your icons. Live sync, free, open source.">
 <meta name="twitter:image" content="https://mkazemie.github.io/google-calendar-desktop-widget/assets/og.png">
+<meta name="twitter:image:alt" content="A transparent Google Calendar widget on a Windows desktop">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "Google Calendar Desktop Widget",
-  "operatingSystem": "Windows 10, Windows 11",
-  "applicationCategory": "UtilitiesApplication",
-  "softwareVersion": "1.3.0",
-  "description": "A free, open-source Windows app that pins the real Google Calendar to your desktop as a transparent, click-through widget with live sync.",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-  "license": "https://www.gnu.org/licenses/agpl-3.0.html",
-  "downloadUrl": "https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.0/CalendarWidgetSetup-1.3.0.exe",
-  "url": "https://mkazemie.github.io/google-calendar-desktop-widget/",
-  "image": "https://mkazemie.github.io/google-calendar-desktop-widget/assets/og.png",
-  "author": { "@type": "Person", "name": "Mahdi Kazemi Esfahani" }
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://mkazemie.github.io/google-calendar-desktop-widget/#website",
+      "url": "https://mkazemie.github.io/google-calendar-desktop-widget/",
+      "name": "Google Calendar Desktop Widget",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://mkazemie.github.io/google-calendar-desktop-widget/#app",
+      "name": "Google Calendar Desktop Widget",
+      "operatingSystem": "Windows 10, Windows 11",
+      "applicationCategory": "UtilitiesApplication",
+      "applicationSubCategory": "Desktop widget",
+      "softwareVersion": "1.3.0",
+      "datePublished": "2026-07-12",
+      "description": "A free, open-source Windows app that pins the real Google Calendar to your desktop as a transparent, click-through widget, or as a live wallpaper behind your desktop icons, with live sync.",
+      "featureList": [
+        "Click-through widget mode: clicks and right-clicks reach the desktop",
+        "Live-wallpaper mode behind the desktop icons",
+        "Adjustable edge shadows that keep desktop icons readable",
+        "Title bar follows Google Calendar's light or dark theme",
+        "Transparency from 0 to 95 percent with live preview",
+        "Pinned beneath all windows; never steals focus",
+        "Live sync with Google Calendar on every device",
+        "Snap, maximize and multi-monitor support, sharp at every display scale",
+        "Starts with Windows"
+      ],
+      "softwareRequirements": ".NET 8 Desktop Runtime and Microsoft Edge WebView2 Runtime (the installer adds them if missing)",
+      "fileSize": "2.5 MB",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "isAccessibleForFree": true,
+      "license": "https://www.gnu.org/licenses/agpl-3.0.html",
+      "downloadUrl": "https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.0/CalendarWidgetSetup-1.3.0.exe",
+      "releaseNotes": "https://github.com/mkazemie/google-calendar-desktop-widget/releases",
+      "url": "https://mkazemie.github.io/google-calendar-desktop-widget/",
+      "image": "https://mkazemie.github.io/google-calendar-desktop-widget/assets/og.png",
+      "screenshot": "https://mkazemie.github.io/google-calendar-desktop-widget/assets/og.png",
+      "sameAs": ["https://github.com/mkazemie/google-calendar-desktop-widget"],
+      "author": { "@type": "Person", "name": "Mahdi Kazemi Esfahani", "alternateName": "Mahdi Kazemiesfahani", "url": "https://github.com/mkazemie" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "How do I put Google Calendar on my Windows desktop?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Download and run the free installer, sign in to your Google account once, then click the mouse button in the widget's title bar. Your real Google Calendar stays on the desktop as a transparent, click-through widget, pinned beneath your other windows." } },
+        { "@type": "Question", "name": "Can Google Calendar be my desktop wallpaper?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. In Settings, turn on \"Sit behind desktop icons (live wallpaper)\". In widget mode the calendar then sits under your desktop icons like a live wallpaper, and edge shadows keep the icons readable on top of it." } },
+        { "@type": "Question", "name": "Is it really free?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. It's free and open source under the GNU AGPL-3.0, with no ads, no account to create and no telemetry. If you'd like to support development, there's an optional PayPal donation link." } },
+        { "@type": "Question", "name": "Is this an official Google app?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. It's an independent open-source project that shows the real calendar.google.com in its own window. It is not affiliated with or endorsed by Google." } },
+        { "@type": "Question", "name": "Does it have a dark mode?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Turn on dark mode in Google Calendar's own settings (the gear icon) and the widget's title bar, frame and hover panel switch to match within a second." } },
+        { "@type": "Question", "name": "Will it get in the way of my work or games?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. In widget mode it stays beneath every other window, never takes focus and lets every click through, so anything you open simply covers it." } },
+        { "@type": "Question", "name": "Windows says the installer is unrecognized. Is it safe?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The installer isn't code-signed, because certificates cost money and this app is free. Click \"More info\", then \"Run anyway\". The full source code is on GitHub, so you can review it or build it yourself." } },
+        { "@type": "Question", "name": "Where is my Google sign-in stored?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Only on your computer, in the app's private browser profile, the same way Chrome stores a session. In Settings you can sign out and keep the account for a quicker sign-in later, or delete all of the widget's browser data. The uninstaller also offers to remove everything." } },
+        { "@type": "Question", "name": "Does it work with multiple monitors and high-DPI screens?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Move it to any monitor, snap or maximize it there, and it remembers its place. It stays sharp at every Windows display scale (125 %, 150 %, 200 % and more), including setups that mix monitors with different scales." } },
+        { "@type": "Question", "name": "What do I need to run it?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Windows 10 or 11 and a Google account. The installer downloads the .NET 8 Desktop Runtime and Microsoft Edge WebView2 only if they're missing (WebView2 is built into Windows 11)." } },
+        { "@type": "Question", "name": "How do I uninstall it?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Like any other app, from Windows Settings → Apps. The uninstaller asks whether to also remove your saved settings and Google sign-in data." } }
+      ]
+    }
+  ]
 }
 </script>
+<script>document.documentElement.className = 'js';</script>
 <style>
   :root {
     --bg: #101116; --card: #1b1d24; --card2: #22242e;
     --text: #e8eaed; --muted: #9aa0a6; --line: #2d3038;
-    --blue: #1a73e8; --blue-soft: #8ab4f8; --red-soft: #f28b82;
+    --blue: #1a73e8; --blue-soft: #8ab4f8; --violet: #c58af9; --red-soft: #f28b82;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body { background: var(--bg); color: var(--text); font-family: "Segoe UI", system-ui, -apple-system, sans-serif; line-height: 1.6; }
+  html { scroll-behavior: smooth; scroll-padding-top: 76px; }
+  body { background: var(--bg); color: var(--text); font-family: "Segoe UI", system-ui, -apple-system, sans-serif; line-height: 1.6; overflow-x: clip; }
   a { color: var(--blue-soft); text-decoration: none; }
+  a:hover { text-decoration: underline; }
   img { max-width: 100%; height: auto; display: block; }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--blue-soft); outline-offset: 2px; }
   .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  .skip { position: absolute; left: -9999px; top: 8px; z-index: 50; background: var(--blue); color: #fff; padding: 8px 14px; border-radius: 8px; }
+  .skip:focus { left: 16px; }
 
   /* nav */
-  nav { position: sticky; top: 0; z-index: 10; background: rgba(16,17,22,.85); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
-  .nav-inner { display: flex; align-items: center; gap: 14px; padding: 14px 0; }
-  .nav-inner img { width: 30px; }
-  .nav-name { font-weight: 600; font-size: 1.02rem; }
-  .nav-links { margin-left: auto; display: flex; gap: 22px; align-items: center; font-size: .95rem; }
-  .nav-links a { color: var(--muted); }
-  .nav-links a:hover { color: var(--text); }
+  nav { position: sticky; top: 0; z-index: 20; background: rgba(16,17,22,.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid transparent; transition: background .3s, border-color .3s; }
+  nav.scrolled { background: rgba(16,17,22,.92); border-bottom-color: var(--line); }
+  .nav-inner { display: flex; align-items: center; gap: 12px; padding: 12px 0; }
+  .nav-brand { display: flex; align-items: center; gap: 10px; min-width: 0; color: var(--text); font-weight: 600; }
+  .nav-brand:hover { text-decoration: none; }
+  .nav-brand img { width: 30px; flex: none; }
+  .nav-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .nav-links { margin-left: auto; display: flex; gap: 22px; align-items: center; font-size: .95rem; flex: none; }
+  .nav-links a:not(.btn) { color: var(--muted); }
+  .nav-links a:not(.btn):hover { color: var(--text); text-decoration: none; }
 
-  .btn { display: inline-block; padding: 12px 26px; border-radius: 26px; font-weight: 600; transition: transform .15s, box-shadow .15s; }
+  .btn { display: inline-block; padding: 12px 26px; border-radius: 26px; font-weight: 600; transition: transform .15s, box-shadow .2s, border-color .2s;
+    position: relative; overflow: hidden; cursor: pointer; border: 0; }
+  .btn:hover { transform: translateY(-2px); text-decoration: none; }
   .btn-blue { background: var(--blue); color: #fff; box-shadow: 0 4px 18px rgba(26,115,232,.35); }
-  .btn-ghost { border: 1px solid var(--line); color: var(--text); }
-  .btn:hover { transform: translateY(-2px); }
+  .btn-blue:hover { box-shadow: 0 8px 28px rgba(26,115,232,.5); }
+  /* a light sweep across primary buttons on hover */
+  .btn-blue::after { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,.35) 50%, transparent 70%);
+    transform: translateX(-120%); transition: transform .7s; }
+  .btn-blue:hover::after { transform: translateX(120%); }
+  .btn-ghost { border: 1px solid var(--line); color: var(--text); background: transparent; }
+  .btn-ghost:hover { border-color: #4a4f5c; }
   .btn-small { padding: 8px 18px; font-size: .9rem; }
 
   /* hero */
-  header { text-align: center; padding: 72px 0 30px; background: radial-gradient(ellipse 90% 60% at 50% -10%, rgba(26,115,232,.22), transparent); }
-  h1 { font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.15; font-weight: 700; max-width: 780px; margin: 0 auto; }
-  h1 em { font-style: normal; color: var(--blue-soft); }
-  .sub { color: var(--muted); font-size: 1.15rem; max-width: 640px; margin: 18px auto 30px; }
+  header.hero { position: relative; text-align: center; padding: 60px 0 24px; isolation: isolate; }
+  .aurora { position: absolute; left: 0; right: 0; top: -80px; bottom: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+  .aurora span { position: absolute; border-radius: 50%; animation: drift 20s ease-in-out infinite alternate; }
+  .aurora span:nth-child(1) { width: 640px; height: 520px; left: 8%; top: -60px; background: radial-gradient(closest-side, rgba(26,115,232,.32), transparent); }
+  .aurora span:nth-child(2) { width: 560px; height: 460px; right: 6%; top: 20px; background: radial-gradient(closest-side, rgba(157,80,187,.28), transparent); animation-duration: 24s; animation-delay: -8s; }
+  .aurora span:nth-child(3) { width: 520px; height: 420px; left: 36%; top: 240px; background: radial-gradient(closest-side, rgba(79,172,254,.18), transparent); animation-duration: 28s; animation-delay: -14s; }
+  @keyframes drift { 0% { transform: translate(0,0) scale(1) } 50% { transform: translate(50px,-30px) scale(1.08) } 100% { transform: translate(-40px,26px) scale(.94) } }
+  .intro > * { animation: up .8s cubic-bezier(.2,.7,.2,1) both; }
+  .intro > :nth-child(2) { animation-delay: .08s; }
+  .intro > :nth-child(3) { animation-delay: .16s; }
+  .intro > :nth-child(4) { animation-delay: .24s; }
+  .intro > :nth-child(5) { animation-delay: .32s; }
+  @keyframes up { from { opacity: 0; transform: translateY(18px) } to { opacity: 1; transform: none } }
+  .badge-new { display: inline-flex; align-items: center; gap: 8px; padding: 4px 14px 4px 5px; margin-bottom: 22px; border-radius: 20px; font-size: .86rem;
+    color: var(--text); border: 1px solid rgba(138,180,248,.3); background: rgba(26,115,232,.1); transition: border-color .2s, background .2s; }
+  .badge-new:hover { border-color: var(--blue-soft); background: rgba(26,115,232,.18); text-decoration: none; }
+  .badge-new b { background: var(--blue); color: #fff; font-size: .7rem; letter-spacing: .08em; padding: 2px 9px; border-radius: 10px; }
+  h1 { font-size: clamp(2.1rem, 5.4vw, 3.5rem); line-height: 1.12; font-weight: 700; max-width: 820px; margin: 0 auto; letter-spacing: -.01em; }
+  h1 em { font-style: normal; background: linear-gradient(90deg, var(--blue-soft), var(--violet), var(--blue-soft)); background-size: 200% auto;
+    -webkit-background-clip: text; background-clip: text; color: transparent; animation: shimmer 8s linear infinite; }
+  @keyframes shimmer { to { background-position: 200% center } }
+  .sub { color: var(--muted); font-size: 1.15rem; max-width: 660px; margin: 18px auto 30px; }
   .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
   .fineprint { color: var(--muted); font-size: .86rem; }
-  .hero-img { margin: 44px auto 0; max-width: 980px; border-radius: 14px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.5); animation: float 7s ease-in-out infinite; }
-  @keyframes float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-10px) } }
+  .fineprint strong { color: var(--text); font-variant-numeric: tabular-nums; }
+  .hero-img { margin: 44px auto 0; max-width: 980px; border-radius: 14px; overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.06);
+    animation: rise 1.1s cubic-bezier(.2,.7,.2,1) .2s both, float 7s ease-in-out 1.4s infinite; }
+  @keyframes rise { from { opacity: 0; transform: translateY(40px) scale(.97) } to { opacity: 1; transform: none } }
+  @keyframes float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
 
-  section { padding: 76px 0 0; }
-  h2 { font-size: clamp(1.5rem, 3.4vw, 2.1rem); text-align: center; margin-bottom: 10px; }
-  .lead { color: var(--muted); text-align: center; max-width: 640px; margin: 0 auto 40px; }
+  section { padding: 92px 0 0; }
+  .eyebrow { display: block; text-align: center; color: var(--blue-soft); font-size: .78rem; letter-spacing: .16em; text-transform: uppercase; font-weight: 600; margin-bottom: 8px; }
+  h2 { font-size: clamp(1.55rem, 3.4vw, 2.2rem); line-height: 1.2; text-align: center; margin-bottom: 12px; }
+  .lead { color: var(--muted); text-align: center; max-width: 660px; margin: 0 auto 40px; }
+  .lead b { color: var(--text); font-weight: 600; }
+  .shot { border-radius: 16px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.05); }
+  .center { text-align: center; }
 
   /* features */
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 26px; transition: transform .2s, border-color .2s; }
-  .card:hover { transform: translateY(-4px); border-color: #3a3f4b; }
-  .card .ico { font-size: 1.7rem; margin-bottom: 10px; }
-  .card h3 { font-size: 1.05rem; margin-bottom: 6px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 18px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 26px; transition: transform .25s, border-color .25s, box-shadow .25s; }
+  .card:hover { transform: translateY(-4px); border-color: rgba(138,180,248,.35); box-shadow: 0 14px 40px rgba(26,115,232,.12); }
+  .card .ico { font-size: 1.7rem; margin-bottom: 10px; display: inline-block; transition: transform .3s cubic-bezier(.3,1.6,.5,1); }
+  .card:hover .ico { transform: scale(1.18) rotate(-7deg); }
+  .card h3 { font-size: 1.05rem; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
   .card p { color: var(--muted); font-size: .95rem; }
+  .tag { font-size: .66rem; letter-spacing: .08em; text-transform: uppercase; color: var(--blue-soft); border: 1px solid rgba(138,180,248,.4); border-radius: 8px; padding: 0 7px; }
+
+  .points { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-top: 26px; }
+  .point { padding: 20px 22px; border-left: 2px solid var(--blue); background: linear-gradient(90deg, rgba(26,115,232,.08), transparent); border-radius: 0 12px 12px 0; }
+  .point strong { display: block; margin-bottom: 4px; }
+  .point p { color: var(--muted); font-size: .93rem; }
 
   /* steps */
   .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; counter-reset: step; }
   .step { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 26px; text-align: center; }
-  .step::before { counter-increment: step; content: counter(step); display: inline-flex; width: 40px; height: 40px; border-radius: 50%; background: var(--blue); color: #fff; font-weight: 700; align-items: center; justify-content: center; margin-bottom: 12px; }
+  .step::before { counter-increment: step; content: counter(step); display: inline-flex; width: 40px; height: 40px; border-radius: 50%; background: var(--blue); color: #fff;
+    font-weight: 700; align-items: center; justify-content: center; margin-bottom: 12px; box-shadow: 0 0 0 6px rgba(26,115,232,.15); }
   .step p { color: var(--muted); font-size: .95rem; }
   .step strong { display: block; color: var(--text); margin-bottom: 4px; }
 
+  /* what's new: a timeline whose line draws itself in */
+  .news { list-style: none; position: relative; padding-left: 28px; }
+  .news::before { content: ""; position: absolute; left: 6px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(var(--blue), rgba(26,115,232,.1));
+    transform-origin: top; transition: transform 1.2s cubic-bezier(.2,.7,.2,1); }
+  .js .news:not(.on)::before { transform: scaleY(0); }
+  .news > li { position: relative; padding-bottom: 26px; }
+  .news > li::before { content: ""; position: absolute; left: -27px; top: 7px; width: 12px; height: 12px; border-radius: 50%; background: var(--bg); border: 2px solid var(--blue-soft); }
+  .news > li:first-child::before { background: var(--blue-soft); box-shadow: 0 0 0 5px rgba(138,180,248,.18); }
+  .ver { display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px; }
+  .ver b { font-size: 1.15rem; }
+  .ver time { color: var(--muted); font-size: .88rem; }
+  .news ul { padding-left: 18px; color: var(--muted); }
+  .news ul li { margin: 3px 0; }
+
   /* faq */
-  details { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 22px; margin-bottom: 10px; }
-  summary { cursor: pointer; font-weight: 600; }
-  details p { color: var(--muted); padding: 10px 0 4px; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 10px; transition: border-color .2s; }
+  details[open] { border-color: #3a3f4b; }
+  summary { cursor: pointer; font-weight: 600; padding: 16px 52px 16px 22px; list-style: none; position: relative; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; font-weight: 400; color: var(--blue-soft); transition: transform .25s; }
+  details[open] summary::after { transform: translateY(-50%) rotate(45deg); }
+  details p { color: var(--muted); padding: 0 22px 16px; }
+  details[open] p { animation: up .35s ease-out; }
 
   /* support */
-  .support { text-align: center; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 44px 24px; }
+  .support { text-align: center; background: radial-gradient(ellipse at top, rgba(242,139,130,.1), transparent 70%), var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 44px 24px; }
   .support p { color: var(--muted); max-width: 520px; margin: 8px auto 22px; }
-  .heart { color: var(--red-soft); }
+  .heart { color: var(--red-soft); display: inline-block; animation: beat 1.6s ease-in-out infinite; }
+  @keyframes beat { 0%,60%,100% { transform: scale(1) } 15% { transform: scale(1.2) } 30% { transform: scale(1) } 45% { transform: scale(1.12) } }
 
-  footer { margin-top: 76px; border-top: 1px solid var(--line); padding: 30px 0 40px; text-align: center; color: var(--muted); font-size: .85rem; }
+  footer { margin-top: 84px; border-top: 1px solid var(--line); padding: 30px 0 40px; text-align: center; color: var(--muted); font-size: .85rem; }
   footer p { max-width: 700px; margin: 6px auto; }
 
-  /* interactive demo */
-  .demo-desktop { position: relative; height: 460px; border-radius: 16px; border: 1px solid var(--line); overflow: hidden;
-    background: linear-gradient(135deg, #1a2a6c, #2d1e5f 55%, #0f3057); user-select: none; }
-  .demo-icon { position: absolute; left: 28px; width: 76px; text-align: center; color: rgba(255,255,255,.75);
-    font-size: .78rem; padding: 8px 4px; border-radius: 10px; cursor: pointer; transition: background .15s; z-index: 1; }
-  .demo-icon span { display: block; font-size: 1.9rem; margin-bottom: 2px; }
+  /* ---------- interactive demo ---------- */
+  .demo { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; align-items: start; }
+  .demo-desktop { position: relative; height: 470px; border-radius: 16px; border: 1px solid var(--line); overflow: hidden;
+    background: linear-gradient(135deg, #1a2a6c, #2d1e5f 55%, #0f3057); user-select: none; -webkit-user-select: none; }
+  .demo-desktop::before { content: ""; position: absolute; width: 360px; height: 360px; left: -80px; top: -60px; border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(79,172,254,.25), transparent); }
+  .demo-icon { position: absolute; left: 18px; width: 76px; text-align: center; color: rgba(255,255,255,.85); background: none; border: 0;
+    font-size: .76rem; padding: 8px 4px; border-radius: 10px; cursor: pointer; transition: background .15s; z-index: 1; }
+  .demo-icon span { display: block; font-size: 1.9rem; line-height: 1.3; }
   .demo-icon:hover { background: rgba(255,255,255,.14); }
-  .demo-window { position: absolute; top: 34px; right: 34px; bottom: 60px; left: 190px; display: flex; flex-direction: column;
-    border-radius: 10px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,.5); transition: box-shadow .4s; z-index: 2; }
-  .demo-desktop.widget .demo-window { box-shadow: 0 10px 30px rgba(0,0,0,.25); }
-  .demo-desktop.widget .demo-body { pointer-events: none; }
-  .demo-bar { height: 36px; flex: none; background: #202124; color: #e8eaed; display: flex; align-items: center; gap: 10px;
-    padding: 0 12px; font-size: .84rem; }
-  .demo-logo { width: 15px; height: 15px; border-radius: 4px; background: var(--blue); flex: none; }
-  .demo-mouse { margin-left: auto; background: none; border: 0; color: #e8eaed; cursor: pointer; padding: 4px 6px; border-radius: 6px; display: flex; }
-  .demo-mouse:hover { background: rgba(255,255,255,.12); }
-  .demo-desktop.widget .demo-mouse { color: var(--blue-soft); animation: pulse 2.2s infinite; }
-  @keyframes pulse { 0%,100% { filter: drop-shadow(0 0 0 rgba(138,180,248,0)) } 50% { filter: drop-shadow(0 0 6px rgba(138,180,248,.9)) } }
-  .demo-burger { letter-spacing: 1px; font-size: 1.1rem; opacity: .9; }
-  .demo-body { flex: 1; position: relative; background:
-      linear-gradient(rgba(60,64,67,.14) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(60,64,67,.14) 1px, transparent 1px), #fff;
-    background-size: 25% 25%, 25% 25%, auto; opacity: .85; transition: opacity .25s; }
-  .demo-ev { position: absolute; width: 19%; border-radius: 6px; color: #fff; font-size: .74rem; line-height: 1.25;
-    padding: 7px 9px; box-shadow: 0 1px 4px rgba(0,0,0,.18); }
-  .demo-ev small { opacity: .8; }
-  .demo-now { position: absolute; left: 25%; right: 50%; top: 68%; border-top: 2.5px solid #ea4335; }
+  .demo-desktop.behind .demo-icon { z-index: 6; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.95); }
+
+  .demo-window { --w-chrome: #f8fafd; --w-chrome-fg: #3c4043; --w-accent: #1a73e8;
+    --w-page: #f8fafd; --w-grid: #ffffff; --w-line: rgba(60,64,67,.14); --w-ink: #1f1f1f; --w-ink2: #5f6368;
+    position: absolute; top: 26px; right: 26px; bottom: 56px; left: 170px; display: flex; flex-direction: column;
+    background: var(--w-chrome); padding: 0 5px 5px; border-radius: 10px; overflow: hidden; z-index: 2;
+    box-shadow: 0 24px 60px rgba(0,0,0,.5); transition: box-shadow .4s, opacity .25s, background .45s, padding .2s; }
+  .demo-window.chrome-dark { --w-chrome: #1f1f1f; --w-chrome-fg: #e8eaed; --w-accent: #8ab4f8; }
+  .demo-window.page-dark { --w-page: #1f1f1f; --w-grid: #131314; --w-line: rgba(255,255,255,.09); --w-ink: #e3e3e3; --w-ink2: #c4c7c5; }
+  .widget .demo-window { box-shadow: 0 10px 30px rgba(0,0,0,.25); padding: 0; pointer-events: none; }
+  .demo-bar { height: 36px; flex: none; display: flex; align-items: center; gap: 9px; padding-left: 12px; color: var(--w-chrome-fg); font-size: .82rem; transition: color .45s; }
+  .demo-logo { width: 15px; height: 15px; border-radius: 4px; flex: none; background: linear-gradient(#174ea6 0 34%, #fff 34%) padding-box, var(--blue); border: 3px solid var(--blue); border-width: 3px 2.5px 3.5px; }
+  .demo-title { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .demo-logo, .demo-title { transition: opacity .15s; }
+  .widget .demo-logo, .widget .demo-title { opacity: 0; }
+  .demo-btns { display: flex; margin-left: auto; height: 100%; pointer-events: auto; }
+  .demo-btn { width: 42px; height: 100%; display: grid; place-items: center; background: none; border: 0; color: var(--w-chrome-fg); cursor: pointer; transition: background .15s, color .45s; }
+  .demo-btn:hover { background: rgba(127,127,127,.18); }
+  .demo-close:hover { background: #c42b1c; color: #fff; }
+  .widget .demo-close { display: none; }
+  .widget .demo-mouse { color: var(--w-accent); animation: pulse 2.2s infinite; }
+  @keyframes pulse { 0%,100% { filter: drop-shadow(0 0 0 transparent) } 50% { filter: drop-shadow(0 0 5px var(--w-accent)) } }
+
+  .demo-body { flex: 1; position: relative; display: flex; flex-direction: column; background: var(--w-page); color: var(--w-ink); border-radius: 4px; overflow: hidden; transition: background .45s, color .45s; }
+  .widget .demo-body { border-radius: 0; }
+  .demo-head { display: flex; align-items: center; gap: 10px; padding: 7px 12px; font-size: .8rem; white-space: nowrap; overflow: hidden; }
+  .demo-head .hamb { color: var(--w-ink2); font-size: 1rem; line-height: 1; }
+  .demo-head .today { border: 1px solid var(--w-ink2); border-radius: 12px; padding: 0 9px; font-size: .72rem; opacity: .8; }
+  .demo-head .month { font-size: .9rem; }
+  .demo-grid { flex: 1; position: relative; margin: 0 6px 6px; border-radius: 10px; background: var(--w-grid); display: flex; flex-direction: column; transition: background .45s; }
+  .demo-days { display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; font-size: .66rem; color: var(--w-ink2); padding: 6px 0 4px; letter-spacing: .04em; }
+  .demo-days b { display: block; font-size: 1.05rem; font-weight: 500; color: var(--w-ink); letter-spacing: 0; }
+  .demo-days .now { color: var(--blue); }
+  .demo-days .now b { color: #fff; background: var(--blue); width: 26px; height: 26px; line-height: 26px; border-radius: 50%; margin: 0 auto; }
+  .page-dark .demo-days .now { color: #a8c7fa; }
+  .page-dark .demo-days .now b { background: #a8c7fa; color: #062e6f; }
+  .demo-cells { flex: 1; position: relative; border-top: 1px solid var(--w-line);
+    background: linear-gradient(var(--w-line) 1px, transparent 1px), linear-gradient(90deg, var(--w-line) 1px, transparent 1px);
+    background-size: 25% 25%, 25% 25%; }
+  .demo-ev { position: absolute; width: 21%; border-radius: 6px; color: #fff; font-size: .72rem; line-height: 1.25; padding: 6px 8px; box-shadow: 0 1px 4px rgba(0,0,0,.18); overflow: hidden; }
+  .demo-ev small { opacity: .85; }
+  .demo-now { position: absolute; left: 50%; width: 25%; top: 50%; border-top: 2.5px solid #ea4335; }
   .demo-now::before { content: ""; position: absolute; left: -5px; top: -6.5px; width: 10px; height: 10px; border-radius: 50%; background: #ea4335; }
-  .demo-badge { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); background: rgba(32,33,36,.92);
-    color: #e8eaed; font-size: .82rem; padding: 7px 18px; border-radius: 16px; white-space: nowrap; z-index: 3; }
-  .demo-menu { position: absolute; display: none; z-index: 4; min-width: 190px; background: #2b2d33; border: 1px solid #3d4046;
-    border-radius: 9px; padding: 6px; box-shadow: 0 14px 40px rgba(0,0,0,.5); font-size: .84rem; color: #e8eaed; }
+  .demo-shadow { position: absolute; top: 0; bottom: 0; width: 0; pointer-events: none; transition: width .2s; z-index: 3; }
+  .demo-shadow.l { left: 0; background: linear-gradient(to right, rgba(0,0,0,1), rgba(0,0,0,.905) 20%, rgba(0,0,0,.655) 40%, rgba(0,0,0,.345) 60%, rgba(0,0,0,.095) 80%, transparent); }
+  .demo-shadow.r { right: 0; background: linear-gradient(to left, rgba(0,0,0,1), rgba(0,0,0,.905) 20%, rgba(0,0,0,.655) 40%, rgba(0,0,0,.345) 60%, rgba(0,0,0,.095) 80%, transparent); }
+
+  .demo-badge { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); background: rgba(32,33,36,.92); color: #e8eaed; font-size: .8rem;
+    padding: 7px 16px; border-radius: 16px; z-index: 7; text-align: center; width: max-content; max-width: calc(100% - 24px); }
+  .demo-toast { position: absolute; left: 50%; top: 12px; transform: translate(-50%, -10px); opacity: 0; pointer-events: none; z-index: 9; background: rgba(32,33,36,.95);
+    border: 1px solid #3d4046; color: #e8eaed; font-size: .82rem; padding: 7px 14px; border-radius: 10px; transition: opacity .25s, transform .25s; white-space: nowrap; }
+  .demo-toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .demo-menu { position: absolute; display: none; z-index: 8; min-width: 190px; background: #2b2d33; border: 1px solid #3d4046;
+    border-radius: 9px; padding: 6px; box-shadow: 0 14px 40px rgba(0,0,0,.5); font-size: .84rem; color: #e8eaed; animation: pop .14s ease-out; }
+  @keyframes pop { from { opacity: 0; transform: scale(.96) } to { opacity: 1; transform: none } }
   .demo-menu div { padding: 6px 12px; border-radius: 6px; display: flex; justify-content: space-between; cursor: default; }
   .demo-menu div:hover { background: rgba(255,255,255,.09); }
   .demo-menu em { font-style: normal; color: var(--muted); }
   .demo-menu hr { border: 0; border-top: 1px solid #3d4046; margin: 5px 8px; }
-  .demo-controls { display: flex; gap: 18px; align-items: center; justify-content: center; flex-wrap: wrap; margin-top: 18px; color: var(--muted); font-size: .92rem; }
-  .demo-controls input[type="range"] { width: 220px; accent-color: var(--blue); }
-  .demo-controls output { color: var(--blue-soft); font-weight: 600; }
 
-  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s, transform .6s; }
-  .reveal.on { opacity: 1; transform: none; }
+  /* the demo's settings panel, styled after the app's own Settings window */
+  .demo-panel { background: #202124; border: 1px solid #3c4043; border-radius: 12px; padding: 16px 18px 18px; font-size: .88rem; }
+  .demo-panel.flash { animation: flash 1.1s ease-out; }
+  @keyframes flash { 0% { box-shadow: 0 0 0 0 rgba(138,180,248,.7) } 100% { box-shadow: 0 0 0 14px rgba(138,180,248,0) } }
+  .demo-panel h3 { font-size: .82rem; font-weight: 600; display: flex; align-items: center; gap: 8px; margin-bottom: 14px; color: var(--text); }
+  .demo-panel h3::before { content: ""; width: 13px; height: 13px; border-radius: 3px; background: var(--blue); }
+  .row { margin-bottom: 16px; }
+  .row-label { display: flex; justify-content: space-between; color: var(--muted); font-size: .7rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 4px; }
+  .row-label output { color: var(--blue-soft); letter-spacing: 0; font-size: .82rem; }
+  .demo-panel input[type="range"] { width: 100%; accent-color: var(--blue); }
+  .check { display: flex; gap: 9px; align-items: flex-start; cursor: pointer; line-height: 1.35; }
+  .check input { accent-color: var(--blue-soft); width: 15px; height: 15px; margin-top: 2px; flex: none; }
+  .dual { --l: 0%; --r: 0%; position: relative; height: 24px; }
+  .dual::before { content: ""; position: absolute; left: 8px; right: 8px; top: 9px; height: 6px; border-radius: 3px;
+    background: linear-gradient(90deg, #8ab4f8, rgba(138,180,248,0)) left / var(--l) 100% no-repeat,
+                linear-gradient(270deg, #8ab4f8, rgba(138,180,248,0)) right / var(--r) 100% no-repeat, #3c4043; }
+  .dual input { position: absolute; inset: 0; width: 100%; height: 24px; margin: 0; background: none; pointer-events: none; -webkit-appearance: none; appearance: none; }
+  .dual input::-webkit-slider-runnable-track { height: 24px; background: transparent; }
+  .dual input::-moz-range-track { background: transparent; }
+  .dual input::-webkit-slider-thumb { -webkit-appearance: none; pointer-events: auto; width: 16px; height: 16px; margin-top: 4px; border: 0; border-radius: 50%; background: var(--blue-soft); cursor: pointer; }
+  .dual input::-moz-range-thumb { pointer-events: auto; width: 16px; height: 16px; border: 0; border-radius: 50%; background: var(--blue-soft); cursor: pointer; }
+  .dual input:focus-visible { outline: none; }
+  .dual input:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(138,180,248,.35); }
+  .dual input:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 4px rgba(138,180,248,.35); }
+  .dual-vals { display: flex; justify-content: space-between; color: var(--blue-soft); font-size: .78rem; }
+  .divider { border: 0; border-top: 1px solid #3c4043; margin: 4px 0 14px; }
+  .seg { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid #5e6368; border-radius: 8px; overflow: hidden; }
+  .seg button { background: none; border: 0; padding: 6px; cursor: pointer; color: var(--muted); transition: background .2s, color .2s; }
+  .seg button[aria-pressed="true"] { background: rgba(138,180,248,.18); color: var(--text); }
+  .hint { color: var(--muted); font-size: .76rem; margin-top: 6px; }
+  .demo-panel .btn { width: 100%; text-align: center; margin-top: 4px; }
+
+  .js .reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1); transition-delay: calc(var(--i, 0) * 70ms); }
+  .js .reveal.zoom { transform: translateY(26px) scale(.975); }
+  .js .reveal.on { opacity: 1; transform: none; }
+
+  @media (max-width: 900px) {
+    .nav-links a:not(.btn) { display: none; }
+    .demo { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .wrap { padding: 0 16px; }
+    header.hero { padding-top: 40px; }
+    .sub { font-size: 1.05rem; }
+    section { padding-top: 72px; }
+    .demo-desktop { height: 420px; }
+    .demo-icon { left: 6px; width: 62px; font-size: .68rem; }
+    .demo-icon span { font-size: 1.5rem; }
+    .demo-window { left: 84px; right: 10px; top: 14px; bottom: 74px; }
+    .demo-badge { font-size: .74rem; bottom: 10px; padding: 6px 12px; }
+    #demoUnder { left: 112px !important; }
+    .demo-head .today, .demo-head .hamb { display: none; }
+    .demo-ev { font-size: .62rem; padding: 4px 5px; }
+    .demo-ev small { display: none; }
+  }
   @media (prefers-reduced-motion: reduce) {
-    .hero-img { animation: none; }
-    .reveal { opacity: 1; transform: none; transition: none; }
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .js .reveal { opacity: 1; transform: none; }
+    .js .news:not(.on)::before { transform: none; }
   }
 </style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 
-<nav>
+<nav aria-label="Main">
   <div class="wrap nav-inner">
-    <img src="assets/logo.svg" alt="">
-    <span class="nav-name">Google Calendar Desktop Widget</span>
+    <a class="nav-brand" href="#top"><img src="assets/logo.svg" alt="" width="30" height="30"><span class="nav-name">Google Calendar Desktop Widget</span></a>
     <div class="nav-links">
       <a href="#features">Features</a>
-      <a href="#how">How it works</a>
       <a href="#try">Try it</a>
+      <a href="#new">What's new</a>
+      <a href="#faq">FAQ</a>
       <a href="https://github.com/mkazemie/google-calendar-desktop-widget">GitHub</a>
       <a class="btn btn-blue btn-small" href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.0/CalendarWidgetSetup-1.3.0.exe">Download</a>
     </div>
   </div>
 </nav>
 
-<header>
-  <div class="wrap">
+<header class="hero" id="top">
+  <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="wrap intro">
+    <a class="badge-new" href="#new"><b>NEW IN 1.3</b> Matches your calendar's theme →</a>
     <h1>Your Google Calendar, <em>living on your desktop</em></h1>
     <p class="sub">Transparent. Click-through. Always up to date. Never in the way.
-    The real Google Calendar, pinned to your Windows wallpaper.</p>
+    The real Google Calendar on your Windows desktop, as a widget or as a live wallpaper behind your icons.</p>
     <div class="cta-row">
       <a class="btn btn-blue" href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.0/CalendarWidgetSetup-1.3.0.exe">⬇&nbsp; Download free</a>
       <a class="btn btn-ghost" href="https://github.com/mkazemie/google-calendar-desktop-widget">View on GitHub</a>
     </div>
-    <p class="fineprint">Free &amp; open source · Windows 10/11 · ~2&nbsp;MB installer</p>
+    <p class="fineprint">Free &amp; open source · Windows 10 &amp; 11 · ~2&nbsp;MB installer · <strong id="dlCount">1,500+</strong> downloads</p>
+  </div>
+  <div class="wrap">
     <div class="hero-img">
-      <img src="assets/hero.svg" alt="Transparent Google Calendar widget pinned to a Windows desktop while mouse clicks pass through it" width="1200" height="640">
+      <img src="assets/hero.svg" alt="A transparent Google Calendar widget on a Windows desktop: a file is opened and the desktop menu is right-clicked straight through it, and an event added on a phone appears on it seconds later" width="1200" height="640" fetchpriority="high">
     </div>
   </div>
 </header>
 
+<main id="main">
+
 <section id="features">
   <div class="wrap">
+    <span class="eyebrow">Features</span>
     <h2>Why you'll love it</h2>
-    <p class="lead">Stop alt-tabbing to check what's next. Your schedule is always one glance away — and completely out of your way.</p>
+    <p class="lead">Stop alt-tabbing to check what's next. Your schedule is always one glance away, and never in your way.</p>
     <div class="grid">
-      <div class="card reveal"><div class="ico">🪟</div><h3>Truly click-through</h3><p>Clicks, drags, even <b>right-clicks</b> land on whatever is behind it — desktop icons, files, the wallpaper menu. The widget is invisible to your mouse.</p></div>
-      <div class="card reveal"><div class="ico">🔄</div><h3>Live, not a snapshot</h3><p>It <b>is</b> Google Calendar. Add an event from your phone and watch it appear on your desktop seconds later.</p></div>
+      <div class="card reveal"><div class="ico">🪟</div><h3>Truly click-through</h3><p>Clicks, drags, even <b>right-clicks</b> land on whatever is behind it: desktop icons, files, the wallpaper menu. Your mouse never notices it's there.</p></div>
+      <div class="card reveal"><div class="ico">🔄</div><h3>Live, not a snapshot</h3><p>It <b>is</b> Google Calendar. Add an event on your phone and watch it appear on your desktop seconds later.</p></div>
       <div class="card reveal"><div class="ico">✏️</div><h3>Edit in place</h3><p>One click makes it a normal window: add events, drag meetings around, then fade it back into the wallpaper.</p></div>
-      <div class="card reveal"><div class="ico">👻</div><h3>As subtle as you want</h3><p>Transparency from 0 to 95&nbsp;% — from solid window to a ghost that melts into your wallpaper.</p></div>
+      <div class="card reveal"><div class="ico">🖼️</div><h3>Live-wallpaper mode <span class="tag">New</span></h3><p>Tuck the calendar <b>behind your desktop icons</b>. Your icons sit on top of your schedule and stay clickable.</p></div>
+      <div class="card reveal"><div class="ico">🌫️</div><h3>Edge shadows <span class="tag">New</span></h3><p>Soft dark fades on the calendar's left and right edges keep desktop icons readable, even over a busy week.</p></div>
+      <div class="card reveal"><div class="ico">🌗</div><h3>Matches your calendar <span class="tag">New</span></h3><p>Light or dark: the title bar and window frame follow Google Calendar's own theme, automatically.</p></div>
+      <div class="card reveal"><div class="ico">👻</div><h3>As subtle as you want</h3><p>Transparency from 0 to 95&nbsp;%, from solid window to a ghost that melts into your wallpaper. Every change previews live.</p></div>
       <div class="card reveal"><div class="ico">📌</div><h3>Stays in the background</h3><p>Pinned beneath every window. It never pops over your work, never steals focus, never interrupts.</p></div>
-      <div class="card reveal"><div class="ico">🖥️</div><h3>Feels native</h3><p>Snap it, maximize it, drag it across monitors like any Windows 11 app. Starts with Windows, lives in the tray.</p></div>
+      <div class="card reveal"><div class="ico">🖥️</div><h3>Feels native</h3><p>Snap it, maximize it, move it across monitors. Sharp at every display scale. Starts with Windows, lives in the tray.</p></div>
     </div>
   </div>
 </section>
 
 <section id="how">
   <div class="wrap">
+    <span class="eyebrow">Two modes</span>
     <h2>Two modes, one button</h2>
-    <p class="lead">The mouse icon in the title bar stays clickable even in widget mode — a full, editable calendar is always exactly one click away.</p>
-    <div class="reveal"><img src="assets/modes.svg" alt="Clicking the title-bar mouse button toggles between interactive mode and a ghosted, click-through widget mode" width="1200" height="420"></div>
+    <p class="lead">In widget mode the title bar shrinks to just its two buttons and everything else lets your clicks through. The mouse button brings back a full, editable calendar in one click.</p>
+    <div class="shot reveal zoom"><img src="assets/modes.svg" alt="Clicking the title-bar mouse button switches between interactive mode, a normal window, and widget mode, a faded click-through calendar where only the mouse and menu buttons stay clickable" width="1200" height="420" loading="lazy" decoding="async"></div>
   </div>
 </section>
 
 <section id="action">
   <div class="wrap">
-    <h2>Invisible to your mouse — even right-click</h2>
+    <span class="eyebrow">Click-through</span>
+    <h2>Invisible to your mouse, even right-click</h2>
     <p class="lead">Right-click your wallpaper and Windows answers, not the calendar. The desktop context menu opens straight through it.</p>
-    <div class="reveal"><img src="assets/rightclick.svg" alt="Right-clicking the desktop through the transparent calendar opens the normal Windows context menu" width="1200" height="560" loading="lazy"></div>
+    <div class="shot reveal zoom"><img src="assets/rightclick.svg" alt="Right-clicking the desktop through the transparent calendar opens the normal Windows context menu" width="1200" height="560" loading="lazy" decoding="async"></div>
+  </div>
+</section>
+
+<section id="wallpaper">
+  <div class="wrap">
+    <span class="eyebrow">Live-wallpaper mode</span>
+    <h2>Make Google Calendar your live wallpaper</h2>
+    <p class="lead">Turn on <b>Sit behind desktop icons</b> and, in widget mode, your calendar slides under the desktop icons, just like a wallpaper. The icons stay on top, readable and clickable.</p>
+    <div class="shot reveal zoom"><img src="assets/wallpaper.svg" alt="The calendar moves behind the desktop icons, an edge shadow fades in behind them to keep their labels readable, and an icon is double-clicked on top of the calendar" width="1200" height="560" loading="lazy" decoding="async"></div>
+    <div class="points">
+      <div class="point reveal"><strong>Behind your icons</strong><p>Your schedule becomes part of the desktop itself. Files and shortcuts sit on top of it.</p></div>
+      <div class="point reveal"><strong>Edge shadows</strong><p>Dark fades on the left and right edges keep icon labels legible. Set each side with one two-handle slider.</p></div>
+      <div class="point reveal"><strong>Still one click away</strong><p>The title-bar buttons stay above the icons, so a fully editable calendar is always one click away.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="theme">
+  <div class="wrap">
+    <span class="eyebrow">Light &amp; dark</span>
+    <h2>Light or dark, it matches your calendar</h2>
+    <p class="lead">Switch Google Calendar to dark mode in its own settings and the widget's title bar, window frame and hover panel follow within a second. Nothing to set up in the widget.</p>
+    <div class="shot reveal zoom"><img src="assets/theme.svg" alt="Google Calendar is switched to its dark theme and the widget's title bar and frame turn dark a moment later, then both switch back to light" width="1200" height="480" loading="lazy" decoding="async"></div>
   </div>
 </section>
 
 <section id="panel">
   <div class="wrap">
+    <span class="eyebrow">Settings</span>
     <h2>A tiny control panel runs everything</h2>
-    <p class="lead">Transparency, hover-panel corner, start-with-Windows, sign-out — drag the slider and the calendar melts into your wallpaper in real time.</p>
-    <div class="reveal"><img src="assets/panel.svg" alt="The control panel with a transparency slider; dragging it fades the calendar between solid and ghost" width="1200" height="560" loading="lazy"></div>
+    <p class="lead">Transparency, live-wallpaper mode, edge shadows, the hover-panel corner, start with Windows, sign-in and sign-out. Changes preview live as you drag.</p>
+    <div class="shot reveal zoom"><img src="assets/panel.svg" alt="The Settings window: dragging the transparency slider fades the calendar, ticking Sit behind desktop icons brings the icons on top, and dragging the edge-shadow handles darkens the calendar's edges" width="1200" height="560" loading="lazy" decoding="async"></div>
   </div>
 </section>
 
 <section id="try">
   <div class="wrap">
-    <h2>Feel it — right here</h2>
-    <p class="lead">Drag the slider, flip the mode, and try <b>right-clicking the wallpaper</b> below. This is what the widget feels like on your desktop.</p>
+    <span class="eyebrow">Interactive demo</span>
+    <h2>Feel it, right here</h2>
+    <p class="lead">Flip the mode, drag the sliders, tuck it behind the icons, switch the calendar's theme, and try <b>right-clicking the wallpaper</b> or clicking <b>Notes</b> through the calendar.</p>
     <div class="demo reveal">
-      <div class="demo-desktop" id="demoDesktop">
-        <div class="demo-icon" style="top:36px"><span>📁</span>Projects</div>
-        <div class="demo-icon" style="top:126px"><span>🖼️</span>Photos</div>
-        <div class="demo-icon under" id="demoUnder" style="top:216px; left:240px" title="I'm behind the calendar — you can still reach me in widget mode"><span>📝</span>Notes</div>
+      <div class="demo-desktop widget" id="demoDesktop">
+        <button class="demo-icon" style="top:22px" data-name="Projects"><span>📁</span>Projects</button>
+        <button class="demo-icon" style="top:108px" data-name="Photos"><span>🖼️</span>Photos</button>
+        <button class="demo-icon" id="demoUnder" style="top:194px; left:212px" data-name="Notes" title="I'm behind the calendar, and still reachable in widget mode"><span>📝</span>Notes</button>
         <div class="demo-window" id="demoWin">
           <div class="demo-bar">
-            <span class="demo-logo"></span> Google Calendar
-            <button class="demo-mouse" id="demoToggle" title="Toggle widget / interactive mode" aria-label="Toggle widget or interactive mode">
-              <svg width="14" height="18" viewBox="0 0 14 18"><rect x="1" y="1" width="12" height="16" rx="6" fill="none" stroke="currentColor" stroke-width="1.6"/><line x1="7" y1="4" x2="7" y2="8" stroke="currentColor" stroke-width="1.6"/></svg>
-            </button>
-            <span class="demo-burger">≡</span>
+            <span class="demo-logo"></span><span class="demo-title">Google Calendar Desktop Widget</span>
+            <span class="demo-btns">
+              <button class="demo-btn demo-mouse" id="demoToggle" title="Toggle click-through" aria-label="Toggle click-through">
+                <svg width="12" height="17" viewBox="0 0 12 17" aria-hidden="true"><rect x="1" y="1" width="10" height="15" rx="5" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="6" y1="4" x2="6" y2="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </button>
+              <button class="demo-btn" id="demoSettings" title="Settings" aria-label="Settings">
+                <svg width="15" height="12" viewBox="0 0 15 12" aria-hidden="true"><path d="M1 1.5h13M1 6h13M1 10.5h13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </button>
+              <button class="demo-btn demo-close" id="demoClose" title="Exit widget" aria-label="Exit widget">
+                <svg width="11" height="11" viewBox="0 0 11 11" aria-hidden="true"><path d="M1 1l9 9M10 1l-9 9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              </button>
+            </span>
           </div>
           <div class="demo-body" id="demoBody">
-            <div class="demo-ev" style="left:6%; top:8%;  background:#1a73e8">Team sync<br><small>9:00 – 9:45</small></div>
-            <div class="demo-ev" style="left:30%; top:30%; background:#0b8043">Deep work<br><small>10:00 – 12:00</small></div>
-            <div class="demo-ev" style="left:54%; top:55%; background:#f4511e">Lunch w/ Sara<br><small>12:30</small></div>
-            <div class="demo-ev" style="left:76%; top:18%; background:#8e24aa">Design review<br><small>9:30</small></div>
-            <div class="demo-now"></div>
+            <div class="demo-head"><span class="hamb">≡</span><span>Calendar</span><span class="today">Today</span><span class="month">November 2026</span></div>
+            <div class="demo-grid">
+              <div class="demo-days"><span>MON<b>16</b></span><span>TUE<b>17</b></span><span class="now">WED<b>18</b></span><span>THU<b>19</b></span></div>
+              <div class="demo-cells">
+                <div class="demo-ev" style="left:2%; top:5%; background:#1a73e8">Team sync<br><small>9:00 – 9:45</small></div>
+                <div class="demo-ev" style="left:27%; top:28%; height:34%; background:#0b8043">Deep work<br><small>10:00 – 12:00</small></div>
+                <div class="demo-ev" style="left:52%; top:60%; background:#f4511e">Lunch w/ Sara<br><small>12:30</small></div>
+                <div class="demo-ev" style="left:77%; top:14%; background:#8e24aa">Design review<br><small>9:30</small></div>
+                <div class="demo-now"></div>
+              </div>
+            </div>
+            <div class="demo-shadow l" id="shadowL"></div>
+            <div class="demo-shadow r" id="shadowR"></div>
           </div>
         </div>
-        <div class="demo-badge" id="demoBadge">Widget mode — click-through</div>
+        <div class="demo-badge" id="demoBadge" aria-live="polite"></div>
+        <div class="demo-toast" id="demoToast" role="status"></div>
         <div class="demo-menu" id="demoMenu">
           <div>View <em>›</em></div>
           <div>Sort by <em>›</em></div>
@@ -262,10 +541,34 @@
           <div>Personalize</div>
         </div>
       </div>
-      <div class="demo-controls">
-        <label for="demoRange">Transparency <output id="demoOut">15%</output></label>
-        <input type="range" id="demoRange" min="0" max="95" value="15">
-        <button class="btn btn-ghost btn-small" id="demoToggle2">🖱️ Toggle widget / interactive</button>
+
+      <div class="demo-panel" id="demoPanel">
+        <h3>Settings</h3>
+        <div class="row">
+          <div class="row-label"><label for="demoRange">Transparency</label><output id="demoOut" for="demoRange">20%</output></div>
+          <input type="range" id="demoRange" min="0" max="95" value="20">
+        </div>
+        <div class="row">
+          <label class="check"><input type="checkbox" id="demoBehind"> Sit behind desktop icons (live wallpaper)</label>
+        </div>
+        <div class="row">
+          <div class="row-label"><span id="shadowLabel">Edge shadows</span></div>
+          <div class="dual" id="dual" role="group" aria-labelledby="shadowLabel">
+            <input type="range" id="shL" min="0" max="100" value="0" aria-label="Left shadow width">
+            <input type="range" id="shR" min="0" max="100" value="100" aria-label="Right shadow width">
+          </div>
+          <div class="dual-vals"><span id="valL">Left off</span><span id="valR">Right off</span></div>
+        </div>
+        <hr class="divider">
+        <div class="row">
+          <div class="row-label"><span id="themeLabel">Google Calendar's own theme</span></div>
+          <div class="seg" role="group" aria-labelledby="themeLabel">
+            <button type="button" data-theme="light" aria-pressed="true">☀️ Light</button>
+            <button type="button" data-theme="dark" aria-pressed="false">🌙 Dark</button>
+          </div>
+          <p class="hint">Set inside Google Calendar; the widget's title bar follows it.</p>
+        </div>
+        <button class="btn btn-blue btn-small" id="demoToggle2">🖱️ Toggle click-through</button>
       </div>
     </div>
   </div>
@@ -273,12 +576,13 @@
 
 <section id="get">
   <div class="wrap">
+    <span class="eyebrow">Get started</span>
     <h2>Up and running in a minute</h2>
-    <p class="lead">No account to create, no configuration required.</p>
+    <p class="lead">No new account, no configuration.</p>
     <div class="steps">
       <div class="step reveal"><strong>Download &amp; run</strong><p>Grab the ~2&nbsp;MB installer. It fetches anything else it needs automatically.</p></div>
-      <div class="step reveal"><strong>Sign in once</strong><p>Log into your Google account — your session is remembered on your machine.</p></div>
-      <div class="step reveal"><strong>Toggle &amp; forget</strong><p>Hit the mouse button in the title bar. Your calendar fades into the desktop.</p></div>
+      <div class="step reveal"><strong>Sign in once</strong><p>Log into your Google account. Your session stays on your computer.</p></div>
+      <div class="step reveal"><strong>Toggle &amp; forget</strong><p>Click the mouse button in the title bar. Your calendar fades into the desktop.</p></div>
     </div>
     <div class="cta-row" style="margin-top:34px">
       <a class="btn btn-blue" href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.0/CalendarWidgetSetup-1.3.0.exe">⬇&nbsp; Download the installer</a>
@@ -286,20 +590,60 @@
   </div>
 </section>
 
-<section id="faq">
-  <div class="wrap" style="max-width:760px">
-    <h2>Questions, answered</h2>
-    <p class="lead"></p>
-    <details class="reveal"><summary>Is it really free?</summary><p>Yes — free and open source (Apache 2.0), with no ads, accounts, or telemetry. If you love it, there's an optional donation link. That's it.</p></details>
-    <details class="reveal"><summary>Is this an official Google app?</summary><p>No. It's an independent open-source project that displays the real calendar.google.com in its own window. Not affiliated with or endorsed by Google.</p></details>
-    <details class="reveal"><summary>Windows says the installer is unrecognized — why?</summary><p>The installer isn't code-signed (certificates cost money; this app is free). Click "More info → Run anyway". The full source code is on GitHub, so you can audit or build it yourself.</p></details>
-    <details class="reveal"><summary>Where is my Google login stored?</summary><p>Only on your machine, in the app's private browser profile — the same way Chrome stores your session. You can sign out (or wipe everything) from the app's settings, and the uninstaller offers to remove all data.</p></details>
-    <details class="reveal"><summary>Does it work with multiple monitors?</summary><p>Yes — drag it to any monitor, snap it, or maximize it there. It remembers its position between restarts.</p></details>
-    <details class="reveal"><summary>What does it need to run?</summary><p>Windows 10 or 11. The installer automatically fetches the .NET 8 runtime and WebView2 (built into Windows 11) if they're missing.</p></details>
+<section id="new">
+  <div class="wrap" style="max-width:820px">
+    <span class="eyebrow">Changelog</span>
+    <h2>What's new</h2>
+    <p class="lead">Updates are free. Installing a new version keeps your settings and Google sign-in.</p>
+    <ol class="news reveal">
+      <li>
+        <div class="ver"><b>1.3</b><time datetime="2026-10-03">October 2026</time></div>
+        <ul>
+          <li>The title bar, window frame and hover panel follow Google Calendar's light or dark theme.</li>
+          <li>Transparency and edge shadows preview live while you adjust them.</li>
+          <li>Settings, title bar and hover panel stay sharp and correctly sized at every display scale, including mixed-scale monitors.</li>
+        </ul>
+      </li>
+      <li>
+        <div class="ver"><b>1.2</b><time datetime="2026-10-02">October 2026</time></div>
+        <ul>
+          <li>Edge shadows: dark fades on the calendar's edges keep desktop icons readable.</li>
+          <li>In widget mode the title bar lets clicks through; only its buttons stay clickable.</li>
+        </ul>
+      </li>
+      <li>
+        <div class="ver"><b>1.1</b><time datetime="2026-07-12">July 2026</time></div>
+        <ul>
+          <li>Live-wallpaper mode: the widget can sit behind your desktop icons.</li>
+          <li>Transparency in percent and an optional corner hover panel.</li>
+          <li>Recovers on its own after monitor and display changes.</li>
+        </ul>
+      </li>
+    </ol>
+    <p class="center"><a href="https://github.com/mkazemie/google-calendar-desktop-widget/releases">All release notes on GitHub →</a></p>
   </div>
 </section>
 
-<section>
+<section id="faq">
+  <div class="wrap" style="max-width:780px">
+    <span class="eyebrow">FAQ</span>
+    <h2>Questions, answered</h2>
+    <p class="lead"></p>
+    <details class="reveal"><summary>How do I put Google Calendar on my Windows desktop?</summary><p>Download and run the free installer, sign in to your Google account once, then click the mouse button in the widget's title bar. Your real Google Calendar stays on the desktop as a transparent, click-through widget, pinned beneath your other windows.</p></details>
+    <details class="reveal"><summary>Can Google Calendar be my desktop wallpaper?</summary><p>Yes. In Settings, turn on "Sit behind desktop icons (live wallpaper)". In widget mode the calendar then sits under your desktop icons like a live wallpaper, and edge shadows keep the icons readable on top of it.</p></details>
+    <details class="reveal"><summary>Is it really free?</summary><p>Yes. It's free and open source under the GNU AGPL-3.0, with no ads, no account to create and no telemetry. If you'd like to support development, there's an optional PayPal donation link.</p></details>
+    <details class="reveal"><summary>Is this an official Google app?</summary><p>No. It's an independent open-source project that shows the real calendar.google.com in its own window. It is not affiliated with or endorsed by Google.</p></details>
+    <details class="reveal"><summary>Does it have a dark mode?</summary><p>Yes. Turn on dark mode in Google Calendar's own settings (the gear icon) and the widget's title bar, frame and hover panel switch to match within a second.</p></details>
+    <details class="reveal"><summary>Will it get in the way of my work or games?</summary><p>No. In widget mode it stays beneath every other window, never takes focus and lets every click through, so anything you open simply covers it.</p></details>
+    <details class="reveal"><summary>Windows says the installer is unrecognized. Is it safe?</summary><p>The installer isn't code-signed, because certificates cost money and this app is free. Click "More info", then "Run anyway". The full source code is on GitHub, so you can review it or build it yourself.</p></details>
+    <details class="reveal"><summary>Where is my Google sign-in stored?</summary><p>Only on your computer, in the app's private browser profile, the same way Chrome stores a session. In Settings you can sign out and keep the account for a quicker sign-in later, or delete all of the widget's browser data. The uninstaller also offers to remove everything.</p></details>
+    <details class="reveal"><summary>Does it work with multiple monitors and high-DPI screens?</summary><p>Yes. Move it to any monitor, snap or maximize it there, and it remembers its place. It stays sharp at every Windows display scale (125 %, 150 %, 200 % and more), including setups that mix monitors with different scales.</p></details>
+    <details class="reveal"><summary>What do I need to run it?</summary><p>Windows 10 or 11 and a Google account. The installer downloads the .NET 8 Desktop Runtime and Microsoft Edge WebView2 only if they're missing (WebView2 is built into Windows 11).</p></details>
+    <details class="reveal"><summary>How do I uninstall it?</summary><p>Like any other app, from Windows Settings → Apps. The uninstaller asks whether to also remove your saved settings and Google sign-in data.</p></details>
+  </div>
+</section>
+
+<section id="support">
   <div class="wrap" style="max-width:760px">
     <div class="support reveal">
       <h2><span class="heart">♥</span> Support the project</h2>
@@ -309,57 +653,128 @@
   </div>
 </section>
 
+</main>
+
 <footer>
   <div class="wrap">
     <p><a href="https://github.com/mkazemie/google-calendar-desktop-widget">GitHub</a> ·
        <a href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.0/CalendarWidgetSetup-1.3.0.exe">Download</a> ·
+       <a href="https://github.com/mkazemie/google-calendar-desktop-widget/releases">Release notes</a> ·
        <a href="https://github.com/mkazemie/google-calendar-desktop-widget/blob/main/LICENSE">AGPL-3.0 License</a></p>
     <p>© 2026 Mahdi Kazemiesfahani. Free &amp; open source under the GNU AGPL-3.0.
        For commercial or proprietary use, contact <a href="mailto:m.kazemi.esfahani@gmail.com">m.kazemi.esfahani@gmail.com</a>.</p>
-    <p>This is an unofficial, independent project — not affiliated with or endorsed by Google. Google Calendar is a trademark of Google LLC.</p>
+    <p>This is an unofficial, independent project, not affiliated with or endorsed by Google. Google Calendar is a trademark of Google LLC.</p>
   </div>
 </footer>
 
 <script>
-  const io = new IntersectionObserver(entries => {
-    for (const e of entries) if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); }
-  }, { threshold: 0.12 });
-  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  const $ = id => document.getElementById(id);
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---- interactive demo ---- */
-  const desk = document.getElementById('demoDesktop');
-  const body = document.getElementById('demoBody');
-  const badge = document.getElementById('demoBadge');
-  const range = document.getElementById('demoRange');
-  const out = document.getElementById('demoOut');
-  const menu = document.getElementById('demoMenu');
+  /* ---- reveal on scroll, staggered within each group ---- */
+  document.querySelectorAll('.grid, .steps, .points').forEach(g =>
+    [...g.children].forEach((c, i) => c.style.setProperty('--i', i)));
+  const reveals = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(entries => {
+      for (const e of entries) if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); }
+    }, { threshold: 0.12 });
+    reveals.forEach(el => io.observe(el));
+  } else {
+    reveals.forEach(el => el.classList.add('on'));
+  }
+
+  const nav = document.querySelector('nav');
+  const onScroll = () => nav.classList.toggle('scrolled', scrollY > 8);
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* ---- live download count from GitHub; the static "1,500+" stays if this fails ---- */
+  (async () => {
+    try {
+      const r = await fetch('https://api.github.com/repos/mkazemie/google-calendar-desktop-widget/releases?per_page=100');
+      if (!r.ok) return;
+      const total = (await r.json()).reduce((sum, rel) => sum + rel.assets.reduce((s, a) => s + a.download_count, 0), 0);
+      if (!(total > 0)) return;
+      const el = $('dlCount');
+      if (reduceMotion) { el.textContent = total.toLocaleString('en-US'); return; }
+      const t0 = performance.now(), dur = 1400;
+      const step = now => {
+        const p = Math.min(1, (now - t0) / dur);
+        el.textContent = Math.round(total * (1 - Math.pow(1 - p, 3))).toLocaleString('en-US');
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    } catch { /* offline or rate-limited: keep the static number */ }
+  })();
+
+  /* ---- interactive demo: mirrors the app's widget / interactive behavior ---- */
+  const desk = $('demoDesktop'), win = $('demoWin'), badge = $('demoBadge'), menu = $('demoMenu'), toast = $('demoToast');
+  const range = $('demoRange'), behind = $('demoBehind'), shL = $('shL'), shR = $('shR'), dual = $('dual');
+  const GAP = 10;          // % of the calendar the two shadows always leave clear, as in the app
   let widget = true;
+  let preview = false;     // interactive mode shows the widget look while a look setting is being changed
+  let themeTimer, toastTimer;
 
   function apply() {
+    const look = widget || preview;
+    const l = +shL.value, r = 100 - shR.value;
     desk.classList.toggle('widget', widget);
-    if (widget) {
-      body.style.opacity = Math.max(0.05, 1 - range.value / 100);
-      badge.textContent = 'Widget mode — click-through (try right-clicking the wallpaper)';
-    } else {
-      body.style.opacity = 0.98;
-      badge.textContent = 'Interactive mode — a normal window: edit, drag, plan';
-    }
-    out.textContent = range.value + '%';
+    desk.classList.toggle('behind', widget && behind.checked);  // interactive mode always comes out from behind the icons
+    win.style.opacity = look ? Math.max(0.05, 1 - range.value / 100) : 1;
+    $('shadowL').style.width = look ? l + '%' : '0';
+    $('shadowR').style.width = look ? r + '%' : '0';
+    dual.style.setProperty('--l', l + '%');
+    dual.style.setProperty('--r', r + '%');
+    $('demoOut').textContent = range.value + '%';
+    $('valL').textContent = l ? 'Left ' + l + '%' : 'Left off';
+    $('valR').textContent = r ? 'Right ' + r + '%' : 'Right off';
+    badge.textContent = !widget ? 'Interactive mode: a normal window. Edit, drag, plan.'
+      : behind.checked ? 'Live-wallpaper mode: your icons sit on top of the calendar'
+      : 'Widget mode: click-through. Right-click the wallpaper, or click Notes through the calendar';
   }
-  function toggle() { widget = !widget; hideMenu(); apply(); }
+  function changedLook() { if (!widget) preview = true; apply(); }
+  function toggle() { widget = !widget; preview = false; hideMenu(); apply(); }
+  function showToast(text) {
+    toast.textContent = text;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+  }
 
-  range.addEventListener('input', apply);
-  document.getElementById('demoToggle').addEventListener('click', e => { e.stopPropagation(); toggle(); });
-  document.getElementById('demoToggle2').addEventListener('click', toggle);
+  range.addEventListener('input', changedLook);
+  behind.addEventListener('change', apply);
+  shL.addEventListener('input', () => { if (+shL.value > shR.value - GAP) shL.value = shR.value - GAP; changedLook(); });
+  shR.addEventListener('input', () => { if (+shR.value < +shL.value + GAP) shR.value = +shL.value + GAP; changedLook(); });
+  $('demoToggle').addEventListener('click', e => { e.stopPropagation(); toggle(); });
+  $('demoToggle2').addEventListener('click', toggle);
+  $('demoSettings').addEventListener('click', e => {
+    e.stopPropagation();
+    const panel = $('demoPanel');
+    panel.classList.remove('flash'); void panel.offsetWidth; panel.classList.add('flash');
+    if (innerWidth <= 900) panel.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
+  });
+  $('demoClose').addEventListener('click', e => { e.stopPropagation(); showToast('That would exit the widget (not in this demo)'); });
+  document.querySelectorAll('.demo-icon').forEach(icon =>
+    icon.addEventListener('click', e => { e.stopPropagation(); hideMenu(); showToast('Opened “' + icon.dataset.name + '”'); }));
 
-  /* right-click pass-through demo: in widget mode the desktop answers */
+  /* the calendar's theme switches first; the widget's chrome catches up a beat later, as in the app */
+  document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
+    const dark = b.dataset.theme === 'dark';
+    document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    win.classList.toggle('page-dark', dark);
+    clearTimeout(themeTimer);
+    themeTimer = setTimeout(() => win.classList.toggle('chrome-dark', dark), 700);
+  }));
+
+  /* right-click pass-through: in widget mode the desktop answers, also over the calendar */
   desk.addEventListener('contextmenu', e => {
-    if (!widget) return;               // interactive mode: the "calendar" owns the mouse
+    if (!widget && win.contains(e.target)) return;  // interactive mode: the calendar owns the mouse
     e.preventDefault();
     const r = desk.getBoundingClientRect();
     menu.style.display = 'block';
-    menu.style.left = Math.min(e.clientX - r.left, r.width - menu.offsetWidth - 8) + 'px';
-    menu.style.top = Math.min(e.clientY - r.top, r.height - menu.offsetHeight - 8) + 'px';
+    menu.style.left = Math.max(8, Math.min(e.clientX - r.left, r.width - menu.offsetWidth - 8)) + 'px';
+    menu.style.top = Math.max(8, Math.min(e.clientY - r.top, r.height - menu.offsetHeight - 8)) + 'px';
   });
   function hideMenu() { menu.style.display = 'none'; }
   document.addEventListener('click', hideMenu);

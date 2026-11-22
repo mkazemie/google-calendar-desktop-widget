@@ -1,0 +1,211 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="480" viewBox="0 0 1200 480" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <linearGradient id="tbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a2a6c"/><stop offset="0.6" stop-color="#2d1e5f"/><stop offset="1" stop-color="#0f3057"/>
+    </linearGradient>
+    <!-- the parts of the window whose colors don't depend on the theme -->
+    <g id="logo">
+      <rect width="16" height="16" rx="4" fill="#1a73e8"/><rect x="3" y="4" width="10" height="8.5" fill="#ffffff"/><rect x="3" y="4" width="10" height="2.6" fill="#174ea6"/>
+    </g>
+  </defs>
+
+  <rect width="1200" height="480" rx="16" fill="url(#tbg)"/>
+  <circle cx="160" cy="120" r="150" fill="#4facfe" opacity="0.12"/>
+  <circle cx="1060" cy="380" r="130" fill="#9d50bb" opacity="0.12"/>
+  <g font-size="11" fill="#ffffff" text-anchor="middle" opacity="0.85">
+    <rect x="80" y="70" width="20" height="8" rx="2" fill="#e0a800"/>
+    <rect x="80" y="74" width="48" height="34" rx="4" fill="#f6bf26"/>
+    <text x="104" y="126">Projects</text>
+    <rect x="80" y="152" width="48" height="38" rx="5" fill="#4facfe"/>
+    <circle cx="93" cy="164" r="4.5" fill="#ffffff" opacity="0.9"/>
+    <path d="M82 188 l14 -14 10 9 7 -6 13 11 z" fill="#1a57b8"/>
+    <text x="104" y="208">Photos</text>
+  </g>
+
+  <rect x="258" y="40" width="700" height="388" rx="12" fill="#000000" opacity="0.35"/>
+
+  <!-- ===== widget chrome (title bar + frame), LIGHT ===== -->
+  <rect x="250" y="30" width="700" height="388" rx="10" fill="#f8fafd"/>
+  <use href="#logo" x="264" y="39"/>
+  <text x="290" y="52" fill="#3c4043" font-size="12.5">Google Calendar Desktop Widget</text>
+  <g fill="none" stroke="#3c4043" stroke-width="1.5" stroke-linecap="round">
+    <g transform="translate(835 47)"><rect x="-4.5" y="-7" width="9" height="14" rx="4.5"/><line x1="0" y1="-4.5" x2="0" y2="-1.5"/></g>
+    <line x1="874" y1="42.5" x2="888" y2="42.5"/><line x1="874" y1="47" x2="888" y2="47"/><line x1="874" y1="51.5" x2="888" y2="51.5"/>
+    <line x1="922" y1="42" x2="932" y2="52"/><line x1="932" y1="42" x2="922" y2="52"/>
+  </g>
+
+  <!-- ===== widget chrome, DARK: follows the page a beat after it switches ===== -->
+  <g opacity="0">
+    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.30;0.34;0.84;0.88;1" dur="11s" repeatCount="indefinite"/>
+    <rect x="250" y="30" width="700" height="388" rx="10" fill="#1f1f1f"/>
+    <use href="#logo" x="264" y="39"/>
+    <text x="290" y="52" fill="#e8eaed" font-size="12.5">Google Calendar Desktop Widget</text>
+    <g fill="none" stroke="#e8eaed" stroke-width="1.5" stroke-linecap="round">
+      <g transform="translate(835 47)"><rect x="-4.5" y="-7" width="9" height="14" rx="4.5"/><line x1="0" y1="-4.5" x2="0" y2="-1.5"/></g>
+      <line x1="874" y1="42.5" x2="888" y2="42.5"/><line x1="874" y1="47" x2="888" y2="47"/><line x1="874" y1="51.5" x2="888" y2="51.5"/>
+      <line x1="922" y1="42" x2="932" y2="52"/><line x1="932" y1="42" x2="922" y2="52"/>
+    </g>
+  </g>
+
+  <!-- ===== calendar page, LIGHT ===== -->
+  <rect x="256" y="64" width="688" height="348" fill="#f8fafd"/>
+  <g stroke="#444746" stroke-width="1.6" stroke-linecap="round">
+    <line x1="272" y1="80" x2="286" y2="80"/><line x1="272" y1="86" x2="286" y2="86"/><line x1="272" y1="92" x2="286" y2="92"/>
+  </g>
+  <use href="#logo" x="300" y="78"/>
+  <text x="324" y="92" fill="#1f1f1f" font-size="15">Calendar</text>
+  <rect x="404" y="74" width="56" height="24" rx="12" fill="none" stroke="#747775"/>
+  <text x="432" y="90" fill="#1f1f1f" font-size="11.5" text-anchor="middle">Today</text>
+  <text x="476" y="92" fill="#444746" font-size="17">‹</text>
+  <text x="494" y="92" fill="#444746" font-size="17">›</text>
+  <text x="516" y="92" fill="#1f1f1f" font-size="15">November 2026</text>
+  <circle cx="918" cy="86" r="6" fill="none" stroke="#444746" stroke-width="3" stroke-dasharray="2.6 2.1"/>
+  <circle cx="918" cy="86" r="4.2" fill="none" stroke="#444746" stroke-width="1.6"/>
+  <rect x="262" y="108" width="676" height="298" rx="14" fill="#ffffff"/>
+  <g fill="#444746" font-size="10.5" text-anchor="middle">
+    <text x="369" y="126">MON</text><text x="495" y="126">TUE</text><text x="622" y="126" fill="#1a73e8">WED</text>
+    <text x="748" y="126">THU</text><text x="875" y="126">FRI</text>
+  </g>
+  <circle cx="622" cy="144" r="13" fill="#1a73e8"/>
+  <g fill="#1f1f1f" font-size="17" text-anchor="middle">
+    <text x="369" y="150">16</text><text x="495" y="150">17</text><text x="622" y="150" fill="#ffffff">18</text>
+    <text x="748" y="150">19</text><text x="875" y="150">20</text>
+  </g>
+  <g stroke="#dadce0" stroke-width="1">
+    <line x1="262" y1="162" x2="938" y2="162"/><line x1="306" y1="211" x2="938" y2="211"/>
+    <line x1="306" y1="260" x2="938" y2="260"/><line x1="306" y1="309" x2="938" y2="309"/>
+    <line x1="306" y1="358" x2="938" y2="358"/>
+    <line x1="306" y1="162" x2="306" y2="406"/><line x1="432" y1="162" x2="432" y2="406"/>
+    <line x1="559" y1="162" x2="559" y2="406"/><line x1="685" y1="162" x2="685" y2="406"/>
+    <line x1="812" y1="162" x2="812" y2="406"/>
+  </g>
+
+  <!-- ===== calendar page, DARK ===== -->
+  <g opacity="0">
+    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.20;0.24;0.74;0.78;1" dur="11s" repeatCount="indefinite"/>
+    <rect x="256" y="64" width="688" height="348" fill="#1f1f1f"/>
+    <g stroke="#c4c7c5" stroke-width="1.6" stroke-linecap="round">
+      <line x1="272" y1="80" x2="286" y2="80"/><line x1="272" y1="86" x2="286" y2="86"/><line x1="272" y1="92" x2="286" y2="92"/>
+    </g>
+    <use href="#logo" x="300" y="78"/>
+    <text x="324" y="92" fill="#e3e3e3" font-size="15">Calendar</text>
+    <rect x="404" y="74" width="56" height="24" rx="12" fill="none" stroke="#8e918f"/>
+    <text x="432" y="90" fill="#e3e3e3" font-size="11.5" text-anchor="middle">Today</text>
+    <text x="476" y="92" fill="#c4c7c5" font-size="17">‹</text>
+    <text x="494" y="92" fill="#c4c7c5" font-size="17">›</text>
+    <text x="516" y="92" fill="#e3e3e3" font-size="15">November 2026</text>
+    <circle cx="918" cy="86" r="6" fill="none" stroke="#c4c7c5" stroke-width="3" stroke-dasharray="2.6 2.1"/>
+    <circle cx="918" cy="86" r="4.2" fill="none" stroke="#c4c7c5" stroke-width="1.6"/>
+    <rect x="262" y="108" width="676" height="298" rx="14" fill="#131314"/>
+    <g fill="#c4c7c5" font-size="10.5" text-anchor="middle">
+      <text x="369" y="126">MON</text><text x="495" y="126">TUE</text><text x="622" y="126" fill="#a8c7fa">WED</text>
+      <text x="748" y="126">THU</text><text x="875" y="126">FRI</text>
+    </g>
+    <circle cx="622" cy="144" r="13" fill="#a8c7fa"/>
+    <g fill="#e3e3e3" font-size="17" text-anchor="middle">
+      <text x="369" y="150">16</text><text x="495" y="150">17</text><text x="622" y="150" fill="#062e6f">18</text>
+      <text x="748" y="150">19</text><text x="875" y="150">20</text>
+    </g>
+    <g stroke="#3c4043" stroke-width="1">
+      <line x1="262" y1="162" x2="938" y2="162"/><line x1="306" y1="211" x2="938" y2="211"/>
+      <line x1="306" y1="260" x2="938" y2="260"/><line x1="306" y1="309" x2="938" y2="309"/>
+      <line x1="306" y1="358" x2="938" y2="358"/>
+      <line x1="306" y1="162" x2="306" y2="406"/><line x1="432" y1="162" x2="432" y2="406"/>
+      <line x1="559" y1="162" x2="559" y2="406"/><line x1="685" y1="162" x2="685" y2="406"/>
+      <line x1="812" y1="162" x2="812" y2="406"/>
+    </g>
+  </g>
+
+  <!-- events: same colors in both themes -->
+  <g font-size="11" fill="#ffffff">
+    <rect x="310" y="165" width="118" height="40" rx="6" fill="#1a73e8"/>
+    <text x="318" y="181" font-weight="600">Team sync</text><text x="318" y="196" font-size="9.5" opacity="0.85">9:00 – 9:45</text>
+    <rect x="436" y="214" width="119" height="86" rx="6" fill="#0b8043"/>
+    <text x="444" y="230" font-weight="600">Deep work</text><text x="444" y="245" font-size="9.5" opacity="0.85">10:00 – 12:00</text>
+    <rect x="563" y="320" width="118" height="38" rx="6" fill="#f4511e"/>
+    <text x="571" y="336" font-weight="600">Lunch w/ Sara</text><text x="571" y="350" font-size="9.5" opacity="0.85">12:30 – 13:15</text>
+    <rect x="689" y="187" width="119" height="70" rx="6" fill="#8e24aa"/>
+    <text x="697" y="203" font-weight="600">Design review</text><text x="697" y="218" font-size="9.5" opacity="0.85">9:30 – 11:00</text>
+    <rect x="816" y="322" width="118" height="38" rx="6" fill="#f6bf26"/>
+    <text x="824" y="338" font-weight="600" fill="#3c4043">Gym</text><text x="824" y="352" font-size="9.5" fill="#3c4043" opacity="0.85">13:00 – 14:00</text>
+  </g>
+  <line x1="559" y1="304" x2="685" y2="304" stroke="#ea4335" stroke-width="2.5"/>
+  <circle cx="559" cy="304" r="5" fill="#ea4335"/>
+
+  <!-- glow when the chrome catches up with the page -->
+  <rect x="247" y="27" width="706" height="394" rx="12" fill="none" stroke="#8ab4f8" stroke-width="3" opacity="0">
+    <animate attributeName="opacity" values="0;0;0.9;0;0;0.9;0;0" keyTimes="0;0.30;0.33;0.42;0.84;0.87;0.96;1" dur="11s" repeatCount="indefinite"/>
+  </rect>
+
+  <!-- appearance menu, opened from the gear (light page) -->
+  <g opacity="0">
+    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.105;0.115;0.19;0.20;1" dur="11s" repeatCount="indefinite"/>
+    <rect x="774" y="106" width="160" height="86" rx="8" fill="#000000" opacity="0.18" transform="translate(2 3)"/>
+    <rect x="774" y="106" width="160" height="86" rx="8" fill="#ffffff" stroke="#dadce0"/>
+    <text x="788" y="126" fill="#444746" font-size="10" font-weight="600" letter-spacing="1">APPEARANCE</text>
+    <rect x="778" y="161" width="152" height="24" rx="5" fill="#1a73e8" opacity="0">
+      <animate attributeName="opacity" values="0;0;0.1;0.1" keyTimes="0;0.155;0.16;1" dur="11s" repeatCount="indefinite"/>
+    </rect>
+    <circle cx="794" cy="146" r="5.5" fill="none" stroke="#1a73e8" stroke-width="1.6"/><circle cx="794" cy="146" r="2.6" fill="#1a73e8"/>
+    <text x="808" y="150" fill="#1f1f1f" font-size="11.5">Light</text>
+    <circle cx="794" cy="173" r="5.5" fill="none" stroke="#444746" stroke-width="1.6"/>
+    <text x="808" y="177" fill="#1f1f1f" font-size="11.5">Dark</text>
+  </g>
+
+  <!-- appearance menu again (dark page) -->
+  <g opacity="0">
+    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.645;0.655;0.73;0.74;1" dur="11s" repeatCount="indefinite"/>
+    <rect x="774" y="106" width="160" height="86" rx="8" fill="#000000" opacity="0.35" transform="translate(2 3)"/>
+    <rect x="774" y="106" width="160" height="86" rx="8" fill="#2b2b2b" stroke="#444746"/>
+    <text x="788" y="126" fill="#c4c7c5" font-size="10" font-weight="600" letter-spacing="1">APPEARANCE</text>
+    <rect x="778" y="134" width="152" height="24" rx="5" fill="#ffffff" opacity="0">
+      <animate attributeName="opacity" values="0;0;0.1;0.1" keyTimes="0;0.695;0.70;1" dur="11s" repeatCount="indefinite"/>
+    </rect>
+    <circle cx="794" cy="146" r="5.5" fill="none" stroke="#c4c7c5" stroke-width="1.6"/>
+    <text x="808" y="150" fill="#e3e3e3" font-size="11.5">Light</text>
+    <circle cx="794" cy="173" r="5.5" fill="none" stroke="#a8c7fa" stroke-width="1.6"/><circle cx="794" cy="173" r="2.6" fill="#a8c7fa"/>
+    <text x="808" y="177" fill="#e3e3e3" font-size="11.5">Dark</text>
+  </g>
+
+  <!-- clicks: gear, Dark, gear, Light -->
+  <g fill="none" stroke="#4285f4" stroke-width="2.5">
+    <circle cx="918" cy="86" r="3" opacity="0">
+      <animate attributeName="r" values="3;3;18;18" keyTimes="0;0.10;0.14;1" dur="11s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;0;0.9;0;0" keyTimes="0;0.10;0.105;0.14;1" dur="11s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="830" cy="173" r="3" opacity="0">
+      <animate attributeName="r" values="3;3;18;18" keyTimes="0;0.18;0.22;1" dur="11s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;0;0.9;0;0" keyTimes="0;0.18;0.185;0.22;1" dur="11s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="918" cy="86" r="3" opacity="0">
+      <animate attributeName="r" values="3;3;18;18" keyTimes="0;0.64;0.68;1" dur="11s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;0;0.9;0;0" keyTimes="0;0.64;0.645;0.68;1" dur="11s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="830" cy="146" r="3" opacity="0">
+      <animate attributeName="r" values="3;3;18;18" keyTimes="0;0.72;0.76;1" dur="11s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;0;0.9;0;0" keyTimes="0;0.72;0.725;0.76;1" dur="11s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- cursor -->
+  <g>
+    <animateTransform attributeName="transform" type="translate"
+      values="640 300; 918 86; 918 86; 830 173; 830 173; 640 300; 640 300; 918 86; 918 86; 830 146; 830 146; 640 300; 640 300"
+      keyTimes="0;0.08;0.12;0.16;0.20;0.28;0.56;0.62;0.66;0.70;0.74;0.84;1" dur="11s" repeatCount="indefinite"/>
+    <path d="M0 0 L0 22 L6 16 L10 26 L14.5 24 L10.5 14 L18 14 Z" fill="#ffffff" stroke="#3c4043" stroke-width="1.4"/>
+  </g>
+
+  <!-- captions -->
+  <rect x="300" y="436" width="600" height="32" rx="16" fill="#202124" opacity="0.92"/>
+  <g fill="#e8eaed" font-size="14" text-anchor="middle">
+    <text x="600" y="457">Switch Google Calendar to dark mode…
+      <animate attributeName="opacity" values="1;1;0;0;1;1" keyTimes="0;0.27;0.30;0.94;0.98;1" dur="11s" repeatCount="indefinite"/>
+    </text>
+    <text x="600" y="457" opacity="0">…and the widget's title bar and frame follow within a second
+      <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.30;0.33;0.58;0.61;1" dur="11s" repeatCount="indefinite"/>
+    </text>
+    <text x="600" y="457" opacity="0">Light or dark, it always matches your calendar
+      <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.61;0.64;0.93;0.96;1" dur="11s" repeatCount="indefinite"/>
+    </text>
+  </g>
+</svg>
