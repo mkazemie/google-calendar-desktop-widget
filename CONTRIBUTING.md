@@ -10,7 +10,13 @@ For that dual model to work, the maintainer must hold the necessary rights to al
 
 1. You are the original author of the contribution, or otherwise have the right to submit it.
 2. You license your contribution under the **AGPL-3.0**, and
-3. You grant **Mahdi Kazemiesfahani** (the maintainer) a perpetual, worldwide, irrevocable, royalty-free right to also license your contribution under other terms, including commercial licenses.
+3. You grant **Mahdi Kazemiesfahani** (the maintainer) a perpetual, worldwide, irrevocable, royalty-free right to also license your contribution under other terms, including commercial licenses. You keep the copyright to your contribution. In return, your contribution will never be made exclusive to a paid version: whenever it is part of a paid version, it is also part of the free, open-source version. Like any code, it may still be changed or removed from all versions over time.
+
+**How you agree:** when you open your first pull request, a bot asks you to confirm these terms by posting this comment:
+
+> I have read CONTRIBUTING.md and agree to its contribution terms
+
+You only need to do this once. A pull request can't be merged until everyone who committed to it has agreed.
 
 If you cannot agree to this, please don't submit code — but feel free to open an issue instead.
 
