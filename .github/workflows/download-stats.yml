@@ -2,12 +2,19 @@
 # Copyright (C) 2026 Mahdi Kazemiesfahani
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Once a day, record every release asset's download count. GitHub only reports a
-# running total, so these daily snapshots are what turn it into downloads per day
-# and per version. Rows go to downloads.csv on the separate "stats" branch, which
-# keeps main's history free of daily commits.
+# Once a day, record every release asset's download count and the repository's
+# traffic. GitHub only reports a running download total and keeps traffic for 14
+# days, so these daily snapshots are what turn them into history. Files go to the
+# separate "stats" branch, which keeps main's history free of daily commits:
+#   downloads.csv  cumulative downloads per release asset, one row per asset per day
+#   views.csv      repo page views and unique visitors per day
+#   clones.csv     git clones and unique cloners per day
+#   referrers.csv  top referring sites, 14-day totals, one snapshot per day
+#   paths.csv      most viewed repo pages, 14-day totals, one snapshot per day
+# Traffic needs the TRAFFIC_TOKEN secret: a fine-grained token for this repository
+# with "Administration: Read-only" (the built-in token can't read traffic).
 
-name: Download stats
+name: Download and traffic stats
 
 on:
   schedule:
@@ -33,7 +40,7 @@ jobs:
             git switch --orphan stats  # first run: start the branch empty
           fi
 
-      - name: Record today's counts
+      - name: Record today's download counts
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -47,14 +54,49 @@ jobs:
             | sed "s/^/$today,/" >> "$file.tmp"
           mv "$file.tmp" "$file"
 
+      - name: Record repository traffic
+        env:
+          GH_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning::TRAFFIC_TOKEN secret is not set; skipping traffic"
+            exit 0
+          fi
+          today=$(date -u +%F)
+          api() { gh api "repos/$GITHUB_REPOSITORY/traffic/$1" --jq "$2"; }
+
+          # views and clones come per day for the last 14 days; days reported again
+          # (including today's partial count) replace the rows already stored
+          daily() {  # file, header, endpoint
+            [ -f "$1" ] || echo "$2" > "$1"
+            { tail -n +2 "$1"; api "$3" ".$3[] | \"\(.timestamp[0:10]),\(.count),\(.uniques)\""; } \
+              | awk -F, 'NF { row[$1] = $0 } END { for (d in row) print row[d] }' | sort > "$1.rows"
+            { head -1 "$1"; cat "$1.rows"; } > "$1.tmp"
+            mv "$1.tmp" "$1"
+            rm "$1.rows"
+          }
+          daily views.csv "date,views,unique_visitors" views
+          daily clones.csv "date,clones,unique_cloners" clones
+
+          # referrers and pages only exist as 14-day totals: keep one snapshot per day
+          snapshot() {  # file, header, endpoint, jq row
+            [ -f "$1" ] || echo "$2" > "$1"
+            grep -v "^$today," "$1" > "$1.tmp" || true
+            api "$3" ".[] | $4 | @csv" | sed "s/^/$today,/" >> "$1.tmp"
+            mv "$1.tmp" "$1"
+          }
+          snapshot referrers.csv "date,referrer,views_14d,unique_visitors_14d" popular/referrers "[.referrer, .count, .uniques]"
+          snapshot paths.csv "date,path,views_14d,unique_visitors_14d" popular/paths "[.path, .count, .uniques]"
+
       - name: Commit
+        if: always()  # keep the download counts even if the traffic step failed (e.g. expired token)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add downloads.csv
+          git add -- *.csv
           if git diff --cached --quiet; then
             echo "No change since the last snapshot"
             exit 0
           fi
-          git commit -m "Download counts for $(date -u +%F)"
+          git commit -m "Stats for $(date -u +%F)"
           git push origin stats
