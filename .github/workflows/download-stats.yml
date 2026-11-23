@@ -55,6 +55,7 @@ jobs:
           mv "$file.tmp" "$file"
 
       - name: Record repository traffic
+        shell: bash  # -eo pipefail: a failed API call stops here instead of landing in a CSV
         env:
           GH_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
         run: |
@@ -63,13 +64,17 @@ jobs:
             exit 0
           fi
           today=$(date -u +%F)
+          # fetched before any file is touched; on an error gh prints the error body,
+          # which must never be stored as data
           api() { gh api "repos/$GITHUB_REPOSITORY/traffic/$1" --jq "$2"; }
 
           # views and clones come per day for the last 14 days; days reported again
           # (including today's partial count) replace the rows already stored
           daily() {  # file, header, endpoint
+            local rows
+            rows=$(api "$3" ".$3[] | \"\(.timestamp[0:10]),\(.count),\(.uniques)\"")
             [ -f "$1" ] || echo "$2" > "$1"
-            { tail -n +2 "$1"; api "$3" ".$3[] | \"\(.timestamp[0:10]),\(.count),\(.uniques)\""; } \
+            { tail -n +2 "$1"; echo "$rows"; } \
               | awk -F, 'NF { row[$1] = $0 } END { for (d in row) print row[d] }' | sort > "$1.rows"
             { head -1 "$1"; cat "$1.rows"; } > "$1.tmp"
             mv "$1.tmp" "$1"
@@ -80,9 +85,13 @@ jobs:
 
           # referrers and pages only exist as 14-day totals: keep one snapshot per day
           snapshot() {  # file, header, endpoint, jq row
+            local rows
+            rows=$(api "$3" ".[] | $4 | @csv")
             [ -f "$1" ] || echo "$2" > "$1"
             grep -v "^$today," "$1" > "$1.tmp" || true
-            api "$3" ".[] | $4 | @csv" | sed "s/^/$today,/" >> "$1.tmp"
+            if [ -n "$rows" ]; then
+              echo "$rows" | sed "s/^/$today,/" >> "$1.tmp"
+            fi
             mv "$1.tmp" "$1"
           }
           snapshot referrers.csv "date,referrer,views_14d,unique_visitors_14d" popular/referrers "[.referrer, .count, .uniques]"
