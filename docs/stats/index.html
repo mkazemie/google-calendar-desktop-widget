@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="dark">
+<title>Stats · Google Calendar Desktop Widget</title>
+<link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+<!--
+  Private stats page. The data (dashboard.enc.json on the "stats" branch) is encrypted
+  by .github/scripts/stats-dashboard.mjs with the STATS_PASSWORD secret and only
+  decrypted here, in the browser, with the same password. Not linked from the site,
+  hidden from search engines, and deliberately not counted by GoatCounter.
+-->
+<style>
+  :root {
+    --page: #101116; --surface: #1b1d24; --surface-2: #22242e; --line: #2d3038;
+    --text-1: #f0efec; --text-2: #c3c2b7; --muted: #898781;
+    --grid: #2a2d36; --axis: #3c404b;
+    --series-1: #3987e5; --series-2: #d95926;  /* validated against --surface, dark mode */
+    --critical: #d03b3b;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--page); color: var(--text-1); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; line-height: 1.5; }
+  a { color: #8ab4f8; }
+  button, input { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid #8ab4f8; outline-offset: 2px; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 16px 48px; }
+  [hidden] { display: none !important; }
+
+  /* lock screen */
+  .lock { max-width: 380px; margin: 12vh auto 0; text-align: center; }
+  .lock img { width: 56px; margin: 0 auto 14px; display: block; }
+  .lock h1 { font-size: 1.5rem; margin-bottom: 4px; }
+  .lock p { color: var(--text-2); }
+  .lock form { margin-top: 22px; display: grid; gap: 12px; text-align: left; }
+  .lock input[type="password"] { width: 100%; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--axis); background: var(--surface); }
+  .lock label { display: flex; gap: 8px; align-items: center; color: var(--text-2); font-size: .9rem; cursor: pointer; }
+  .lock input[type="checkbox"] { accent-color: var(--series-1); width: 16px; height: 16px; }
+  .btn { padding: 10px 18px; border-radius: 22px; border: 0; background: #1a73e8; color: #fff; font-weight: 600; cursor: pointer; }
+  .btn:disabled { opacity: .6; cursor: progress; }
+  .btn-ghost { background: none; border: 1px solid var(--axis); color: var(--text-1); padding: 6px 14px; font-weight: 500; }
+  .msg { min-height: 1.5em; font-size: .9rem; }
+  .msg.err { color: #f28b82; }
+  .muted { color: var(--muted); font-size: .85rem; }
+
+  /* dashboard */
+  .top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+  .top img { width: 32px; }
+  .top h1 { font-size: 1.35rem; }
+  .top .muted { margin-right: auto; }
+  .filters { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 18px; }
+  .seg { display: inline-flex; border: 1px solid var(--axis); border-radius: 10px; overflow: hidden; }
+  .seg button { background: none; border: 0; padding: 7px 14px; cursor: pointer; color: var(--text-2); }
+  .seg button + button { border-left: 1px solid var(--axis); }
+  .seg button[aria-pressed="true"] { background: rgba(57,135,229,.18); color: var(--text-1); font-weight: 600; }
+  .banner { background: rgba(208,59,59,.12); border: 1px solid rgba(208,59,59,.5); border-radius: 12px; padding: 12px 16px; margin-bottom: 18px; color: var(--text-1); font-size: .92rem; }
+  .banner b { color: #f28b82; }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; }
+  .tile-label { color: var(--text-2); font-size: .85rem; }
+  .tile-value { font-size: 1.9rem; font-weight: 600; line-height: 1.25; margin: 2px 0; }
+  .tile-sub { color: var(--muted); font-size: .8rem; }
+
+  /* auto-fill, not auto-fit: a card drawn while it is still alone must already get its final column width */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 460px), 1fr)); gap: 14px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px 12px; min-width: 0; }
+  .card h2 { font-size: 1rem; font-weight: 600; }
+  .card .sub { color: var(--muted); font-size: .8rem; margin-bottom: 12px; }
+  .empty { color: var(--muted); font-size: .9rem; padding: 26px 0; text-align: center; }
+
+  svg.chart { display: block; overflow: visible; }
+  svg.chart text { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+  svg.chart text.end-label { fill: var(--text-2); font-weight: 600; }
+  .grid { stroke: var(--grid); stroke-width: 1; }
+  .axis { stroke: var(--axis); stroke-width: 1; }
+  .col { transition: filter .12s; }
+  .col.active { filter: brightness(1.3); }
+  .crosshair { stroke: var(--text-2); stroke-width: 1; }
+
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; font-size: .82rem; color: var(--text-2); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .key { display: inline-block; width: 14px; height: 2px; border-radius: 1px; }
+
+  .blist { display: grid; gap: 7px; }
+  .brow { display: grid; grid-template-columns: minmax(96px, 36%) 1fr; gap: 10px; align-items: center; border-radius: 6px; padding: 2px 4px; margin: 0 -4px; cursor: default; }
+  .brow:hover, .brow:focus-visible { background: var(--surface-2); }
+  .blabel { color: var(--text-2); font-size: .86rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .btrack { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .bar { height: 12px; flex: none; width: calc((100% - 64px) * var(--f)); min-width: 2px; background: var(--series-1); border-radius: 0 4px 4px 0; }
+  .bval { font-size: .86rem; font-weight: 600; white-space: nowrap; }
+
+  details.table { margin-top: 10px; border-top: 1px solid var(--line); padding-top: 6px; }
+  details.table summary { cursor: pointer; color: var(--muted); font-size: .8rem; width: max-content; }
+  details.table table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: .84rem; }
+  details.table th, details.table td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--line); }
+  details.table th { color: var(--muted); font-weight: 500; }
+  details.table td.num, details.table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  details.table .scroll { max-height: 260px; overflow-y: auto; }
+
+  .tip { position: fixed; z-index: 10; pointer-events: none; background: #2b2d35; border: 1px solid #3d4048; border-radius: 9px; padding: 8px 11px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.45); font-size: .84rem; min-width: 120px; }
+  .tip-title { color: var(--muted); font-size: .78rem; margin-bottom: 3px; }
+  .tip-row { display: flex; align-items: center; gap: 7px; }
+  .tip-row b { color: var(--text-1); }
+  .tip-row span { color: var(--text-2); }
+
+  footer { margin-top: 28px; color: var(--muted); font-size: .82rem; display: grid; gap: 4px; }
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <section class="lock" id="lock">
+    <img src="../assets/logo.svg" alt="">
+    <h1>Stats</h1>
+    <p>Private dashboard. Enter the password to unlock it.</p>
+    <form id="unlock">
+      <input type="text" name="username" value="stats" autocomplete="username" hidden>
+      <input type="password" id="pw" autocomplete="current-password" placeholder="Password" required aria-label="Password">
+      <label><input type="checkbox" id="remember"> Remember on this device</label>
+      <button class="btn" id="unlockBtn">Unlock</button>
+      <p class="msg" id="lockMsg" role="status"></p>
+    </form>
+    <p class="muted" id="lockUpdated"></p>
+  </section>
+
+  <section id="dash" hidden>
+    <div class="top">
+      <img src="../assets/logo.svg" alt="">
+      <h1>Stats</h1>
+      <span class="muted" id="updated"></span>
+      <button class="btn btn-ghost" id="lockBtn">Lock</button>
+    </div>
+    <div class="filters">
+      <div class="seg" role="group" aria-label="Date range" id="range">
+        <button type="button" data-days="7">Last 7 days</button>
+        <button type="button" data-days="30">Last 30 days</button>
+        <button type="button" data-days="90">Last 90 days</button>
+      </div>
+    </div>
+    <div class="banner" id="gcError" hidden></div>
+    <div class="tiles" id="tiles"></div>
+    <div class="cards" id="cards"></div>
+    <footer>
+      <p>GitHub numbers are snapshotted daily at 04:23 UTC; GitHub reports referrers and popular pages only as 14-day totals.
+         Website numbers come from GoatCounter (tracking since Nov 22, 2026); visitors with ad blockers aren't counted.</p>
+      <p>Refresh now: GitHub → Actions → "Download and traffic stats" → Run workflow (the page updates within ~5 minutes).
+         Live website numbers: <a href="https://mkazemie.goatcounter.com">mkazemie.goatcounter.com</a>.</p>
+    </footer>
+  </section>
+
+</main>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+  const DATA_URL = 'https://raw.githubusercontent.com/mkazemie/google-calendar-desktop-widget/stats/dashboard.enc.json';
+  const GOATCOUNTER_SINCE = '2026-11-22';
+  const KEY_STORE = 'gcw-stats-key', RANGE_STORE = 'gcw-stats-range';
+  const $ = id => document.getElementById(id);
+
+  /* ---------- storage: optional conveniences; every access may throw ---------- */
+  const store = {
+    get(area, k) { try { return window[area].getItem(k); } catch { return null; } },
+    set(area, k, v) { try { window[area].setItem(k, v); } catch { /* private mode etc. */ } },
+    del(area, k) { try { window[area].removeItem(k); } catch { /* ignore */ } },
+  };
+
+  /* ---------- crypto: must match .github/scripts/stats-dashboard.mjs ---------- */
+  const fromB64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+  const toB64 = bytes => btoa(String.fromCharCode(...bytes));
+  const fingerprint = f => f.kdf.salt + ':' + f.kdf.iterations;
+
+  async function deriveKey(password, kdf) {
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
+    const bits = await crypto.subtle.deriveBits(
+      { name: 'PBKDF2', hash: kdf.hash, salt: fromB64(kdf.salt), iterations: kdf.iterations }, base, 256);
+    return new Uint8Array(bits);
+  }
+  async function decrypt(f, keyBytes) {
+    const key = await crypto.subtle.importKey('raw', keyBytes, 'AES-GCM', false, ['decrypt']);
+    const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: fromB64(f.iv) }, key, fromB64(f.data));
+    return JSON.parse(new TextDecoder().decode(plain));
+  }
+  function savedKey(f) {
+    const raw = store.get('sessionStorage', KEY_STORE) || store.get('localStorage', KEY_STORE);
+    try {
+      const k = JSON.parse(raw);
+      return k && k.fp === fingerprint(f) ? fromB64(k.key) : null;
+    } catch { return null; }
+  }
+  function forgetKey() { store.del('sessionStorage', KEY_STORE); store.del('localStorage', KEY_STORE); }
+
+  /* ---------- formatting ---------- */
+  const DAY = 864e5;
+  const today = () => new Date().toISOString().slice(0, 10);
+  const addDays = (d, n) => new Date(Date.parse(d + 'T00:00:00Z') + n * DAY).toISOString().slice(0, 10);
+  const fmtDay = d => new Date(d + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+  const fmtNum = n => n >= 10000
+    ? new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(n)
+    : Number(n).toLocaleString('en-US');
+  const sum = list => list.reduce((s, v) => s + v, 0);
+
+  /* ---------- small DOM helpers (labels are data: always textContent) ---------- */
+  function h(tag, props = {}, ...children) {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(props)) {
+      if (k === 'text') el.textContent = v;
+      else if (k === 'class') el.className = v;
+      else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v);
+    }
+    el.append(...children.filter(Boolean));
+    return el;
+  }
+  const SVG = 'http://www.w3.org/2000/svg';
+  function s(tag, attrs = {}, parent) {
+    const el = document.createElementNS(SVG, tag);
+    for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+    if (parent) parent.append(el);
+    return el;
+  }
+
+  /* ---------- tooltip: values lead, labels follow ---------- */
+  const tip = $('tip');
+  function showTip(title, rows, x, y) {
+    tip.replaceChildren(h('div', { class: 'tip-title', text: title }),
+      ...rows.map(r => h('div', { class: 'tip-row' },
+        r.color ? h('i', { class: 'key', style: 'background:' + r.color }) : null,
+        h('b', { text: r.value }), h('span', { text: r.label }))));
+    tip.hidden = false;
+    const w = tip.offsetWidth, hh = tip.offsetHeight;
+    tip.style.left = Math.max(8, Math.min(x + 14, innerWidth - w - 8)) + 'px';
+    tip.style.top = Math.max(8, Math.min(y - hh - 10, innerHeight - hh - 8)) + 'px';
+  }
+  const hideTip = () => { tip.hidden = true; };
+  const centerOf = el => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top]; };
+
+  /* ---------- axes ---------- */
+  function ticks(max) {
+    const raw = Math.max(max, 1) / 4;
+    const p = 10 ** Math.floor(Math.log10(raw));
+    const step = Math.max(1, [1, 2, 5, 10].map(m => m * p).find(v => v >= raw));
+    const top = Math.max(step, Math.ceil(max / step) * step);
+    const out = [];
+    for (let t = 0; t <= top + 1e-9; t += step) out.push(t);
+    return out;
+  }
+  function frame(host, height, right) {
+    const W = Math.max(280, host.clientWidth), H = height;
+    const m = { l: 40, r: right, t: 10, b: 26 };
+    return { W, H, m, pw: W - m.l - m.r, ph: H - m.t - m.b };
+  }
+  function yAxis(svg, f, t, y) {
+    for (const v of t) {
+      s('line', { class: v === 0 ? 'axis' : 'grid', x1: f.m.l, x2: f.W - f.m.r, y1: y(v), y2: y(v) }, svg);
+      s('text', { x: f.m.l - 8, y: y(v) + 4, 'text-anchor': 'end' }, svg).textContent = fmtNum(v);
+    }
+  }
+  function xLabels(svg, f, labels, xAt) {
+    const every = Math.ceil(labels.length / Math.max(1, Math.floor(f.pw / 62)));
+    labels.forEach((l, i) => {
+      if ((labels.length - 1 - i) % every) return;  // always label the newest day
+      s('text', { x: xAt(i), y: f.H - 7, 'text-anchor': 'middle' }, svg).textContent = l;
+    });
+  }
+  const empty = (host, text) => host.append(h('p', { class: 'empty', text }));
+
+  /* ---------- column chart: one series, one column per day ---------- */
+  function columnChart(host, points, unit) {
+    if (!points.length) return;
+    const f = frame(host, 210, 8);
+    const t = ticks(Math.max(...points.map(p => p.value)));
+    const top = t[t.length - 1];
+    const y = v => f.m.t + f.ph - (v / top) * f.ph;
+    const band = f.pw / points.length;
+    const bw = Math.max(2, Math.min(24, band * 0.7));
+    const xAt = i => f.m.l + band * (i + 0.5);
+    const svg = s('svg', { class: 'chart', width: f.W, height: f.H, tabindex: 0, role: 'img',
+      'aria-label': `${unit} per day, ${points.length} days. Use the arrow keys to read values; the table below lists them all.` });
+    yAxis(svg, f, t, y);
+    const cols = points.map((p, i) => {
+      if (p.value <= 0) return null;
+      const x = xAt(i) - bw / 2, yt = y(p.value), yb = y(0), r = Math.min(4, bw / 2, yb - yt);
+      return s('path', { class: 'col', fill: 'var(--series-1)',
+        d: `M${x},${yb}V${yt + r}Q${x},${yt} ${x + r},${yt}H${x + bw - r}Q${x + bw},${yt} ${x + bw},${yt + r}V${yb}Z` }, svg);
+    });
+    xLabels(svg, f, points.map(p => p.label), xAt);
+    let active = -1;
+    const show = (i, x, yy) => {
+      cols.forEach((c, j) => c && c.classList.toggle('active', j === i));
+      active = i;
+      const p = points[i];
+      showTip(p.title || p.label, [{ value: fmtNum(p.value), label: unit, color: 'var(--series-1)' }], x, yy);
+    };
+    points.forEach((p, i) => {
+      const hit = s('rect', { x: f.m.l + band * i, y: f.m.t, width: band, height: f.ph, fill: 'transparent' }, svg);
+      hit.addEventListener('pointermove', e => show(i, e.clientX, e.clientY));
+    });
+    svg.addEventListener('pointerleave', () => { cols.forEach(c => c && c.classList.remove('active')); hideTip(); });
+    const keyShow = i => { const [x, yy] = centerOf(svg); show(i, x - f.W / 2 + xAt(i), yy + y(points[i].value)); };
+    svg.addEventListener('focus', () => keyShow(points.length - 1));
+    svg.addEventListener('blur', () => { cols.forEach(c => c && c.classList.remove('active')); hideTip(); });
+    svg.addEventListener('keydown', e => {
+      const d = e.key === 'ArrowLeft' ? -1 : e.key === 'ArrowRight' ? 1 : 0;
+      if (!d) return;
+      e.preventDefault();
+      keyShow(Math.max(0, Math.min(points.length - 1, (active < 0 ? points.length - 1 : active) + d)));
+    });
+    host.append(svg);
+  }
+
+  /* ---------- line chart: same-unit series over days, crosshair readout ---------- */
+  function lineChart(host, labels, series, unit) {
+    if (!labels.length) return;
+    host.append(h('div', { class: 'legend' }, ...series.map(sr =>
+      h('span', {}, h('i', { class: 'key', style: 'background:' + sr.color }), h('span', { text: sr.name })))));
+    const f = frame(host, 210, 34);
+    const n = labels.length;
+    const t = ticks(Math.max(...series.flatMap(sr => sr.values)));
+    const top = t[t.length - 1];
+    const y = v => f.m.t + f.ph - (v / top) * f.ph;
+    const xAt = i => n === 1 ? f.m.l + f.pw / 2 : f.m.l + i * f.pw / (n - 1);
+    const svg = s('svg', { class: 'chart', width: f.W, height: f.H, tabindex: 0, role: 'img',
+      'aria-label': `${series.map(sr => sr.name).join(' and ')} per day. Use the arrow keys to read values; the table below lists them all.` });
+    yAxis(svg, f, t, y);
+    xLabels(svg, f, labels.map(fmtDay), xAt);
+    const cross = s('line', { class: 'crosshair', y1: f.m.t, y2: f.m.t + f.ph, visibility: 'hidden' }, svg);
+    for (const sr of series) {
+      s('path', { fill: 'none', stroke: sr.color, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round',
+        d: sr.values.map((v, i) => (i ? 'L' : 'M') + xAt(i) + ',' + y(v)).join('') }, svg);
+      s('circle', { cx: xAt(n - 1), cy: y(sr.values[n - 1]), r: 4, fill: sr.color, stroke: 'var(--surface)', 'stroke-width': 2 }, svg);
+    }
+    // label the line ends only where they don't collide
+    const ends = series.map(sr => ({ v: sr.values[n - 1], yy: y(sr.values[n - 1]) }));
+    if (ends.length < 2 || Math.abs(ends[0].yy - ends[1].yy) >= 14)
+      ends.forEach(e => { s('text', { class: 'end-label', x: xAt(n - 1) + 9, y: e.yy + 4 }, svg).textContent = fmtNum(e.v); });
+    const dots = series.map(sr => s('circle', { r: 4, fill: sr.color, stroke: 'var(--surface)', 'stroke-width': 2, visibility: 'hidden' }, svg));
+    let active = -1;
+    const show = (i, x, yy) => {
+      active = i;
+      cross.setAttribute('x1', xAt(i)); cross.setAttribute('x2', xAt(i)); cross.setAttribute('visibility', 'visible');
+      dots.forEach((d, k) => { d.setAttribute('cx', xAt(i)); d.setAttribute('cy', y(series[k].values[i])); d.setAttribute('visibility', 'visible'); });
+      showTip(fmtDay(labels[i]), series.map(sr => ({ value: fmtNum(sr.values[i]), label: sr.name, color: sr.color })), x, yy);
+    };
+    const clear = () => { cross.setAttribute('visibility', 'hidden'); dots.forEach(d => d.setAttribute('visibility', 'hidden')); hideTip(); };
+    const hit = s('rect', { x: f.m.l - 6, y: f.m.t, width: f.pw + 12, height: f.ph, fill: 'transparent' }, svg);
+    hit.addEventListener('pointermove', e => {
+      const px = e.clientX - svg.getBoundingClientRect().left;
+      show(n === 1 ? 0 : Math.max(0, Math.min(n - 1, Math.round((px - f.m.l) / (f.pw / (n - 1))))), e.clientX, e.clientY);
+    });
+    svg.addEventListener('pointerleave', clear);
+    const keyShow = i => { const [x, yy] = centerOf(svg); show(i, x - f.W / 2 + xAt(i), yy + f.m.t + 20); };
+    svg.addEventListener('focus', () => keyShow(n - 1));
+    svg.addEventListener('blur', clear);
+    svg.addEventListener('keydown', e => {
+      const d = e.key === 'ArrowLeft' ? -1 : e.key === 'ArrowRight' ? 1 : 0;
+      if (!d) return;
+      e.preventDefault();
+      keyShow(Math.max(0, Math.min(n - 1, (active < 0 ? n - 1 : active) + d)));
+    });
+    host.append(svg);
+  }
+
+  /* ---------- ranked bars: one series, value at the tip, tail folded into "Other" ---------- */
+  function barList(host, rows, unit, limit = 8) {
+    rows = rows.filter(r => r.value > 0).sort((a, b) => b.value - a.value);
+    if (rows.length > limit)
+      rows = [...rows.slice(0, limit - 1), { label: `Other (${rows.length - limit + 1})`, value: sum(rows.slice(limit - 1).map(r => r.value)) }];
+    if (!rows.length) return 'Nothing recorded yet.';
+    const max = Math.max(...rows.map(r => r.value)), total = sum(rows.map(r => r.value));
+    host.append(h('div', { class: 'blist' }, ...rows.map(r => {
+      const share = Math.round(r.value / total * 100) + '% of total';
+      const row = h('div', { class: 'brow', tabindex: 0, 'aria-label': `${r.label}: ${r.value} ${unit}, ${share}` },
+        h('span', { class: 'blabel', text: r.label, title: r.label }),
+        h('span', { class: 'btrack' },
+          h('span', { class: 'bar', style: '--f:' + (r.value / max) }),
+          h('span', { class: 'bval', text: fmtNum(r.value) })));
+      const show = (x, y) => showTip(r.label, [{ value: fmtNum(r.value), label: unit }, { value: share, label: '' }], x, y);
+      row.addEventListener('pointermove', e => show(e.clientX, e.clientY));
+      row.addEventListener('pointerleave', hideTip);
+      row.addEventListener('focus', () => show(...centerOf(row)));
+      row.addEventListener('blur', hideTip);
+      return row;
+    })));
+  }
+
+  /* ---------- cards ---------- */
+  const openTables = new Set();
+  function card(id, title, sub, draw, table) {
+    const body = h('div');
+    const c = h('section', { class: 'card', 'aria-label': title }, h('h2', { text: title }), h('p', { class: 'sub', text: sub }), body);
+    $('cards').append(c);
+    const reason = draw(body);
+    if (reason) return empty(body, reason);
+    if (!table) return;
+    const det = h('details', { class: 'table', ontoggle: () => det.open ? openTables.add(id) : openTables.delete(id) },
+      h('summary', { text: 'Table' }),
+      h('div', { class: 'scroll' }, h('table', {},
+        h('thead', {}, h('tr', {}, ...table.head.map((t, i) => h('th', { class: i ? 'num' : '', text: t })))),
+        h('tbody', {}, ...table.rows.map(r => h('tr', {}, ...r.map((v, i) =>
+          h('td', { class: i ? 'num' : '', text: typeof v === 'number' ? v.toLocaleString('en-US') : v }))))))));
+    det.open = openTables.has(id);
+    c.append(det);
+  }
+  function tile(label, value, sub) {
+    $('tiles').append(h('div', { class: 'tile' },
+      h('div', { class: 'tile-label', text: label }), h('div', { class: 'tile-value', text: value }), h('div', { class: 'tile-sub', text: sub })));
+  }
+
+  /* ---------- the dashboard ---------- */
+  let data = null, range = Number(store.get('localStorage', RANGE_STORE)) || 30;
+
+  function render() {
+    hideTip();
+    $('tiles').replaceChildren();
+    $('cards').replaceChildren();
+    document.querySelectorAll('#range button').forEach(b => b.setAttribute('aria-pressed', Number(b.dataset.days) === range));
+    const from = addDays(today(), -(range - 1));
+    const inRange = d => d >= from;
+    const gh = data.github, gc = data.goatcounter || {};
+    const gcRange = gc.ranges && gc.ranges[range];
+    const gcMissing = gc.error ? 'GoatCounter data unavailable (see the note above).' : null;
+
+    // GitHub downloads: the CSV holds running totals, so a day's downloads are the change since the previous snapshot
+    const totals = new Map();
+    for (const r of gh.downloads) totals.set(r.date, (totals.get(r.date) || 0) + r.downloads);
+    const dates = [...totals.keys()].sort();
+    const daily = dates.slice(1).map((d, i) => ({ date: d, since: dates[i], value: Math.max(0, totals.get(d) - totals.get(dates[i])) }));
+    const latest = gh.downloads.filter(r => r.date === dates[dates.length - 1]);
+    const dailyInRange = daily.filter(d => inRange(d.date));
+
+    // website visits per day, from the first day GoatCounter could have counted
+    const gcStart = from > GOATCOUNTER_SINCE ? from : GOATCOUNTER_SINCE;
+    const visitsByDay = new Map((gc.daily || []).map(d => [d.date, d.visits]));
+    const visitDays = [];
+    for (let d = gcStart; d <= today(); d = addDays(d, 1)) visitDays.push({ date: d, value: visitsByDay.get(d) || 0 });
+    const downloadClicks = gcRange ? sum(gcRange.events.filter(e => e.name.startsWith('download-')).map(e => e.count)) : null;
+    const views = gh.views.filter(r => inRange(r.date)).sort((a, b) => a.date.localeCompare(b.date));
+
+    $('gcError').hidden = !gc.error;
+    if (gc.error) $('gcError').replaceChildren(h('b', { text: 'Website numbers unavailable. ' }),
+      document.createTextNode('GoatCounter said: ' + gc.error + ' Check the GOATCOUNTER_TOKEN secret, then re-run the workflow.'));
+
+    const since = d => d > from ? ` · since ${fmtDay(d)}` : '';
+    tile('Total downloads', dates.length ? fmtNum(sum(latest.map(r => r.downloads))) : '–', 'All versions, all time');
+    tile('New downloads', dailyInRange.length ? fmtNum(sum(dailyInRange.map(d => d.value))) : '–',
+      daily.length ? `Last ${range} days${since(daily[0].date)}` : 'Needs two daily snapshots');
+    tile('Website visits', gc.error ? '–' : fmtNum(sum(visitDays.map(d => d.value))), `Last ${range} days${since(gcStart)}`);
+    tile('Download clicks', downloadClicks === null ? '–' : fmtNum(downloadClicks), `Website buttons, last ${range} days`);
+    tile('GitHub repo views', views.length ? fmtNum(sum(views.map(r => r.views))) : '–',
+      views.length ? `Last ${range} days${since(views[0].date)}` : 'No data yet');
+
+    card('downloads-daily', 'Downloads per day', 'New downloads of any version, from the daily GitHub snapshots',
+      body => dailyInRange.length
+        ? columnChart(body, dailyInRange.map(d => ({ label: fmtDay(d.date), value: d.value,
+            title: d.since === addDays(d.date, -1) ? fmtDay(d.date) : `${fmtDay(d.since)} – ${fmtDay(d.date)}` })), 'downloads')
+        : 'Daily download counts appear once there are two daily snapshots in this range.',
+      { head: ['Day', 'Downloads'], rows: dailyInRange.map(d => [fmtDay(d.date), d.value]).reverse() });
+
+    card('downloads-version', 'Downloads by version', 'All time, as of the latest snapshot',
+      body => latest.length ? barList(body, latest.map(r => ({ label: r.tag, value: r.downloads })), 'downloads') : 'No download data yet.',
+      { head: ['Version', 'File', 'Downloads'], rows: latest.map(r => [r.tag, r.asset, r.downloads]) });
+
+    card('visits-daily', 'Website visits per day', `GoatCounter, last ${range} days`,
+      body => gcMissing || columnChart(body, visitDays.map(d => ({ label: fmtDay(d.date), value: d.value })), 'visits'),
+      { head: ['Day', 'Visits'], rows: visitDays.map(d => [fmtDay(d.date), d.value]).reverse() });
+
+    const gcList = (id, title, sub, key, column, unit, labelFor) => card(id, title, sub,
+      body => gcMissing || (gcRange ? barList(body, gcRange[key].map(r => ({ label: labelFor(r), value: r.count })), unit) : 'Nothing recorded yet.'),
+      gcRange && { head: [column, unit[0].toUpperCase() + unit.slice(1)], rows: gcRange[key].map(r => [labelFor(r), r.count]) });
+    gcList('countries', 'Visits by country', `GoatCounter, last ${range} days`, 'locations', 'Country', 'visits', r => r.name || '(unknown)');
+    gcList('referrers', 'Where website visitors come from', `GoatCounter referrers, last ${range} days`, 'referrers', 'Referrer', 'visits', r => r.name || '(direct or unknown)');
+    gcList('clicks', 'Clicks on the website', `Download buttons, GitHub links, donations and demo use, last ${range} days`, 'events', 'Event', 'clicks', r => r.title || r.name);
+    gcList('systems', 'Visitors by operating system', `GoatCounter, last ${range} days`, 'systems', 'System', 'visits', r => r.name || '(unknown)');
+
+    card('repo-views', 'GitHub repo views per day', `github.com repository pages, last ${range} days`,
+      body => views.length
+        ? lineChart(body, views.map(r => r.date), [
+            { name: 'Views', color: 'var(--series-1)', values: views.map(r => r.views) },
+            { name: 'Unique visitors', color: 'var(--series-2)', values: views.map(r => r.unique_visitors) }], 'views')
+        : 'No traffic data in this range yet.',
+      { head: ['Day', 'Views', 'Unique visitors'], rows: views.map(r => [fmtDay(r.date), r.views, r.unique_visitors]).reverse() });
+
+    const asOf = `Last 14 days (GitHub's fixed window)` + (gh.referrers[0] ? `, as of ${fmtDay(gh.referrers[0].date)}` : '');
+    card('gh-referrers', 'Where GitHub visitors come from', asOf,
+      body => gh.referrers.length ? barList(body, gh.referrers.map(r => ({ label: r.referrer, value: r.views_14d })), 'views') : 'No referrer data yet.',
+      { head: ['Referrer', 'Views', 'Unique visitors'], rows: gh.referrers.map(r => [r.referrer, r.views_14d, r.unique_visitors_14d]) });
+
+    const page = p => p.replace(/^\/mkazemie\/google-calendar-desktop-widget/, '') || 'Repository home';
+    card('gh-paths', 'Most viewed repo pages', asOf,
+      body => gh.paths.length ? barList(body, gh.paths.map(r => ({ label: page(r.path), value: r.views_14d })), 'views') : 'No page data yet.',
+      { head: ['Page', 'Views', 'Unique visitors'], rows: gh.paths.map(r => [page(r.path), r.views_14d, r.unique_visitors_14d]) });
+  }
+
+  document.querySelectorAll('#range button').forEach(b => b.addEventListener('click', () => {
+    range = Number(b.dataset.days);
+    store.set('localStorage', RANGE_STORE, range);
+    render();
+  }));
+  let lastWidth = 0;
+  new ResizeObserver(([e]) => {
+    const w = Math.round(e.contentRect.width);
+    if (data && w !== lastWidth) { lastWidth = w; requestAnimationFrame(render); }
+  }).observe($('cards'));
+
+  /* ---------- unlock flow ---------- */
+  let file = null;
+  const fmtStamp = iso => new Date(iso).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+  function open(d) {
+    data = d;
+    $('updated').textContent = 'Data from ' + fmtStamp(file.updated);
+    $('lock').hidden = true;
+    $('dash').hidden = false;
+    render();
+  }
+  async function load() {
+    // ?src= (a relative path only) previews a local copy of the data file
+    const src = new URLSearchParams(location.search).get('src');
+    const url = src && /^[\w./-]+$/.test(src) ? src : DATA_URL;
+    const res = await fetch(url + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json();
+  }
+  async function start() {
+    const msg = $('lockMsg');
+    try {
+      file = await load();
+    } catch (e) {
+      msg.className = 'msg err';
+      msg.textContent = "Couldn't load the data (" + e.message + '). Has the stats workflow run yet?';
+      $('unlockBtn').disabled = true;
+      return;
+    }
+    $('lockUpdated').textContent = 'Data from ' + fmtStamp(file.updated);
+    const key = savedKey(file);
+    if (key) {
+      try { return open(await decrypt(file, key)); } catch { forgetKey(); }
+    }
+    $('pw').focus();
+  }
+  $('unlock').addEventListener('submit', async e => {
+    e.preventDefault();
+    const msg = $('lockMsg'), btn = $('unlockBtn');
+    if (!file) return;
+    btn.disabled = true;
+    msg.className = 'msg';
+    msg.textContent = 'Unlocking…';
+    try {
+      const key = await deriveKey($('pw').value, file.kdf);
+      const d = await decrypt(file, key);
+      const saved = JSON.stringify({ fp: fingerprint(file), key: toB64(key) });
+      store.set('sessionStorage', KEY_STORE, saved);
+      if ($('remember').checked) store.set('localStorage', KEY_STORE, saved);
+      $('pw').value = '';
+      msg.textContent = '';
+      open(d);
+    } catch {
+      msg.className = 'msg err';
+      msg.textContent = 'Wrong password.';
+      $('pw').select();
+    } finally {
+      btn.disabled = false;
+    }
+  });
+  $('lockBtn').addEventListener('click', () => {
+    forgetKey();
+    data = null;
+    hideTip();
+    $('cards').replaceChildren();
+    $('tiles').replaceChildren();
+    $('dash').hidden = true;
+    $('lock').hidden = false;
+    $('pw').focus();
+  });
+
+  start();
+</script>
+</body>
+</html>

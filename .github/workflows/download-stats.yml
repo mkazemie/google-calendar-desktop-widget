@@ -11,8 +11,11 @@
 #   clones.csv     git clones and unique cloners per day
 #   referrers.csv  top referring sites, 14-day totals, one snapshot per day
 #   paths.csv      most viewed repo pages, 14-day totals, one snapshot per day
-# Traffic needs the TRAFFIC_TOKEN secret: a fine-grained token for this repository
-# with "Administration: Read-only" (the built-in token can't read traffic).
+#   dashboard.enc.json  all of the above plus GoatCounter's website numbers, encrypted
+#                       for the private page docs/stats/ (.github/scripts/stats-dashboard.mjs)
+# Secrets: TRAFFIC_TOKEN, a fine-grained token for this repository with "Administration:
+# Read-only" (the built-in token can't read traffic); STATS_PASSWORD, the stats page's
+# password; GOATCOUNTER_TOKEN, a GoatCounter API key that can read statistics.
 
 name: Download and traffic stats
 
@@ -34,6 +37,7 @@ jobs:
 
       - name: Switch to the stats branch
         run: |
+          cp .github/scripts/stats-dashboard.mjs "$RUNNER_TEMP/"  # main's files disappear on the switch
           if git fetch --depth=1 origin stats; then
             git switch -c stats FETCH_HEAD
           else
@@ -97,12 +101,20 @@ jobs:
           snapshot referrers.csv "date,referrer,views_14d,unique_visitors_14d" popular/referrers "[.referrer, .count, .uniques]"
           snapshot paths.csv "date,path,views_14d,unique_visitors_14d" popular/paths "[.path, .count, .uniques]"
 
+      - name: Build the encrypted stats page data
+        if: always()  # still refresh the page with whatever the steps above collected
+        env:
+          STATS_PASSWORD: ${{ secrets.STATS_PASSWORD }}
+          GOATCOUNTER_TOKEN: ${{ secrets.GOATCOUNTER_TOKEN }}
+          GOATCOUNTER_SITE: https://mkazemie.goatcounter.com
+        run: node "$RUNNER_TEMP/stats-dashboard.mjs"
+
       - name: Commit
         if: always()  # keep the download counts even if the traffic step failed (e.g. expired token)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- *.csv
+          git add -A  # the stats branch holds only this job's files
           if git diff --cached --quiet; then
             echo "No change since the last snapshot"
             exit 0
