@@ -440,9 +440,11 @@
     const downloadClicks = gcRange ? sum(gcRange.events.filter(e => e.name.startsWith('download-')).map(e => e.count)) : null;
     const views = gh.views.filter(r => inRange(r.date)).sort((a, b) => a.date.localeCompare(b.date));
 
-    $('gcError').hidden = !gc.error;
+    $('gcError').hidden = !gc.error && !(gc.warnings && gc.warnings.length);
     if (gc.error) $('gcError').replaceChildren(h('b', { text: 'Website numbers unavailable. ' }),
       document.createTextNode('GoatCounter said: ' + gc.error + ' Check the GOATCOUNTER_TOKEN secret, then re-run the workflow.'));
+    else if (gc.warnings && gc.warnings.length) $('gcError').replaceChildren(h('b', { text: 'Some website numbers are missing. ' }),
+      document.createTextNode('GoatCounter said: ' + gc.warnings.join('; ')));
 
     const since = d => d > from ? ` · since ${fmtDay(d)}` : '';
     tile('Total downloads', dates.length ? fmtNum(sum(latest.map(r => r.downloads))) : '–', 'All versions, all time');

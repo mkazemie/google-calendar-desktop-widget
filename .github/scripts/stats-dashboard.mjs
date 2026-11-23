@@ -78,30 +78,41 @@ async function goatcounter() {
   }
   const named = list => (list || []).map(s => ({ name: s.name, count: s.count }));
 
-  try {
-    const total = await get('stats/total', Math.max(...RANGES));
-    const result = {
-      daily: (total.stats || []).map(s => ({ date: s.day, visits: s.daily })),
-      ranges: {},
-    };
-    for (const days of RANGES) {
-      const hits = await get('stats/hits', days, '&limit=100');
-      const locations = await get('stats/locations', days, '&limit=20');
-      const referrers = await get('stats/toprefs', days, '&limit=20');
-      const systems = await get('stats/systems', days, '&limit=10');
-      result.ranges[days] = {
-        // link clicks and demo use are GoatCounter "events"; their path is the event name
-        events: (hits.hits || []).filter(h => h.event).map(h => ({ name: h.path, title: h.title, count: h.count })),
-        locations: named(locations.stats),
-        referrers: named(referrers.stats),
-        systems: named(systems.stats),
-      };
+  // each request on its own: one failing endpoint shouldn't blank the others
+  const errors = [];
+  let calls = 0;
+  async function tryGet(endpoint, days, query) {
+    calls++;
+    try {
+      return await get(endpoint, days, query);
+    } catch (e) {
+      errors.push(`${e.message} (last ${days} days)`);
+      console.log(`::warning::GoatCounter ${e.message} (last ${days} days)`);
+      return null;
     }
-    return result;
-  } catch (e) {
-    console.log(`::warning::GoatCounter: ${e.message}`);
-    return { error: e.message };
   }
+
+  const total = await tryGet('stats/total', Math.max(...RANGES));
+  const result = {
+    daily: (total?.stats || []).map(s => ({ date: s.day, visits: s.daily })),
+    ranges: {},
+  };
+  for (const days of RANGES) {
+    const hits = await tryGet('stats/hits', days, '&limit=100');
+    const locations = await tryGet('stats/locations', days, '&limit=20');
+    const referrers = await tryGet('stats/toprefs', days, '&limit=20');
+    const systems = await tryGet('stats/systems', days, '&limit=10');
+    result.ranges[days] = {
+      // link clicks and demo use are GoatCounter "events"; their path is the event name
+      events: (hits?.hits || []).filter(h => h.event).map(h => ({ name: h.path, title: h.title, count: h.count })),
+      locations: named(locations?.stats),
+      referrers: named(referrers?.stats),
+      systems: named(systems?.stats),
+    };
+  }
+  if (errors.length === calls) return { error: errors[0] };
+  if (errors.length) result.warnings = errors;
+  return result;
 }
 
 function encrypt(data) {
