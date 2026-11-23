@@ -106,6 +106,8 @@
 }
 </script>
 <script>document.documentElement.className = 'js';</script>
+<!-- privacy-friendly visit counting, no cookies: https://mkazemie.goatcounter.com -->
+<script data-goatcounter="https://mkazemie.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 <style>
   :root {
     --bg: #101116; --card: #1b1d24; --card2: #22242e;
@@ -390,8 +392,8 @@
       <a href="#try">Try it</a>
       <a href="#new">What's new</a>
       <a href="#faq">FAQ</a>
-      <a href="https://github.com/mkazemie/google-calendar-desktop-widget">GitHub</a>
-      <a class="btn btn-blue btn-small" href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.0/CalendarWidgetSetup-1.3.0.exe">Download</a>
+      <a href="https://github.com/mkazemie/google-calendar-desktop-widget" data-goatcounter-click="github-nav" data-goatcounter-title="GitHub (nav)">GitHub</a>
+      <a class="btn btn-blue btn-small" href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.0/CalendarWidgetSetup-1.3.0.exe" data-goatcounter-click="download-nav" data-goatcounter-title="Download (nav)">Download</a>
     </div>
   </div>
 </nav>
@@ -404,8 +406,8 @@
     <p class="sub">Transparent. Click-through. Always up to date. Never in the way.
     The real Google Calendar on your Windows desktop, as a widget or as a live wallpaper behind your icons.</p>
     <div class="cta-row">
-      <a class="btn btn-blue" href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.0/CalendarWidgetSetup-1.3.0.exe">⬇&nbsp; Download free</a>
-      <a class="btn btn-ghost" href="https://github.com/mkazemie/google-calendar-desktop-widget">View on GitHub</a>
+      <a class="btn btn-blue" href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.0/CalendarWidgetSetup-1.3.0.exe" data-goatcounter-click="download-hero" data-goatcounter-title="Download (hero)">⬇&nbsp; Download free</a>
+      <a class="btn btn-ghost" href="https://github.com/mkazemie/google-calendar-desktop-widget" data-goatcounter-click="github-hero" data-goatcounter-title="GitHub (hero)">View on GitHub</a>
     </div>
     <p class="fineprint">Free &amp; open source · Windows 10 &amp; 11 · ~2&nbsp;MB installer · <strong id="dlCount">1,500+</strong> downloads</p>
   </div>
@@ -585,7 +587,7 @@
       <div class="step reveal"><strong>Toggle &amp; forget</strong><p>Click the mouse button in the title bar. Your calendar fades into the desktop.</p></div>
     </div>
     <div class="cta-row" style="margin-top:34px">
-      <a class="btn btn-blue" href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.0/CalendarWidgetSetup-1.3.0.exe">⬇&nbsp; Download the installer</a>
+      <a class="btn btn-blue" href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.0/CalendarWidgetSetup-1.3.0.exe" data-goatcounter-click="download-get-started" data-goatcounter-title="Download (get started)">⬇&nbsp; Download the installer</a>
     </div>
   </div>
 </section>
@@ -648,7 +650,7 @@
     <div class="support reveal">
       <h2><span class="heart">♥</span> Support the project</h2>
       <p>Google Calendar Desktop Widget is free and always will be. If it earns a permanent spot on your desktop, you can fuel its development.</p>
-      <a class="btn btn-blue" href="https://paypal.me/MahdiKazemiesfahani">☕ Donate via PayPal</a>
+      <a class="btn btn-blue" href="https://paypal.me/MahdiKazemiesfahani" data-goatcounter-click="donate-paypal" data-goatcounter-title="Donate (PayPal)">☕ Donate via PayPal</a>
     </div>
   </div>
 </section>
@@ -658,12 +660,13 @@
 <footer>
   <div class="wrap">
     <p><a href="https://github.com/mkazemie/google-calendar-desktop-widget">GitHub</a> ·
-       <a href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.0/CalendarWidgetSetup-1.3.0.exe">Download</a> ·
+       <a href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.0/CalendarWidgetSetup-1.3.0.exe" data-goatcounter-click="download-footer" data-goatcounter-title="Download (footer)">Download</a> ·
        <a href="https://github.com/mkazemie/google-calendar-desktop-widget/releases">Release notes</a> ·
        <a href="https://github.com/mkazemie/google-calendar-desktop-widget/blob/main/LICENSE">AGPL-3.0 License</a></p>
     <p>© 2026 Mahdi Kazemiesfahani. Free &amp; open source under the GNU AGPL-3.0.
        For commercial or proprietary use, contact <a href="mailto:m.kazemi.esfahani@gmail.com">m.kazemi.esfahani@gmail.com</a>.</p>
     <p>This is an unofficial, independent project, not affiliated with or endorsed by Google. Google Calendar is a trademark of Google LLC.</p>
+    <p>This site counts visits with <a href="https://www.goatcounter.com">GoatCounter</a>, which uses no cookies. The app itself sends no telemetry.</p>
   </div>
 </footer>
 
@@ -779,6 +782,16 @@
   function hideMenu() { menu.style.display = 'none'; }
   document.addEventListener('click', hideMenu);
   document.addEventListener('scroll', hideMenu, { passive: true });
+
+  /* analytics: one event per visit that actually plays with the demo */
+  let demoCounted = false;
+  function countDemoUse() {
+    if (demoCounted || !window.goatcounter || !goatcounter.count) return;
+    demoCounted = true;
+    goatcounter.count({ path: 'demo-used', title: 'Interactive demo used', event: true });
+  }
+  document.querySelector('.demo').addEventListener('pointerdown', countDemoUse);
+  document.querySelector('.demo').addEventListener('keydown', countDemoUse);
 
   apply();
 </script>
