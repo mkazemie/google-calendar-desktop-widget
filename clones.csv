@@ -1,2 +1,0 @@
-date,clones,unique_cloners
-{"message":"Resource not accessible by personal access token","documentation_url":"https://docs.github.com/rest/metrics/traffic#get-repository-clones","status":"403"}
