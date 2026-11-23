@@ -470,11 +470,17 @@
       body => gcMissing || columnChart(body, visitDays.map(d => ({ label: fmtDay(d.date), value: d.value })), 'visits'),
       { head: ['Day', 'Visits'], rows: visitDays.map(d => [fmtDay(d.date), d.value]).reverse() });
 
-    const gcList = (id, title, sub, key, column, unit, labelFor) => card(id, title, sub,
-      body => gcMissing || (gcRange ? barList(body, gcRange[key].map(r => ({ label: labelFor(r), value: r.count })), unit) : 'Nothing recorded yet.'),
-      gcRange && { head: [column, unit[0].toUpperCase() + unit.slice(1)], rows: gcRange[key].map(r => [labelFor(r), r.count]) });
+    const gcList = (id, title, sub, key, column, unit, labelFor, emptyText) => {
+      const rows = gcRange && gcRange[key] || [];  // data files from before a list existed lack it
+      card(id, title, sub,
+        body => gcMissing || (barList(body, rows.map(r => ({ label: labelFor(r), value: r.count })), unit) && (emptyText || 'Nothing recorded yet.')),
+        rows.length && { head: [column, unit[0].toUpperCase() + unit.slice(1)], rows: rows.map(r => [labelFor(r), r.count]) });
+    };
     gcList('countries', 'Visits by country', `GoatCounter, last ${range} days`, 'locations', 'Country', 'visits', r => r.name || '(unknown)');
     gcList('referrers', 'Where website visitors come from', `GoatCounter referrers, last ${range} days`, 'referrers', 'Referrer', 'visits', r => r.name || '(direct or unknown)');
+    gcList('campaigns', 'Tagged links (campaigns)', `Visits through links ending in ?utm_campaign=…, e.g. a LinkedIn post, last ${range} days`,
+      'campaigns', 'Campaign', 'visits', r => r.name || '(unnamed)',
+      'No tagged links used in this range. Share a link ending in ?utm_source=linkedin&utm_campaign=<name> to see it here.');
     gcList('clicks', 'Clicks on the website', `Download buttons, GitHub links, donations and demo use, last ${range} days`, 'events', 'Event', 'clicks', r => r.title || r.name);
     gcList('systems', 'Visitors by operating system', `GoatCounter, last ${range} days`, 'systems', 'System', 'visits', r => r.name || '(unknown)');
 

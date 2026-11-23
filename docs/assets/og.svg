@@ -9,13 +9,28 @@
       <stop offset="0" stop-color="#4facfe" stop-opacity="0.30"/>
       <stop offset="1" stop-color="#9d50bb" stop-opacity="0.22"/>
     </linearGradient>
+    <!-- edge shadow: black fading to clear along a cosine curve, like the app's -->
+    <linearGradient id="shade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity="0.95"/>
+      <stop offset="0.2" stop-color="#000" stop-opacity="0.86"/>
+      <stop offset="0.4" stop-color="#000" stop-opacity="0.62"/>
+      <stop offset="0.6" stop-color="#000" stop-opacity="0.33"/>
+      <stop offset="0.8" stop-color="#000" stop-opacity="0.09"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="win"><rect x="640" y="70" width="500" height="490" rx="10"/></clipPath>
+    <filter id="lift" x="-30%" y="-10%" width="160%" height="120%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1.2" flood-color="#000" flood-opacity="0.85"/>
+    </filter>
   </defs>
+
   <rect width="1200" height="630" fill="url(#bg)"/>
   <circle cx="220" cy="140" r="200" fill="url(#glow)"/>
   <circle cx="380" cy="520" r="150" fill="url(#glow)" opacity="0.7"/>
+  <circle cx="1060" cy="600" r="160" fill="#9d50bb" opacity="0.10"/>
 
   <!-- logo -->
-  <g transform="translate(80,120)">
+  <g transform="translate(72,84)">
     <rect width="84" height="84" rx="18" fill="#1a73e8"/>
     <rect x="14" y="20" width="56" height="46" fill="#ffffff"/>
     <rect x="14" y="20" width="56" height="14" fill="#174ea6"/>
@@ -25,42 +40,105 @@
     </g>
   </g>
 
-  <text x="80" y="290" fill="#ffffff" font-size="52" font-weight="700">Google Calendar</text>
-  <text x="80" y="350" fill="#ffffff" font-size="52" font-weight="700">Desktop Widget</text>
-  <text x="80" y="404" fill="#c8d0e0" font-size="24">Transparent · Click-through · Live on your desktop</text>
-  <rect x="80" y="440" width="260" height="54" rx="27" fill="#1a73e8"/>
-  <text x="210" y="474" fill="#ffffff" font-size="21" font-weight="600" text-anchor="middle">Free for Windows</text>
-
-  <!-- mini widget mock -->
-  <g transform="translate(700,90)">
-    <rect x="8" y="8" width="420" height="440" rx="14" fill="#000000" opacity="0.3"/>
-    <rect x="0" y="0" width="420" height="30" rx="10" fill="#202124"/>
-    <rect x="0" y="18" width="420" height="12" fill="#202124"/>
-    <rect x="12" y="8" width="14" height="14" rx="3" fill="#1a73e8"/>
-    <text x="34" y="20" fill="#e8eaed" font-size="12">Google Calendar Desktop Widget</text>
-    <rect x="0" y="30" width="420" height="410" fill="#ffffff" opacity="0.82"/>
-    <g stroke="#dadce0" stroke-width="1" opacity="0.9">
-      <line x1="0" y1="90" x2="420" y2="90"/><line x1="0" y1="160" x2="420" y2="160"/>
-      <line x1="0" y1="230" x2="420" y2="230"/><line x1="0" y1="300" x2="420" y2="300"/><line x1="0" y1="370" x2="420" y2="370"/>
-      <line x1="105" y1="30" x2="105" y2="440"/><line x1="210" y1="30" x2="210" y2="440"/><line x1="315" y1="30" x2="315" y2="440"/>
-    </g>
-    <g fill="#5f6368" font-size="11" text-anchor="middle">
-      <text x="52" y="52">MON</text><text x="157" y="52">TUE</text><text x="262" y="52">WED</text><text x="367" y="52">THU</text>
-    </g>
-    <circle cx="262" cy="70" r="14" fill="#1a73e8"/>
-    <text x="262" y="75" fill="#ffffff" font-size="15" text-anchor="middle" font-weight="600">16</text>
-    <g fill="#202124" font-size="15" text-anchor="middle" font-weight="600">
-      <text x="52" y="75">14</text><text x="157" y="75">15</text><text x="367" y="75">17</text>
-    </g>
-    <rect x="12" y="100" width="82" height="40" rx="6" fill="#1a73e8" opacity="0.92"/>
-    <rect x="117" y="170" width="82" height="52" rx="6" fill="#0b8043" opacity="0.92"/>
-    <rect x="222" y="240" width="82" height="40" rx="6" fill="#f4511e" opacity="0.92"/>
-    <rect x="327" y="130" width="82" height="52" rx="6" fill="#8e24aa" opacity="0.92"/>
-    <rect x="222" y="330" width="82" height="40" rx="6" fill="#f6bf26" opacity="0.95"/>
-    <line x1="210" y1="310" x2="315" y2="310" stroke="#ea4335" stroke-width="2.5"/>
-    <circle cx="210" cy="310" r="5" fill="#ea4335"/>
-    <!-- cursor passing through -->
-    <circle cx="150" cy="390" r="15" fill="#ffffff" opacity="0.25"/>
-    <path d="M144 378 l0 21 5.5 -5.5 3.7 9.4 4.6 -2 -3.7 -9.4 7.4 0 z" fill="#ffffff" stroke="#3c4043" stroke-width="1.4"/>
+  <!-- title and pitch -->
+  <text x="72" y="262" fill="#ffffff" font-size="56" font-weight="700">Google Calendar</text>
+  <text x="72" y="326" fill="#ffffff" font-size="56" font-weight="700">Desktop Widget</text>
+  <text x="72" y="380" fill="#c8d0e0" font-size="25">Your schedule, live on your Windows desktop</text>
+  <g font-size="18" fill="#e8eaed" text-anchor="middle">
+    <rect x="72" y="408" width="152" height="40" rx="20" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.28"/>
+    <text x="148" y="434">Click-through</text>
+    <rect x="236" y="408" width="164" height="40" rx="20" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.28"/>
+    <text x="318" y="434">Live wallpaper</text>
+    <rect x="412" y="408" width="146" height="40" rx="20" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.28"/>
+    <text x="485" y="434">Light &amp; dark</text>
   </g>
+  <rect x="72" y="478" width="336" height="56" rx="28" fill="#1a73e8"/>
+  <text x="240" y="514" fill="#ffffff" font-size="21" font-weight="600" text-anchor="middle">Free for Windows 10 &amp; 11</text>
+
+  <!-- the widget in live-wallpaper mode: translucent calendar under the desktop icons -->
+  <rect x="648" y="80" width="500" height="490" rx="14" fill="#000000" opacity="0.32"/>
+  <g clip-path="url(#win)" opacity="0.93">
+    <!-- title bar in widget mode: only its two buttons, in the calendar's light theme -->
+    <rect x="640" y="70" width="500" height="30" fill="#f8fafd"/>
+    <g transform="translate(1071 85)" fill="none" stroke="#1a73e8" stroke-width="1.6">
+      <rect x="-4.5" y="-7" width="9" height="14" rx="4.5"/><line x1="0" y1="-4.5" x2="0" y2="-1.5" stroke-linecap="round"/>
+    </g>
+    <g stroke="#3c4043" stroke-width="1.6" stroke-linecap="round">
+      <line x1="1110" y1="80.5" x2="1124" y2="80.5"/><line x1="1110" y1="85" x2="1124" y2="85"/><line x1="1110" y1="89.5" x2="1124" y2="89.5"/>
+    </g>
+
+    <!-- calendar page header -->
+    <rect x="640" y="100" width="500" height="460" fill="#f8fafd"/>
+    <rect x="676" y="110" width="16" height="16" rx="4" fill="#1a73e8"/>
+    <rect x="679" y="114" width="10" height="8.5" fill="#ffffff"/>
+    <rect x="679" y="114" width="10" height="2.6" fill="#174ea6"/>
+    <text x="700" y="124" fill="#1f1f1f" font-size="14">Calendar</text>
+    <rect x="772" y="108" width="48" height="22" rx="11" fill="none" stroke="#747775"/>
+    <text x="796" y="123" fill="#1f1f1f" font-size="10.5" text-anchor="middle">Today</text>
+    <text x="832" y="125" fill="#444746" font-size="15">‹</text>
+    <text x="848" y="125" fill="#444746" font-size="15">›</text>
+    <text x="868" y="125" fill="#1f1f1f" font-size="14">November 2026</text>
+
+    <!-- week grid -->
+    <rect x="644" y="140" width="492" height="430" rx="12" fill="#ffffff"/>
+    <g fill="#444746" font-size="10" text-anchor="middle">
+      <text x="722" y="158">MON</text><text x="814" y="158">TUE</text><text x="906" y="158" fill="#1a73e8">WED</text>
+      <text x="998" y="158">THU</text><text x="1090" y="158">FRI</text>
+    </g>
+    <circle cx="906" cy="178" r="14" fill="#1a73e8"/>
+    <g fill="#1f1f1f" font-size="18" text-anchor="middle">
+      <text x="722" y="184">16</text><text x="814" y="184">17</text><text x="906" y="184" fill="#ffffff">18</text>
+      <text x="998" y="184">19</text><text x="1090" y="184">20</text>
+    </g>
+    <g stroke="#dadce0" stroke-width="1">
+      <line x1="644" y1="198" x2="1136" y2="198"/><line x1="676" y1="254" x2="1136" y2="254"/>
+      <line x1="676" y1="310" x2="1136" y2="310"/><line x1="676" y1="366" x2="1136" y2="366"/>
+      <line x1="676" y1="422" x2="1136" y2="422"/><line x1="676" y1="478" x2="1136" y2="478"/>
+      <line x1="676" y1="534" x2="1136" y2="534"/>
+      <line x1="676" y1="198" x2="676" y2="560"/><line x1="768" y1="198" x2="768" y2="560"/>
+      <line x1="860" y1="198" x2="860" y2="560"/><line x1="952" y1="198" x2="952" y2="560"/>
+      <line x1="1044" y1="198" x2="1044" y2="560"/>
+    </g>
+    <g fill="#ffffff" font-size="10.5">
+      <rect x="680" y="200" width="84" height="42" rx="6" fill="#1a73e8"/>
+      <text x="686" y="215" font-weight="600">Team sync</text><text x="686" y="229" font-size="9" opacity="0.85">9:00 – 9:45</text>
+      <rect x="772" y="256" width="84" height="110" rx="6" fill="#0b8043"/>
+      <text x="778" y="271" font-weight="600">Deep work</text><text x="778" y="285" font-size="9" opacity="0.85">10:00 – 12:00</text>
+      <rect x="864" y="396" width="84" height="42" rx="6" fill="#f4511e"/>
+      <text x="870" y="411" font-weight="600">Lunch w/ Sara</text><text x="870" y="425" font-size="9" opacity="0.85">12:30 – 13:15</text>
+      <rect x="956" y="228" width="84" height="82" rx="6" fill="#8e24aa"/>
+      <text x="962" y="243" font-weight="600">Design review</text><text x="962" y="257" font-size="9" opacity="0.85">9:30 – 11:00</text>
+      <rect x="956" y="424" width="84" height="52" rx="6" fill="#f6bf26"/>
+      <text x="962" y="439" font-weight="600" fill="#3c4043">Gym</text><text x="962" y="453" font-size="9" fill="#3c4043" opacity="0.85">13:00 – 14:00</text>
+      <rect x="1048" y="256" width="84" height="40" rx="6" fill="#7986cb"/>
+      <text x="1054" y="271" font-weight="600">1:1 with Alex</text><text x="1054" y="285" font-size="9" opacity="0.85">10:00 – 10:45</text>
+      <rect x="1048" y="480" width="84" height="50" rx="6" fill="#039be5"/>
+      <text x="1054" y="495" font-weight="600">Dentist</text><text x="1054" y="509" font-size="9" opacity="0.85">14:00 – 15:00</text>
+    </g>
+    <line x1="860" y1="378" x2="952" y2="378" stroke="#ea4335" stroke-width="2.5"/>
+    <circle cx="860" cy="378" r="5" fill="#ea4335"/>
+
+    <!-- edge shadow behind the icons -->
+    <rect x="640" y="100" width="150" height="460" fill="url(#shade)"/>
+  </g>
+
+  <!-- desktop icons on top of the calendar -->
+  <g filter="url(#lift)" font-size="11" fill="#ffffff" text-anchor="middle">
+    <rect x="652" y="206" width="20" height="8" rx="2" fill="#e0a800"/>
+    <rect x="652" y="210" width="48" height="34" rx="4" fill="#f6bf26"/>
+    <text x="676" y="262">Projects</text>
+    <rect x="652" y="288" width="48" height="38" rx="5" fill="#4facfe"/>
+    <circle cx="665" cy="300" r="4.5" fill="#ffffff" opacity="0.9"/>
+    <path d="M654 324 l14 -14 10 9 7 -6 13 11 z" fill="#1a57b8"/>
+    <text x="676" y="344">Photos</text>
+    <rect x="658" y="368" width="36" height="46" rx="4" fill="#f1f3f4"/>
+    <g stroke="#9aa0a6" stroke-width="2">
+      <line x1="665" y1="380" x2="687" y2="380"/><line x1="665" y1="388" x2="687" y2="388"/><line x1="665" y1="396" x2="681" y2="396"/>
+    </g>
+    <text x="676" y="430">Notes</text>
+  </g>
+
+  <!-- a click landing on an icon, through the calendar -->
+  <circle cx="680" cy="306" r="20" fill="none" stroke="#ffffff" stroke-width="2.5" opacity="0.55"/>
+  <path d="M684 310 L684 332 L690 326 L694 336 L698.5 334 L694.5 324 L702 324 Z" fill="#ffffff" stroke="#3c4043" stroke-width="1.4"/>
 </svg>

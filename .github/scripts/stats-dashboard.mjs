@@ -101,12 +101,14 @@ async function goatcounter() {
     const hits = await tryGet('stats/hits', days, '&limit=100');
     const locations = await tryGet('stats/locations', days, '&limit=20');
     const referrers = await tryGet('stats/toprefs', days, '&limit=20');
+    const campaigns = await tryGet('stats/campaigns', days, '&limit=20');  // links tagged ?utm_campaign=…
     const systems = await tryGet('stats/systems', days, '&limit=10');
     result.ranges[days] = {
       // link clicks and demo use are GoatCounter "events"; their path is the event name
       events: (hits?.hits || []).filter(h => h.event).map(h => ({ name: h.path, title: h.title, count: h.count })),
       locations: named(locations?.stats),
       referrers: named(referrers?.stats),
+      campaigns: named(campaigns?.stats),
       systems: named(systems?.stats),
     };
   }
