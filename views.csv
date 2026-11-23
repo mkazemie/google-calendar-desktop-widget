@@ -1,0 +1,2 @@
+date,views,unique_visitors
+{"message":"Resource not accessible by personal access token","documentation_url":"https://docs.github.com/rest/metrics/traffic#get-page-views","status":"403"}

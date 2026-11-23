@@ -1,0 +1,2 @@
+date,path,views_14d,unique_visitors_14d
+2026-11-23,{"message":"Resource not accessible by personal access token","documentation_url":"https://docs.github.com/rest/metrics/traffic#get-top-referral-paths","status":"403"}
