@@ -9,7 +9,11 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $sign = Join-Path $PSScriptRoot 'signing\sign.ps1'
 
-dotnet publish "$root\CalendarWidget" -c Release -r win-x64 --no-self-contained -o "$root\CalendarWidget\bin\publish"
+# the app's version (shown in Settings, compared by the update check) comes from the installer script
+$version = [regex]::Match((Get-Content "$PSScriptRoot\CalendarWidget.iss" -Raw), '#define MyAppVersion "([^"]+)"').Groups[1].Value
+if (-not $version) { throw 'MyAppVersion not found in CalendarWidget.iss' }
+
+dotnet publish "$root\CalendarWidget" -c Release -r win-x64 --no-self-contained -o "$root\CalendarWidget\bin\publish" -p:Version=$version
 if ($LASTEXITCODE -ne 0) { throw 'dotnet publish failed' }
 
 & $sign "$root\CalendarWidget\bin\publish\CalendarWidget.exe" "$root\CalendarWidget\bin\publish\CalendarWidget.dll"

@@ -48,7 +48,7 @@
       "operatingSystem": "Windows 10, Windows 11",
       "applicationCategory": "UtilitiesApplication",
       "applicationSubCategory": "Desktop widget",
-      "softwareVersion": "1.3.1",
+      "softwareVersion": "1.3.2",
       "datePublished": "2026-07-12",
       "description": "A free, open-source Windows app that pins the real Google Calendar to your desktop as a transparent, click-through widget, or as a live wallpaper behind your desktop icons, with live sync.",
       "featureList": [
@@ -67,7 +67,7 @@
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
       "isAccessibleForFree": true,
       "license": "https://www.gnu.org/licenses/agpl-3.0.html",
-      "downloadUrl": "https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.1/CalendarWidgetSetup-1.3.1.exe",
+      "downloadUrl": "https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.2/CalendarWidgetSetup-1.3.2.exe",
       "releaseNotes": "https://github.com/mkazemie/google-calendar-desktop-widget/releases",
       "url": "https://mkazemie.github.io/google-calendar-desktop-widget/",
       "image": "https://mkazemie.github.io/google-calendar-desktop-widget/assets/og.png",
@@ -379,6 +379,17 @@
     .js .reveal { opacity: 1; transform: none; }
     .js .news:not(.on)::before { transform: none; }
   }
+  /* first-run help next to downloads, phone hand-off, data promises */
+  .smartnote { color: var(--muted); font-size: .82rem; max-width: 560px; margin: 10px auto 0; }
+  .smartnote b { color: var(--text); font-weight: 600; }
+  .tophone { display: none; max-width: 420px; margin: 18px auto 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); text-align: center; }
+  .tophone p { color: var(--muted); font-size: .9rem; margin-bottom: 10px; }
+  .tophone .btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  @media (max-width: 760px), (pointer: coarse) and (hover: none) { .tophone { display: block; } }
+  .datalist { max-width: 760px; margin: 0 auto; display: grid; gap: 12px; }
+  .datalist div { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; }
+  .datalist b { display: block; margin-bottom: 2px; }
+  .datalist span { color: var(--muted); font-size: .95rem; }
 </style>
 </head>
 <body>
@@ -393,7 +404,7 @@
       <a href="#new">What's new</a>
       <a href="#faq">FAQ</a>
       <a href="https://github.com/mkazemie/google-calendar-desktop-widget" data-goatcounter-click="github-nav" data-goatcounter-title="GitHub (nav)">GitHub</a>
-      <a class="btn btn-blue btn-small" href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.1/CalendarWidgetSetup-1.3.1.exe" data-goatcounter-click="download-nav" data-goatcounter-title="Download (nav)">Download</a>
+      <a class="btn btn-blue btn-small" href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.2/CalendarWidgetSetup-1.3.2.exe" data-goatcounter-click="download-nav" data-goatcounter-title="Download (nav)">Download</a>
     </div>
   </div>
 </nav>
@@ -406,10 +417,18 @@
     <p class="sub">Transparent. Click-through. Always up to date. Never in the way.
     The real Google Calendar on your Windows desktop, as a widget or as a live wallpaper behind your icons.</p>
     <div class="cta-row">
-      <a class="btn btn-blue" href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.1/CalendarWidgetSetup-1.3.1.exe" data-goatcounter-click="download-hero" data-goatcounter-title="Download (hero)">⬇&nbsp; Download free</a>
+      <a class="btn btn-blue" href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.2/CalendarWidgetSetup-1.3.2.exe" data-goatcounter-click="download-hero" data-goatcounter-title="Download (hero)">⬇&nbsp; Download free</a>
       <a class="btn btn-ghost" href="https://github.com/mkazemie/google-calendar-desktop-widget" data-goatcounter-click="github-hero" data-goatcounter-title="GitHub (hero)">View on GitHub</a>
     </div>
     <p class="fineprint">Free &amp; open source · Windows 10 &amp; 11 · ~2&nbsp;MB installer · <strong id="dlCount">1,500+</strong> downloads</p>
+    <p class="smartnote">New release? Windows may say <b>"Windows protected your PC"</b> until enough people have downloaded it. Click <b>More info</b>, check the publisher is <b>Mahdi Kazemiesfahani</b>, then <b>Run anyway</b>.</p>
+    <div class="tophone" id="tophone">
+      <p>📱 On your phone? This is a Windows app. Send the link to yourself and install it on your PC.</p>
+      <div class="btns">
+        <a class="btn btn-blue btn-small" id="sendEmail" data-goatcounter-click="phone-email" data-goatcounter-title="Phone: email link to PC" href="mailto:?subject=Google%20Calendar%20Desktop%20Widget%20for%20my%20PC&amp;body=Install%20on%20Windows%3A%20https%3A%2F%2Fmkazemie.github.io%2Fgoogle-calendar-desktop-widget%2F%3Futm_source%3Dphone-handoff">✉️ Email me the link</a>
+        <button class="btn btn-ghost btn-small" id="sendCopy" data-goatcounter-click="phone-copy" data-goatcounter-title="Phone: copy or share link" type="button">🔗 Copy or share link</button>
+      </div>
+    </div>
   </div>
   <div class="wrap">
     <div class="hero-img">
@@ -587,8 +606,9 @@
       <div class="step reveal"><strong>Toggle &amp; forget</strong><p>Click the mouse button in the title bar. Your calendar fades into the desktop.</p></div>
     </div>
     <div class="cta-row" style="margin-top:34px">
-      <a class="btn btn-blue" href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.1/CalendarWidgetSetup-1.3.1.exe" data-goatcounter-click="download-get-started" data-goatcounter-title="Download (get started)">⬇&nbsp; Download the installer</a>
+      <a class="btn btn-blue" href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.2/CalendarWidgetSetup-1.3.2.exe" data-goatcounter-click="download-get-started" data-goatcounter-title="Download (get started)">⬇&nbsp; Download the installer</a>
     </div>
+    <p class="smartnote">New release? Windows may say <b>"Windows protected your PC"</b> until enough people have downloaded it. Click <b>More info</b>, check the publisher is <b>Mahdi Kazemiesfahani</b>, then <b>Run anyway</b>.</p>
   </div>
 </section>
 
@@ -598,6 +618,13 @@
     <h2>What's new</h2>
     <p class="lead">Updates are free. Installing a new version keeps your settings and Google sign-in.</p>
     <ol class="news reveal">
+      <li>
+        <div class="ver"><b>1.3.2</b><time datetime="2026-11-25">November 2026</time></div>
+        <ul>
+          <li>The widget tells you when a new version is out (a once-a-day check with GitHub) and links to it from Settings.</li>
+          <li>Settings shows your version and has a "Report a problem" link.</li>
+        </ul>
+      </li>
       <li>
         <div class="ver"><b>1.3.1</b><time datetime="2026-11-25">November 2026</time></div>
         <ul>
@@ -629,6 +656,20 @@
       </li>
     </ol>
     <p class="center"><a href="https://github.com/mkazemie/google-calendar-desktop-widget/releases">All release notes on GitHub →</a></p>
+  </div>
+</section>
+
+<section id="data">
+  <div class="wrap">
+    <span class="eyebrow">Privacy</span>
+    <h2>Your data</h2>
+    <p class="lead">An app that shows your calendar should be clear about what it does with it.</p>
+    <div class="datalist">
+      <div class="reveal"><b>Your calendar stays between your PC and Google</b><span>The widget shows the real calendar.google.com in its own window. Your events never pass through any other server.</span></div>
+      <div class="reveal"><b>Your Google sign-in stays on your PC</b><span>It's kept in the widget's private browser profile on your computer. Settings and the uninstaller can remove it.</span></div>
+      <div class="reveal"><b>No telemetry, no tracking in the app</b><span>The only other thing the app does online is check GitHub once a day for a newer version. That request carries nothing about you.</span></div>
+      <div class="reveal"><b>This website counts visits, without cookies</b><span>Visit counts come from GoatCounter, which uses no cookies and collects no personal data.</span></div>
+    </div>
   </div>
 </section>
 
@@ -666,8 +707,9 @@
 <footer>
   <div class="wrap">
     <p><a href="https://github.com/mkazemie/google-calendar-desktop-widget">GitHub</a> ·
-       <a href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.1/CalendarWidgetSetup-1.3.1.exe" data-goatcounter-click="download-footer" data-goatcounter-title="Download (footer)">Download</a> ·
+       <a href="https://github.com/mkazemie/google-calendar-desktop-widget/releases/download/v1.3.2/CalendarWidgetSetup-1.3.2.exe" data-goatcounter-click="download-footer" data-goatcounter-title="Download (footer)">Download</a> ·
        <a href="https://github.com/mkazemie/google-calendar-desktop-widget/releases">Release notes</a> ·
+       <a href="https://github.com/mkazemie/google-calendar-desktop-widget/issues/new/choose" data-goatcounter-click="report-problem" data-goatcounter-title="Report a problem (footer)">Report a problem</a> ·
        <a href="https://github.com/mkazemie/google-calendar-desktop-widget/blob/main/LICENSE">AGPL-3.0 License</a></p>
     <p>© 2026 Mahdi Kazemiesfahani. Free &amp; open source under the GNU AGPL-3.0.
        For commercial or proprietary use, contact <a href="mailto:m.kazemi.esfahani@gmail.com">m.kazemi.esfahani@gmail.com</a>.</p>
@@ -800,6 +842,19 @@
   document.querySelector('.demo').addEventListener('keydown', countDemoUse);
 
   apply();
+  /* phone hand-off: share sheet where available, else copy the link */
+  (function () {
+    const btn = document.getElementById('sendCopy');
+    if (!btn) return;
+    const url = 'https://mkazemie.github.io/google-calendar-desktop-widget/?utm_source=phone-handoff';
+    btn.addEventListener('click', async () => {
+      try {
+        if (navigator.share) { await navigator.share({ title: 'Google Calendar Desktop Widget', text: 'Install on my Windows PC', url }); return; }
+        await navigator.clipboard.writeText(url);
+        btn.textContent = '✓ Link copied';
+      } catch { /* share cancelled or clipboard blocked */ }
+    });
+  })();
 </script>
 </body>
 </html>

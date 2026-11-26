@@ -41,6 +41,12 @@ public class MainForm : Form
     private bool maximizedBeforeAttach;   // attached windows are always Normal; re-maximize on detach
     private Rectangle normalBoundsBeforeAttach;  // the pre-maximize rect to give back to RestoreBounds
     private readonly HashSet<IntPtr> clickThroughApplied = [];  // windows WE made transparent
+    private readonly System.Windows.Forms.Timer updateTimer = new() { Interval = 60_000 };  // first check a minute after start
+    private UpdateChecker.Release? availableUpdate;
+
+    /// <summary>A newer release found by the daily update check, or null.</summary>
+    public UpdateChecker.Release? AvailableUpdate => availableUpdate;
+    public event EventHandler? AvailableUpdateChanged;
 
     public MainForm()
     {
@@ -72,6 +78,29 @@ public class MainForm : Form
         SetupTray();
         hoverPoll.Tick += (_, _) => CheckMouseHover();
         hoverPoll.Start();
+
+        updateTimer.Tick += async (_, _) => await CheckForUpdateAsync();
+        updateTimer.Start();
+    }
+
+    // once a minute after start, then daily; a newer version is announced once in the tray
+    // and stays offered in Settings
+    private async Task CheckForUpdateAsync()
+    {
+        updateTimer.Interval = (int)TimeSpan.FromHours(24).TotalMilliseconds;
+        var release = await UpdateChecker.CheckAsync();
+        if (release is null || release == availableUpdate)
+            return;
+        availableUpdate = release;
+        AvailableUpdateChanged?.Invoke(this, EventArgs.Empty);
+        if (settings.NotifiedVersion != release.Version.ToString())
+        {
+            settings.NotifiedVersion = release.Version.ToString();
+            settings.Save();
+            tray.BalloonTipTitle = "Update available";
+            tray.BalloonTipText = $"Google Calendar Desktop Widget {release.Version} is out. Open Settings to download it.";
+            tray.ShowBalloonTip(10000);
+        }
     }
 
     // native window behaviors (Aero Snap, drag-to-top / double-click maximize) require these
@@ -833,6 +862,7 @@ public class MainForm : Form
         tray.ContextMenuStrip = menu;
         tray.Visible = true;
         tray.DoubleClick += (_, _) => ShowSettings();
+        tray.BalloonTipClicked += (_, _) => { if (availableUpdate is not null) ShowSettings(); };
     }
 
     public void ShowSettings()

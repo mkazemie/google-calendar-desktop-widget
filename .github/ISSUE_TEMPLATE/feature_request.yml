@@ -1,0 +1,11 @@
+name: Suggest an idea
+description: Something you'd like the widget to do.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like?
+      description: Describe the idea and the problem it solves for you.
+    validations:
+      required: true

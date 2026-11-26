@@ -35,6 +35,7 @@ public class SettingsForm : Form
     private readonly ComboBox cmbCorner;
     private readonly CheckBox cbStartup;
     private readonly Label lblTip;
+    private readonly LinkLabel lnkAbout;
     private readonly Button btnDonate;
     private readonly Button btnExit;
     private readonly Button btnAccount;
@@ -133,10 +134,22 @@ public class SettingsForm : Form
             ForeColor = Muted,
         };
 
+        // ---- version, update offer, problem reports ----
+        lnkAbout = new LinkLabel
+        {
+            ForeColor = Muted,
+            LinkColor = Accent,
+            ActiveLinkColor = Fore,
+            VisitedLinkColor = Accent,
+            LinkBehavior = LinkBehavior.HoverUnderline,
+        };
+        lnkAbout.LinkClicked += (_, e) => OpenUrl((string)e.Link!.LinkData!);
+        main.AvailableUpdateChanged += (_, _) => RefreshAbout();
+        RefreshAbout();
+
         // ---- support the project ----
         btnDonate = ActionButton("♥  Support development (PayPal)", Color.FromArgb(242, 139, 130));  // soft red, matching the dark palette
-        btnDonate.Click += (_, _) => System.Diagnostics.Process.Start(
-            new System.Diagnostics.ProcessStartInfo("https://paypal.me/MahdiKazemiesfahani") { UseShellExecute = true });
+        btnDonate.Click += (_, _) => OpenUrl("https://paypal.me/MahdiKazemiesfahani");
 
         btnExit = ActionButton("Exit widget", Fore);
         btnExit.Click += (_, _) => Application.Exit();
@@ -145,7 +158,7 @@ public class SettingsForm : Form
         btnAccount.Click += OnAccountClick;
 
         Controls.AddRange([lblAlpha, valAlpha, sldAlpha, cbBehind, lblShadow, sldShadow, valShadowLeft, valShadowRight,
-            lblCorner, cbCorner, cmbCorner, cbStartup, lblTip, btnDonate, btnExit, btnAccount]);
+            lblCorner, cbCorner, cmbCorner, cbStartup, lblTip, lnkAbout, btnDonate, btnExit, btnAccount]);
 
         LayoutForDpi(DeviceDpi);  // provisional (system DPI); redone once the window's monitor is known
     }
@@ -170,7 +183,7 @@ public class SettingsForm : Form
         foreach (Control c in Controls)
             c.Font = body;
         lblAlpha.Font = valAlpha.Font = lblShadow.Font = lblCorner.Font = section;
-        valShadowLeft.Font = valShadowRight.Font = lblTip.Font = small;
+        valShadowLeft.Font = valShadowRight.Font = lblTip.Font = lnkAbout.Font = small;
 
         int x = S(Gutter);
         int w = S(LogicalWidth - 2 * Gutter);
@@ -205,7 +218,8 @@ public class SettingsForm : Form
         y += cmbCorner.PreferredHeight + S(16);
 
         y = Row(cbStartup, x, y, w, 12);
-        y = Row(lblTip, x, y, w, 12);  // wraps to as many lines as the text needs
+        y = Row(lblTip, x, y, w, 10);  // wraps to as many lines as the text needs
+        y = Row(lnkAbout, x, y, w, 12);
 
         btnDonate.SetBounds(x, y, w, S(36));
         y += S(36 + 12);
@@ -315,6 +329,29 @@ public class SettingsForm : Form
             Hide();
         }
         base.OnFormClosing(e);
+    }
+
+    /// <summary>"Version X · Report a problem", or an update offer when a newer release exists.</summary>
+    private void RefreshAbout()
+    {
+        const string report = "Report a problem";
+        var update = main.AvailableUpdate;
+        string head = update is null
+            ? $"Version {UpdateChecker.Current}"
+            : $"Update available: {update.Version} (you have {UpdateChecker.Current})";
+        lnkAbout.Text = head + "  ·  " + report;
+        lnkAbout.Links.Clear();
+        if (update is not null)
+            lnkAbout.Links.Add(0, "Update available".Length, update.PageUrl);
+        lnkAbout.Links.Add(lnkAbout.Text.Length - report.Length, report.Length, UpdateChecker.RepoUrl + "/issues/new/choose");
+        if (IsHandleCreated)
+            LayoutForDpi(DeviceDpi);  // the update line may need more room
+    }
+
+    private static void OpenUrl(string url)
+    {
+        try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true }); }
+        catch { /* no default browser */ }
     }
 
     private static Label SectionLabel(string text) => new() { Text = text, ForeColor = Muted };

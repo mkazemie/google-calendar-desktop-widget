@@ -38,6 +38,9 @@ public class AppSettings
     // calendar's light/dark theme instead of flashing the default until the page loads
     public string? ThemeColor { get; set; }
 
+    // newest version already announced in the tray, so each release is announced only once
+    public string? NotifiedVersion { get; set; }
+
     // saved window bounds (borderless state); Width == 0 means "not set yet"
     public int WinX { get; set; }
     public int WinY { get; set; }

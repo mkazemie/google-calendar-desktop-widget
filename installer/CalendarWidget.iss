@@ -4,7 +4,7 @@
 ; during setup instead of being bundled into the exe.
 
 #define MyAppName "Google Calendar Desktop Widget"
-#define MyAppVersion "1.3.1"
+#define MyAppVersion "1.3.2"
 #define MyAppExeName "CalendarWidget.exe"
 
 [Setup]
