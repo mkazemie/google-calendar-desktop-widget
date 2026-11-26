@@ -379,13 +379,10 @@
     .js .reveal { opacity: 1; transform: none; }
     .js .news:not(.on)::before { transform: none; }
   }
-  /* first-run help next to downloads, phone hand-off, data promises */
+  /* first-run help next to downloads, data promises */
   .smartnote { color: var(--muted); font-size: .82rem; max-width: 560px; margin: 10px auto 0; }
   .smartnote b { color: var(--text); font-weight: 600; }
-  .tophone { display: none; max-width: 420px; margin: 18px auto 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); text-align: center; }
-  .tophone p { color: var(--muted); font-size: .9rem; margin-bottom: 10px; }
-  .tophone .btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  @media (max-width: 760px), (pointer: coarse) and (hover: none) { .tophone { display: block; } }
+  .phonenote { color: var(--muted); font-size: .85rem; margin-top: 8px; }
   .datalist { max-width: 760px; margin: 0 auto; display: grid; gap: 12px; }
   .datalist div { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; }
   .datalist b { display: block; margin-bottom: 2px; }
@@ -422,13 +419,6 @@
     </div>
     <p class="fineprint">Free &amp; open source · Windows 10 &amp; 11 · ~2&nbsp;MB installer · <strong id="dlCount">1,500+</strong> downloads</p>
     <p class="smartnote">New release? Windows may say <b>"Windows protected your PC"</b> until enough people have downloaded it. Click <b>More info</b>, check the publisher is <b>Mahdi Kazemiesfahani</b>, then <b>Run anyway</b>.</p>
-    <div class="tophone" id="tophone">
-      <p>📱 On your phone? This is a Windows app. Send the link to yourself and install it on your PC.</p>
-      <div class="btns">
-        <a class="btn btn-blue btn-small" id="sendEmail" data-goatcounter-click="phone-email" data-goatcounter-title="Phone: email link to PC" href="mailto:?subject=Google%20Calendar%20Desktop%20Widget%20for%20my%20PC&amp;body=Install%20on%20Windows%3A%20https%3A%2F%2Fmkazemie.github.io%2Fgoogle-calendar-desktop-widget%2F%3Futm_source%3Dphone-handoff">✉️ Email me the link</a>
-        <button class="btn btn-ghost btn-small" id="sendCopy" data-goatcounter-click="phone-copy" data-goatcounter-title="Phone: copy or share link" type="button">🔗 Copy or share link</button>
-      </div>
-    </div>
   </div>
   <div class="wrap">
     <div class="hero-img">
@@ -842,17 +832,27 @@
   document.querySelector('.demo').addEventListener('keydown', countDemoUse);
 
   apply();
-  /* phone hand-off: share sheet where available, else copy the link */
+  /* phones can't run the Windows installer: every download button becomes "Send to my PC",
+     which shares (or copies) the site link so the visitor can install later on their computer */
   (function () {
-    const btn = document.getElementById('sendCopy');
-    if (!btn) return;
+    if (!matchMedia('(max-width: 760px), (pointer: coarse) and (hover: none)').matches) return;
     const url = 'https://mkazemie.github.io/google-calendar-desktop-widget/?utm_source=phone-handoff';
-    btn.addEventListener('click', async () => {
-      try {
-        if (navigator.share) { await navigator.share({ title: 'Google Calendar Desktop Widget', text: 'Install on my Windows PC', url }); return; }
-        await navigator.clipboard.writeText(url);
-        btn.textContent = '✓ Link copied';
-      } catch { /* share cancelled or clipboard blocked */ }
+    document.querySelectorAll('a[href$=".exe"]').forEach(a => {
+      // removed before GoatCounter binds its click events, so these taps aren't counted as downloads
+      a.removeAttribute('data-goatcounter-click');
+      a.removeAttribute('data-goatcounter-title');
+      a.textContent = a.classList.contains('btn') ? '📲 Send to my PC' : 'Send to my PC';
+      if (a.closest('.cta-row'))
+        a.closest('.cta-row').insertAdjacentHTML('afterend', '<p class="phonenote">Windows app: send the link to yourself and install it on your PC.</p>');
+      a.addEventListener('click', async e => {
+        e.preventDefault();
+        if (window.goatcounter && goatcounter.count) goatcounter.count({ path: 'phone-send', title: 'Phone: send to my PC', event: true });
+        try {
+          if (navigator.share) { await navigator.share({ title: 'Google Calendar Desktop Widget', text: 'Install this on my Windows PC', url }); return; }
+          await navigator.clipboard.writeText(url);
+          a.textContent = '✓ Link copied, open it on your PC';
+        } catch { /* share cancelled or clipboard blocked */ }
+      });
     });
   })();
 </script>
