@@ -4,7 +4,7 @@
 ; during setup instead of being bundled into the exe.
 
 #define MyAppName "Google Calendar Desktop Widget"
-#define MyAppVersion "1.3.0"
+#define MyAppVersion "1.3.1"
 #define MyAppExeName "CalendarWidget.exe"
 
 [Setup]
@@ -24,6 +24,9 @@ PrivilegesRequired=admin
 UninstallDisplayIcon={app}\{#MyAppExeName}
 SetupIconFile=..\CalendarWidget\app.ico
 WizardStyle=modern
+; signed with Azure Artifact Signing; the "azsign" tool is defined by build.ps1 (ISCC /Sazsign=...)
+SignTool=azsign
+SignedUninstaller=yes
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
